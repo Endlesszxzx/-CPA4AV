@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<!DOCTYPE benchmark PUBLIC "+//IDN sosy-lab.org//DTD BenchExec benchmark 1.9//EN" "https://www.sosy-lab.org/benchexec/benchmark-2.3.dtd">
+<benchmark tool="cpachecker" timelimit="5 min" memlimit="4 GB" cpuCores="1" threads="2">
+
+  <option name="-heap">4096M</option>
+  <option name="-benchmark"/>
+  <option name="-timelimit">300s</option>
+
+<rundefinition name="racebench">
+	<!-- the ist task 'select-points' represents the use of interrupt points select strategy --> 
+  <tasks name="select-points">
+	  <includesfile>./test/racebench/Tasks.set</includesfile>
+	  <propertyfile>./test/unreach-call.prp</propertyfile>
+	  <option name="-config">./config/myAnalysis-concurrent-interrupt-benchmark-racebench.properties</option>
+  </tasks>
+  <tasks name="all-points">
+	  <includesfile>./test/racebench/Tasks.set</includesfile>
+	  <propertyfile>./test/unreach-call.prp</propertyfile>
+	  <option name="-config">./config/myAnalysis-concurrent-interrupt-benchmark-racebench-all-points.properties</option>
+  </tasks>
+</rundefinition>
+
+
+<rundefinition name="ldv-races">
+  <tasks name="select-points">
+	  <includesfile>./test/svcomp-benchmarks/ldv-races_interrupt/ldv-races_interrupt/Tasks.set</includesfile>
+	  <propertyfile>./test/unreach-call.prp</propertyfile>
+	  <option name="-config">./config/myAnalysis-concurrent-interrupt-benchmark-ldv-races.properties</option>
+  </tasks>
+  <tasks name="all-points">
+	  <includesfile>./test/svcomp-benchmarks/ldv-races_interrupt/ldv-races_interrupt/Tasks.set</includesfile>
+	  <propertyfile>./test/unreach-call.prp</propertyfile>
+	  <option name="-config">./config/myAnalysis-concurrent-interrupt-benchmark-ldv-races-all-points.properties</option>
+  </tasks>
+</rundefinition>
+
+
+<rundefinition name="goblint-regression">
+  <tasks name="select-points">
+	  <includesfile>./test/svcomp-benchmarks/goblint-regression_interrupt/goblint-regression_interrupt/Tasks.set</includesfile>
+	  <propertyfile>./test/unreach-call.prp</propertyfile>
+	  <option name="-config">./config/myAnalysis-concurrent-interrupt-benchmark-goblint-regression.properties</option>
+  </tasks>
+  <tasks name="all-points">
+	  <includesfile>./test/svcomp-benchmarks/goblint-regression_interrupt/goblint-regression_interrupt/Tasks.set</includesfile>
+	  <propertyfile>./test/unreach-call.prp</propertyfile>
+	  <option name="-config">./config/myAnalysis-concurrent-interrupt-benchmark-goblint-regression-all-points.properties</option>
+  </tasks>
+</rundefinition>
+
+
+<rundefinition name="pthread">
+  <tasks name="select-points">
+	  <includesfile>./test/svcomp-benchmarks/pthread_interrupt/pthread_interrupt/Tasks.set</includesfile>
+	  <propertyfile>./test/unreach-call.prp</propertyfile>
+	  <option name="-config">./config/myAnalysis-concurrent-interrupt-benchmark-pthread.properties</option>
+  </tasks>
+  <tasks name="all-points">
+	  <includesfile>./test/svcomp-benchmarks/pthread_interrupt/pthread_interrupt/Tasks.set</includesfile>
+	  <propertyfile>./test/unreach-call.prp</propertyfile>
+	  <option name="-config">./config/myAnalysis-concurrent-interrupt-benchmark-pthread-all-points.properties</option>
+  </tasks>
+</rundefinition>
+
+</benchmark>

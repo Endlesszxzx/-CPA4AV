@@ -1,0 +1,48 @@
+Manifest-Version: 1.0
+Ant-Version: Apache Ant 1.10.7
+Created-By: 11.0.8+10-LTS (Oracle Corporation)
+Main-Class: org.sosy_lab.cpachecker.cmdline.CPAMain
+Class-Path:              lib/apron.jar             lib/gmp.jar        
+      lib/jpl.jar             lib/jsylvan.jar             cpachecker.j
+ ar             lib/java/runtime/animal-sniffer-annotations.jar       
+       lib/java/runtime/antlr4-runtime.jar             lib/java/runtim
+ e/batik-awt-util.jar             lib/java/runtime/batik-constants.jar
+              lib/java/runtime/batik-dom.jar             lib/java/runt
+ ime/batik-ext.jar             lib/java/runtime/batik-i18n.jar        
+      lib/java/runtime/batik-svggen.jar             lib/java/runtime/b
+ atik-util.jar             lib/java/runtime/batik-xml.jar             
+ lib/java/runtime/checker-qual.jar             lib/java/runtime/com.mi
+ crosoft.z3.jar             lib/java/runtime/common.jar             li
+ b/java/runtime/CVC4.jar             lib/java/runtime/error_prone_anno
+ tations.jar             lib/java/runtime/failureaccess.jar           
+   lib/java/runtime/guava.jar             lib/java/runtime/icu4j.jar  
+            lib/java/runtime/j2objc-annotations.jar             lib/ja
+ va/runtime/javabdd.jar             lib/java/runtime/java-cup-runtime.
+ jar             lib/java/runtime/java-smt.jar             lib/java/ru
+ ntime/jdd.jar             lib/java/runtime/jhoafparser.jar           
+   lib/java/runtime/jna.jar             lib/java/runtime/jsr305.jar   
+           lib/java/runtime/lasso-ranker.jar             lib/java/runt
+ ime/listenablefuture.jar             lib/java/runtime/llvm-j.jar     
+         lib/java/runtime/org.eclipse.cdt.core.jar             lib/jav
+ a/runtime/org.eclipse.core.contenttype.jar             lib/java/runti
+ me/org.eclipse.core.jobs.jar             lib/java/runtime/org.eclipse
+ .core.resources.jar             lib/java/runtime/org.eclipse.core.run
+ time.jar             lib/java/runtime/org.eclipse.equinox.common.jar 
+             lib/java/runtime/org.eclipse.equinox.preferences.jar     
+         lib/java/runtime/org.eclipse.jdt.core.jar             lib/jav
+ a/runtime/org.eclipse.osgi.jar             lib/java/runtime/pjbdd.jar
+              lib/java/runtime/princess_2.13.jar             lib/java/
+ runtime/princess-parser_2.13.jar             lib/java/runtime/princes
+ s-smt-parser_2.13.jar             lib/java/runtime/scala-library.jar 
+             lib/java/runtime/scala-parser-combinators_2.13.jar       
+       lib/java/runtime/smtinterpol.jar             lib/java/runtime/s
+ potbugs-annotations.jar             lib/java/runtime/ultimate-core.ja
+ r             lib/java/runtime/ultimate-core-rcp.jar             lib/
+ java/runtime/ultimate-icfg-transformer.jar             lib/java/runti
+ me/ultimate-java-cup.jar             lib/java/runtime/ultimate-librar
+ y-smtlib.jar             lib/java/runtime/ultimate-library-smtlib-uti
+ ls.jar             lib/java/runtime/ultimate-model-checker-utils.jar 
+             lib/java/runtime/ultimate-model.jar             lib/java/
+ runtime/ultimate-smt-solver-bridge.jar             lib/java/runtime/u
+ ltimate-util.jar
+

@@ -1,0 +1,94 @@
+   BENCHMARK INFORMATION
+benchmark definition:    cpachecker4av-ldv-races.xml
+name:                    cpachecker4av-ldv-races
+run sets:                select-points.ldv-races, all-points.ldv-races
+date:                    Fri, 2022-08-26 10:04:59 CST
+tool:                    CPAchecker 2.0
+tool executable:         scripts/cpa.sh
+options:                 -heap 4096M -benchmark -timelimit 300s
+parallel runs:           2
+resource limits:
+- memory:                4000.0 MB
+- time:                  300 s
+- cpu cores:             1
+hardware requirements:
+- cpu cores:             1
+- memory:                4000.0 MB
+------------------------------------------------------------
+
+   SYSTEM INFORMATION
+host:                    YangTian
+os:                      Linux-5.15.0-46-generic-x86_64-with-glibc2.29
+cpu:                     Intel Core i7-8700 CPU @ 3.20GHz
+- cores:                 12
+- max frequency:         4600.0 MHz
+- turbo boost enabled:   True
+ram:                     33539.833856 MB
+------------------------------------------------------------
+
+
+
+select-points.ldv-races
+Run set 1 of 2 with options '-heap 4096M -benchmark -timelimit 300s -config ./config/myAnalysis-concurrent-interrupt-benchmark-ldv-races.properties' and propertyfile 'None'
+
+inputfile                 status                       cpu time   wall time        host
+---------------------------------------------------------------------------------------
+svp_simple_300_001.yml    false(unreach-call)              3.25        3.26        None
+svp_simple_301_001.yml    false(unreach-call)              3.26        3.27        None
+svp_simple_302_001.yml    false(unreach-call)              3.44        3.45        None
+svp_simple_303_001.yml    false(unreach-call)              3.48        3.49        None
+svp_simple_304_001.yml    false(unreach-call)              3.33        3.34        None
+svp_simple_305_001.yml    false(unreach-call)              3.40        3.41        None
+svp_simple_306_001.yml    false(unreach-call)              3.35        3.37        None
+svp_simple_307_001.yml    false(unreach-call)              3.48        3.49        None
+svp_simple_308_001.yml    false(unreach-call)              3.33        3.35        None
+svp_simple_309_001.yml    false(unreach-call)              3.40        3.41        None
+svp_simple_310_001.yml    false(unreach-call)              3.51        3.52        None
+svp_simple_311_001.yml    false(unreach-call)              3.40        3.41        None
+svp_simple_312_001.yml    false(unreach-call)              3.69        3.70        None
+svp_simple_313_001.yml    false(unreach-call)              3.50        3.51        None
+svp_simple_314_001.yml    false(unreach-call)              3.45        3.47        None
+svp_simple_315_001.yml    false(unreach-call)              3.37        3.39        None
+svp_simple_316_001.yml    false(unreach-call)              3.57        3.58        None
+svp_simple_317_001.yml    true                             3.47        3.49        None
+svp_simple_318_001.yml    true                             3.26        3.28        None
+---------------------------------------------------------------------------------------
+Run set 1                 done                            65.25       36.19           -
+
+
+all-points.ldv-races
+Run set 2 of 2 with options '-heap 4096M -benchmark -timelimit 300s -config ./config/myAnalysis-concurrent-interrupt-benchmark-ldv-races-all-points.properties' and propertyfile 'None'
+
+inputfile                 status                       cpu time   wall time        host
+---------------------------------------------------------------------------------------
+svp_simple_300_001.yml    false(unreach-call)              3.36        3.38        None
+svp_simple_301_001.yml    false(unreach-call)              3.33        3.34        None
+svp_simple_302_001.yml    false(unreach-call)              3.43        3.44        None
+svp_simple_303_001.yml    false(unreach-call)              3.33        3.34        None
+svp_simple_304_001.yml    false(unreach-call)              3.54        3.55        None
+svp_simple_305_001.yml    false(unreach-call)              3.52        3.53        None
+svp_simple_306_001.yml    false(unreach-call)              3.35        3.36        None
+svp_simple_307_001.yml    false(unreach-call)              3.37        3.38        None
+svp_simple_308_001.yml    false(unreach-call)              3.41        3.42        None
+svp_simple_309_001.yml    false(unreach-call)              3.49        3.50        None
+svp_simple_310_001.yml    false(unreach-call)              3.51        3.55        None
+svp_simple_311_001.yml    false(unreach-call)              3.54        3.55        None
+svp_simple_312_001.yml    false(unreach-call)              3.46        3.47        None
+svp_simple_313_001.yml    false(unreach-call)              3.39        3.40        None
+svp_simple_314_001.yml    false(unreach-call)              3.41        3.42        None
+svp_simple_315_001.yml    false(unreach-call)              3.41        3.42        None
+svp_simple_316_001.yml    false(unreach-call)              3.47        3.48        None
+svp_simple_317_001.yml    true                             3.35        3.37        None
+svp_simple_318_001.yml    true                             3.27        3.29        None
+---------------------------------------------------------------------------------------
+Run set 2                 done                            65.23       36.16           -
+
+Statistics:             38 Files
+  correct:               0
+    correct true:        0
+    correct false:       0
+  incorrect:             0
+    incorrect true:      0
+    incorrect false:     0
+  unknown:               0
+  Score:                 0 (max: 0)

@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 //
-//public class DataAccessState implements AbstractState, Graphable {
-public class DataAccessState implements AbstractState {
+public class DataAccessState implements AbstractState, Graphable {
+//public class DataAccessState implements AbstractState {
     private List<DataState> dataAccess;
 
     private List<DataState> dataRace;
@@ -341,22 +341,22 @@ public class DataAccessState implements AbstractState {
         return "DataAccessState{" + "\ndataAccess=" + dataAccess + ", \ndataRace=" + dataRace + ", \npathFunc=" + pathFunc + ", \npathNum=" + pathNum + ", \nans='" + ans + ", \nisRace=" + isRace + '}';
     }
 
-//    @Override
-//    public String toDOTLabel() {
-//        StringBuilder sb = new StringBuilder();
-//        sb.append("\n--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
-//        sb.append(ans).append("\n").append(getString());
-//        sb.append(pathFunc).append("\n").append(pathNum);
-//        return sb.toString();
-//    }
-//
-//    @Override
-//    public boolean shouldBeHighlighted() {
-//        if (ans.toString().contains("three access states")) {
-//            return true;
-//        }
-//        return false;
-//    }
+    @Override
+    public String toDOTLabel() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\n--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
+        sb.append(ans).append("\n").append(getString());
+        sb.append(pathFunc).append("\n").append(pathNum);
+        return sb.toString();
+    }
+
+    @Override
+    public boolean shouldBeHighlighted() {
+        if (ans.toString().contains("three access states")) {
+            return true;
+        }
+        return false;
+    }
 
 }
 

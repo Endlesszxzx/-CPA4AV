@@ -104,10 +104,7 @@ public class DataAccessTransferRelation extends SingleEdgeTransferRelation {
                 isr = stack.get(stack.size()-1);
             }
 
-
-            System.out.println("========================================= TransferRelation ===================================================================");
-            System.out.println("edge: " + cfaEdge);
-
+            
             DataAccessState dataAccess = new DataAccessState(lastDataAccess.getDataAccess(),lastDataAccess.getDataRace());
 
             String mainFunction = edgeInfo.getCfa().getMainFunction().getFunctionName();

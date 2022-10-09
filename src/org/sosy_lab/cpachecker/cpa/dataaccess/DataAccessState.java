@@ -11,24 +11,10 @@ import java.util.List;
 
 //
 public class DataAccessState implements AbstractState, Graphable {
-//public class DataAccessState implements AbstractState {
+    //public class DataAccessState implements AbstractState {
     private List<DataState> dataAccess;
 
     private List<DataState> dataRace;
-
-    private List<String> pathFunc;
-
-    private List<String> pathNum;
-
-    private String ans;
-
-    public String getAns() {
-        return ans;
-    }
-
-    public void setAns(String ans) {
-        this.ans = ans;
-    }
 
     private boolean isRace = false;
 
@@ -50,16 +36,12 @@ public class DataAccessState implements AbstractState, Graphable {
     public DataAccessState() {
         dataAccess = new ArrayList<DataState>();
         dataRace = new ArrayList<DataState>();
-        pathFunc = new ArrayList<String>();
-        pathNum = new ArrayList<String>();
     }
 
     //
-    public DataAccessState(List<DataState> dataAccess, List<DataState> dataRace, List<String> pathFunc, List<String> pathNum) {
+    public DataAccessState(List<DataState> dataAccess, List<DataState> dataRace) {
         this.dataAccess = newData(dataAccess);
         this.dataRace = newData(dataRace);
-        this.pathFunc = new ArrayList<>(pathFunc);
-        this.pathNum = new ArrayList<>(pathNum);
     }
 
     public List<DataState> newData(List<DataState> dataAccess) {
@@ -111,16 +93,6 @@ public class DataAccessState implements AbstractState, Graphable {
         dataAccess.add(e);
     }
 
-    public int Is_exist(String Name) {
-        /**
-         * 判断当前 Name 是否在数据访问集中, 在返回序号，不在返回-1
-         */
-
-        for (int i = 0; i <= dataAccess.size(); i++) {
-            if (dataAccess.get(i).getN() == Name) return i;
-        }
-        return -1;
-    }
 
     public int actionListPosition(String Name) {
         /**
@@ -156,80 +128,6 @@ public class DataAccessState implements AbstractState, Graphable {
         dataRace.add(race);
     }
 
-
-    // path 的方法
-    public List<String> getpathFunc() {
-        return pathFunc;
-    }
-
-    public boolean setPath(String road) {
-
-        if (pathFunc.isEmpty()) {
-            pathFunc.add(road);
-            return true;
-        }
-
-
-        if (pathFunc.get(pathFunc.size() - 1) == road) {
-            return true;
-        }
-
-        if (pathFunc.contains(road)) {
-            for (int i = 0; i < pathFunc.size(); i++) {
-                if (pathFunc.get(i) == road) {
-                    return false;
-                }
-            }
-        }
-
-        pathFunc.add(road);
-        return true;
-    }
-
-    public List<String> getPathNum() {
-        return pathNum;
-    }
-
-    public void setPathNum(String pathNum) {
-        this.pathNum.add(pathNum);
-    }
-
-    public void poppath(int idx) {
-        for (int i = idx + 1; i < pathFunc.size(); i++) {
-            pathFunc.remove(i);
-        }
-    }
-
-    public List<String> involvedPaths(String road) {
-        List<String> re = new ArrayList<String>();
-        for (int i = pathFunc.size() - 1; i >= 0; i--) {
-            if (pathFunc.get(i) == road) {
-                break;
-            }
-            re.add(pathFunc.get(i));
-        }
-        return re;
-    }
-
-    public void disposePath(State ec, String mainFunction) {
-        if (ec.getTask() != mainFunction) return;
-
-        int index = isExistPath(ec.getTask());
-        if (index != -1) {
-            poppath(index);
-        }
-    }
-
-    public int isExistPath(String Task) {
-        for (int i = pathFunc.size() - 2; i >= 0; i--) {
-            if (pathFunc.get(i) == Task) {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
     public void DataRace(State ec, String mainFunction) {
         /**
          * 数据冲突检测
@@ -242,7 +140,7 @@ public class DataAccessState implements AbstractState, Graphable {
 
         if (index == -1) {
             DataState e = new DataState(ec.getName(), ec);
-            ans = "\n   add this state:" + ec;
+            dataAccess.add(e);
             return;
         }
 
@@ -253,16 +151,11 @@ public class DataAccessState implements AbstractState, Graphable {
         // 判断 变量ec.Name 的 DataAccess 的大小，小于2，直接加入
         if (actionList.getA().size() < 2) {
             actionList.append(ec);
-//            System.out.println("\n             For share_var " + ec.getName() + ", not enough elements in DataAccess");
-            ans = "\n   For share_var " + ec.getName() + ", not enough elements in DataAccess";
-
             return;
         }
 
-        Interruptinformation get_race = actionList.get_ep(ec, involvedPaths(ec.getName()));   // 倒序搜索 ep
+        Interruptinformation get_race = actionList.get_ep(ec);   // 倒序搜索 ep
         if (get_race.getepPosition() == -1) {     // 没找到相应的 ep
-//            System.out.println("\n             For state " + ec.toString() + ", the appropriate ep and er were not found, causing a data conflict with them");
-            ans = "\n   For state " + ec.toString() + ", the appropriate ep and er were not found, causing a data conflict with them";
             actionList.updateDataAccess(get_race.getepPosition(), ec, 2, mainFunction);
             return;
         }
@@ -278,12 +171,7 @@ public class DataAccessState implements AbstractState, Graphable {
             for (int j = 0; j < 4; j++) {
 
                 if (Arrays.equals(patternList[j], pattern) && ep.getLoaction() != ec.getLoaction()) {
-//                if (Arrays.equals(patternList[j], pattern)) {
-                    ans = "\n   For the three access states {" + ep.toString() + "," + er.toString() + "," + ec.toString() + "} of the variable " + ep.getName() + " a data conflict occurs";
-//                    System.out.println(ans);
-
                     actionList.updateDataAccess(get_race.getepPosition(), ec, 0, mainFunction);
-//                    String[][] patternList = {{"R", "W", "R"}, {"W", "W", "R"}, {"R", "W", "W"}, {"W", "R", "W"}};    // 冲突模式集
                     isRace = true;
                     DataState race = new DataState(ep.getName(), ep);
                     race.append(er);
@@ -310,22 +198,16 @@ public class DataAccessState implements AbstractState, Graphable {
         }
 
         // 当都不发生数据冲突时
-        ans = "\n   For state " + ec + ", we didn't find two states with which we could conflict with it\n";
         actionList.updateDataAccess(get_race.getepPosition(), ec, 1, mainFunction);
     }
 
 
     public void toprint() {
         if (!isRace) {
-            System.out.println(ans);
-
-//            System.out.println("\nNow the DataAccess is :");
-//            System.out.println(getString());
             System.out.println("\n\n");
             return;
         }
         isRace = false;
-        System.out.println("\n\033[31m" + ans);
         System.out.println("\nNow the DataAccess is :");
         System.out.println(getString());
         System.out.println("\n\n\033[0m");
@@ -333,28 +215,24 @@ public class DataAccessState implements AbstractState, Graphable {
 
 
     public String getString() {
-        return "DataAccess=" + dataAccess.toString() + ", \nDataRace=" + dataRace.toString() + ", \npathFunc = " + pathFunc.toString() + ", \npathNum = " + pathNum.toString() + "\n\n";
+        return "DataAccess=" + dataAccess.toString() + ", \nDataRace=" + dataRace.toString() + "\n\n";
     }
 
     @Override
     public String toString() {
-        return "DataAccessState{" + "\ndataAccess=" + dataAccess + ", \ndataRace=" + dataRace + ", \npathFunc=" + pathFunc + ", \npathNum=" + pathNum + ", \nans='" + ans + ", \nisRace=" + isRace + '}';
+        return "DataAccessState{" + "\ndataAccess=" + dataAccess + ", \ndataRace=" + dataRace +", \nisRace=" + isRace + '}';
     }
 
     @Override
     public String toDOTLabel() {
         StringBuilder sb = new StringBuilder();
         sb.append("\n--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
-        sb.append(ans).append("\n").append(getString());
-        sb.append(pathFunc).append("\n").append(pathNum);
+        sb.append(this.toString());
         return sb.toString();
     }
 
     @Override
     public boolean shouldBeHighlighted() {
-        if (ans.toString().contains("three access states")) {
-            return true;
-        }
         return false;
     }
 

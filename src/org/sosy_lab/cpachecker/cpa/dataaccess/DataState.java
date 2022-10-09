@@ -126,7 +126,7 @@ public class DataState {
 
     }
 
-    public Interruptinformation get_ep(State ec,List<String> involvedPaths) {
+    public Interruptinformation get_ep(State ec) {
         /**
          * 得到 ep 的位置
          * @param ActionList 与 ec 同名的共享变量之前的所有操作集合
@@ -148,13 +148,11 @@ public class DataState {
             }
 
             // 没找到，但找到了中断中对共享变量的其它操作
-            if((!(ans.getInterLocation().contains(ep.getTask())) && ep.getTask().contains("isr")) || (ans.getInterLocation().contains(ep.getTask()))){
-//            if(ep.getTask().contains("isr")){
+            if(!(ans.getInterLocation().contains(ep.getTask())) && ep.getTopfunc().contains("isr")){
                 ans.setInterLocation(ep.getTask());
                 ans.setInterOperation(ep.getAction());
                 ans.setInter_state(ep);
             }
-
 
             // 找到了 ep
             else if(!(ans.getInterLocation().contains(ep.getTask()))){
@@ -167,6 +165,7 @@ public class DataState {
                 ans.setepPosition(i);
                 return ans;
             }
+
 
         }
 

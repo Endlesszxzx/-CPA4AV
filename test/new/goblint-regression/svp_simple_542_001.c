@@ -1,14 +1,17 @@
 
 int myglobal;
 
-int isr_f() {
-  return 5;
+//int f() {
+//  return 5;
+//}
+int f(){
+myglobal=5;
 }
 
 void svp_simple_542_001_isr_1(void *arg) {
-  int tmp = isr_fun();
-  myglobal=tmp; // RACE!
-
+//  int tmp = f();
+//  myglobal=tmp; // RACE!
+f();
 }
 
 int svp_simple_542_001_main(void) {

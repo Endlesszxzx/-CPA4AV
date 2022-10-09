@@ -78,7 +78,9 @@ public class CallstackState
   }
 
   /** for logging and debugging */
-  private List<String> getStack() {
+  // modified by xhr: 22-10-09
+  // private to public
+  public List<String> getStack() {
     final List<String> stack = new ArrayList<>();
     CallstackState state = this;
     while (state != null) {

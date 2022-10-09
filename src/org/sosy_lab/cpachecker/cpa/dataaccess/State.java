@@ -7,6 +7,17 @@ public class State {
     private String Name;
     private String Task;
     private int Loaction;
+    private String topfunc;
+    private String Action;
+
+    public String getTopfunc() {
+        return topfunc;
+    }
+
+    public void setTopfunc(String ISR) {
+        this.topfunc = ISR;
+    }
+
 
     public String getName() {
         return Name;
@@ -40,23 +51,22 @@ public class State {
         Action = action;
     }
 
-    private String Action;
 
     public State() {
     }
 
-    public State(String name, String task, int loaction, String action) {
+    public State(String name, String task, int loaction, String action, String isr) {
         Name = name;
         Task = task;
         Loaction = loaction;
         Action = action;
+        topfunc = isr;
     }
 
     @Override
     public String toString() {
-        return "(" + Name + "," + Task + ", '" + Loaction + ", '" + Action + ')';
+        return "(" + Name + "," + Task + ", '" + Loaction + ", '" + Action + "," + topfunc + ')';
     }
-
 
 
 }

@@ -40,6 +40,7 @@ import org.sosy_lab.cpachecker.cfa.ast.c.CBinaryExpression.BinaryOperator;
 import org.sosy_lab.cpachecker.cfa.ast.c.CExpression;
 import org.sosy_lab.cpachecker.cfa.ast.c.CExpressionAssignmentStatement;
 import org.sosy_lab.cpachecker.cfa.ast.c.CFunctionCall;
+import org.sosy_lab.cpachecker.cfa.ast.c.CFunctionCallAssignmentStatement;
 import org.sosy_lab.cpachecker.cfa.ast.c.CIdExpression;
 import org.sosy_lab.cpachecker.cfa.ast.c.CInitializerExpression;
 import org.sosy_lab.cpachecker.cfa.ast.c.CIntegerLiteralExpression;
@@ -50,9 +51,13 @@ import org.sosy_lab.cpachecker.cfa.ast.c.CReturnStatement;
 import org.sosy_lab.cpachecker.cfa.ast.c.CStatement;
 import org.sosy_lab.cpachecker.cfa.ast.c.CVariableDeclaration;
 import org.sosy_lab.cpachecker.cfa.model.CFAEdge;
+import org.sosy_lab.cpachecker.cfa.model.CFANode;
+import org.sosy_lab.cpachecker.cfa.model.FunctionExitNode;
 import org.sosy_lab.cpachecker.cfa.model.c.CAssumeEdge;
 import org.sosy_lab.cpachecker.cfa.model.c.CDeclarationEdge;
 import org.sosy_lab.cpachecker.cfa.model.c.CFunctionCallEdge;
+import org.sosy_lab.cpachecker.cfa.model.c.CFunctionReturnEdge;
+import org.sosy_lab.cpachecker.cfa.model.c.CFunctionSummaryEdge;
 import org.sosy_lab.cpachecker.cfa.model.c.CReturnStatementEdge;
 import org.sosy_lab.cpachecker.cfa.model.c.CStatementEdge;
 import org.sosy_lab.cpachecker.cfa.types.c.CArrayType;
@@ -626,7 +631,56 @@ public class DepConstraintBuilder {
             return null;
           }
         }
-      }
+      } else if (pEdge instanceof CFunctionReturnEdge) {
+          CFANode edgePreNode = pEdge.getPredecessor();
+          int retEnterEdgeNumber = edgePreNode.getNumEnteringEdges();
+
+          // TODO: if the number of entering edge is greater than one, some constraints may be missed.
+          // e.g., two different functions 'A' and 'B' call the same function 'C', then the set of
+          // return edges in 'C' contains two entering edges.
+          // Therefore, for the function return edge that returns back to more than one place, we make
+          // conservative process (i.e., return UCD constraint).
+          if (retEnterEdgeNumber == 1) {
+            // return edge: 'return x' -> '__retval__ = x'
+            // get the return variable '__retval__' in return edge.
+            CLeftHandSide retLHSExp = null;
+            if (edgePreNode instanceof FunctionExitNode) {
+              CFAEdge retEdge = edgePreNode.getEnteringEdge(0);
+              if (retEdge instanceof CReturnStatementEdge) {
+                Optional<CReturnStatement> retStmt = ((CReturnStatementEdge) retEdge).getRawAST();
+                if (retStmt.isPresent()) {
+                  Optional<CAssignment> retAsgnStmtOpt = retStmt.get().asAssignment();
+                  if (retAsgnStmtOpt.isPresent()
+                      && retAsgnStmtOpt.get() instanceof CExpressionAssignmentStatement) {
+                    retLHSExp =
+                        ((CExpressionAssignmentStatement) retAsgnStmtOpt.get()).getLeftHandSide();
+                  }
+                }
+              }
+            }
+
+            // function return edge: 'x = func()'
+            // get the assigned variale 'x'.
+            CFunctionSummaryEdge summaryEdge = ((CFunctionReturnEdge) pEdge).getSummaryEdge();
+            CLeftHandSide funCallAsgnLHS = null;
+            if (summaryEdge != null) {
+              CFunctionCall funCallExp = summaryEdge.getExpression();
+              if (funCallExp instanceof CFunctionCallAssignmentStatement) {
+                funCallAsgnLHS = ((CFunctionCallAssignmentStatement) funCallExp).getLeftHandSide();
+              }
+            }
+
+            // create assignment statement.
+            if (retLHSExp != null && funCallAsgnLHS != null) {
+              return new CExpressionAssignmentStatement(
+                  pEdge.getFileLocation(),
+                  funCallAsgnLHS,
+                  retLHSExp);
+            }
+          } else {
+            return null;
+          }
+        }
     }
     return null;
   }

@@ -608,8 +608,9 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
         return new ThreadingIntpState(threads, locks, new ArrayDeque<>(intpStack), intpLevelEnableFlags,
                 new HashMap<>(intpTimes), pActiveThread, entryFunction, threadIdsForWitness);
     }
-
-    String getActiveThread() {
+    // modified by xhr: 22-10-09
+    // default to public
+    public String getActiveThread() {
         return activeThread;
     }
 

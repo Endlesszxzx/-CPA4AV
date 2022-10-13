@@ -9,7 +9,6 @@ import java.util.*;
 import java.util.ArrayList;
 import java.util.List;
 
-//
 public class DataAccessState implements AbstractState, Graphable {
     //public class DataAccessState implements AbstractState {
     private List<DataState> dataAccess;
@@ -53,36 +52,10 @@ public class DataAccessState implements AbstractState, Graphable {
     }
 
 
-//    public DataAccessState(List<DataState> dataAccess, List<DataState> dataRace, List<String> path) {
-//        this.dataAccess = dataAccess;
-//        this.dataRace = dataRace;
-//        this.path = path;
-//    }
-
     // dataAccess的方法
 
     public List<DataState> getDataAccess() {
         return dataAccess;
-    }
-
-    public void setDataAccess(State e) {
-        if (dataAccess.isEmpty()) {
-            dataAccess.add(new DataState(e.getName(), e));
-            return;
-        }
-
-        boolean notIsExists = true;
-        for (DataState data : dataAccess) {
-            if (data.getN() == e.getName()) {
-                notIsExists = false;
-                data.append(e);
-            }
-        }
-
-        if (notIsExists) {
-            dataAccess.add(new DataState(e.getName(), e));
-            return;
-        }
     }
 
     public void setDataAccess(DataState dataAccess) {
@@ -111,10 +84,6 @@ public class DataAccessState implements AbstractState, Graphable {
         return dataRace;
     }
 
-    public void setDataRace(List<DataState> dataRace) {
-        this.dataRace = dataRace;
-    }
-
     public boolean isInDataRace(String Name) {
         for (DataState data : dataRace) {
             if (data.getN() == Name) {
@@ -122,10 +91,6 @@ public class DataAccessState implements AbstractState, Graphable {
             }
         }
         return false;
-    }
-
-    public void setDataRace(DataState race) {
-        dataRace.add(race);
     }
 
     public void DataRace(State ec, String mainFunction) {
@@ -199,23 +164,6 @@ public class DataAccessState implements AbstractState, Graphable {
 
         // 当都不发生数据冲突时
         actionList.updateDataAccess(get_race.getepPosition(), ec, 1, mainFunction);
-    }
-
-
-    public void toprint() {
-        if (!isRace) {
-            System.out.println("\n\n");
-            return;
-        }
-        isRace = false;
-        System.out.println("\nNow the DataAccess is :");
-        System.out.println(getString());
-        System.out.println("\n\n\033[0m");
-    }
-
-
-    public String getString() {
-        return "DataAccess=" + dataAccess.toString() + ", \nDataRace=" + dataRace.toString() + "\n\n";
     }
 
     @Override

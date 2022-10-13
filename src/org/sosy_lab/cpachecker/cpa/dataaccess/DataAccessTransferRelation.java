@@ -55,13 +55,6 @@ public class DataAccessTransferRelation extends SingleEdgeTransferRelation {
 
     @Override
     public Collection<DataAccessState> getAbstractSuccessorsForEdge(AbstractState pstate, Precision precision, CFAEdge pCfaEdge) throws CPATransferException, InterruptedException {
-        /**
-         * @param state 父节点的信息
-         * @param precision 精度，这用不到
-         * @param cfaEdge 边上的信6息
-         */
-
-        // count time for transfer relation
         DataAccessState lastDataAccess = (DataAccessState) pstate;
         return Collections.singleton(lastDataAccess);
     }
@@ -94,18 +87,18 @@ public class DataAccessTransferRelation extends SingleEdgeTransferRelation {
                 CallstackState callstack = (CallstackState) threadingIntpState.getThreadCallstack(activeThread);
                 stack = callstack.getStack();
             }
-            for(String funcName:stack){
-                if (funcName.contains("isr")){
+            for (String funcName : stack) {
+                if (funcName.contains("isr")) {
                     isr = funcName;
                     break;
                 }
             }
-            if(isr == null ){
-                isr = stack.get(stack.size()-1);
+            if (isr == null) {
+                isr = stack.get(stack.size() - 1);
             }
 
-            
-            DataAccessState dataAccess = new DataAccessState(lastDataAccess.getDataAccess(),lastDataAccess.getDataRace());
+
+            DataAccessState dataAccess = new DataAccessState(lastDataAccess.getDataAccess(), lastDataAccess.getDataRace());
 
             String mainFunction = edgeInfo.getCfa().getMainFunction().getFunctionName();
 
@@ -115,10 +108,6 @@ public class DataAccessTransferRelation extends SingleEdgeTransferRelation {
             // 得到边所在的函数名
             String task = edgeVtx.getBlockStartEdge().getPredecessor().getFunctionName();
 
-//        if(edgeVtx.toString().contains("volatile int")){
-//            return Collections.singleton(lastDataAccess);
-//        }
-
             // 先判断读   因为对于任何一条语句， 无论怎样都是先读后写
             if (!gRVars.isEmpty()) {
                 for (Var var : gRVars) {
@@ -127,7 +116,7 @@ public class DataAccessTransferRelation extends SingleEdgeTransferRelation {
                     if (dataAccess.isInDataRace(var.getName())) continue;
 
                     int location = var.getExp().getFileLocation().getEndingLineNumber();
-                    State ec = new State(var.getName(), task, location, "R",isr);
+                    State ec = new State(var.getName(), task, location, "R", isr);
 
                     // 进行数据冲突检测
                     dataAccess.DataRace(ec, mainFunction);
@@ -142,15 +131,13 @@ public class DataAccessTransferRelation extends SingleEdgeTransferRelation {
                     if (dataAccess.isInDataRace(var.getName())) continue;
 
                     int location = var.getExp().getFileLocation().getEndingLineNumber();
-                    State ec = new State(var.getName(), task, location, "W",isr);
+                    State ec = new State(var.getName(), task, location, "W", isr);
 
                     // 进行数据冲突检测
                     dataAccess.DataRace(ec, mainFunction);
                 }
             }
 
-
-//        System.out.println("***************************************************************end this test***************************************************************");
             return Collections.singleton(dataAccess);
         } finally {
             // anyway, stop the timer when transfer process finished.

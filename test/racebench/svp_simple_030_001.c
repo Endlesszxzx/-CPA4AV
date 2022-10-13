@@ -17,7 +17,7 @@ extern int rand();
 
 
 void svp_simple_030_001_init();
-void isr_addData();
+void addData();
 volatile int svp_simple_030_001_isr_1_flag;
 volatile int svp_simple_030_001_gloable_var;
 
@@ -40,12 +40,12 @@ void svp_simple_030_001_init() {
   init();
 }
 
-void isr_addData() {
+void addData() {
   svp_simple_030_001_gloable_var++;  
 }
 
 void svp_simple_001_001_isr_1() {
-  isr_addData();
+  addData();
   svp_simple_030_001_isr_1_flag = 0;
   enable_isr(2);
 }

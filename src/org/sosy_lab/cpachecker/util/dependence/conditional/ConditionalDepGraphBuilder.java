@@ -307,6 +307,7 @@ public class ConditionalDepGraphBuilder {
       for (int i = 0; i < node.getNumLeavingEdges(); ++i) {
         CFAEdge edge = node.getLeavingEdge(i);
         String edgeFuncName = getEdgeFunctionName(edge);
+        CFANode edgeSucNode = edge.getSuccessor();
 
         // special optimization for main function.
         if (funcName.equals(mainFunctionName) && !extractStart) {
@@ -319,7 +320,7 @@ public class ConditionalDepGraphBuilder {
               extractStart = true;
             }
           }
-          waitlist.add(edge.getSuccessor());
+          waitlist.add(edgeSucNode);
           continue;
         }
 
@@ -344,6 +345,26 @@ public class ConditionalDepGraphBuilder {
             //            System.out.println(noneBlockDepNode);
             statistics.blockNumber.inc();
             statistics.blockSize.setNextValue(noneBlockDepNode.getBlockEdgeNumber());
+          }
+
+          // process the successor edges at function exit nodes.
+          if (edgeSucNode instanceof FunctionExitNode) {
+            for (int j = 0; j < edgeSucNode.getNumLeavingEdges(); ++j) {
+              CFAEdge retLeavingEdge = edgeSucNode.getLeavingEdge(j);
+              EdgeVtx retNoneBlockDepNode =
+                  handleNoBlockNode(
+                      edgeSucNode,
+                      retLeavingEdge,
+                      null,
+                      pExtractor,
+                      waitlist,
+                      pVisitedNodes);
+              if (retNoneBlockDepNode != null) {
+                pDGNodes.put(retLeavingEdge.hashCode(), retNoneBlockDepNode);
+                statistics.blockNumber.inc();
+                statistics.blockSize.setNextValue(retNoneBlockDepNode.getBlockEdgeNumber());
+              }
+            }
           }
         }
       }
@@ -509,7 +530,9 @@ public class ConditionalDepGraphBuilder {
         }
       }
 
-      if (!pVisitedNodes.contains(edgeSucNode) && !(edgeSucNode instanceof FunctionExitNode)) {
+      if (!pVisitedNodes.contains(edgeSucNode)
+          && !((pEdgePreNode instanceof FunctionExitNode)
+              || (edgeSucNode instanceof FunctionExitNode))) {
         pWaitlist.add(edgeSucNode);
       }
       pVisitedNodes.add(pEdgePreNode);

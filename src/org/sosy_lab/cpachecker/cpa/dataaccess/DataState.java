@@ -61,13 +61,6 @@ public class DataState {
         return A.size();
     }
 
-    public void delActionlist(int idx) {
-        for (int i = idx, len = A.size(); i < len; i++) {
-            A.remove(i);
-            len--;
-            i--;
-        }
-    }
 
     public void setAll(DataState e) {
         N = e.N;
@@ -90,8 +83,6 @@ public class DataState {
             }
         }
 
-
-
         // 产生了数据冲突
         else if (flag == 0) {
             this.getEmpty();
@@ -110,12 +101,16 @@ public class DataState {
                 ans.setepPosition(i);
                 return ans;
             }
-
             // 没找到，但找到了中断中对共享变量的其它操作
             if(ep.getTopfunc().contains("isr")){
                 ans.setInterLocation(ep.getTask());
                 ans.setInterOperation(ep.getAction());
                 ans.setInter_state(ep);
+            }
+            // 用于在主函数当中在不同函数内其冲突
+            if(ep.getTopfunc() == ec.getTopfunc()){
+                ans.setepPosition(i);
+                return ans;
             }
         }
 

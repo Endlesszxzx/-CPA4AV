@@ -17,6 +17,32 @@ public class DataAccessState implements AbstractState, Graphable {
 
     private boolean isRace = false;
 
+    private Map<String,List<String>> pathFunc;
+
+    public Map<String, List<String>> getPathFunc() {
+        return pathFunc;
+    }
+
+    public void setPathFunc(Map<String, List<String>> pathFunc) {
+        this.pathFunc = pathFunc;
+    }
+
+    public void setPathFunc(String mainFunc) {
+        List<String>  func = new ArrayList<>();
+        func.add(mainFunc);
+        pathFunc.put(mainFunc,func);
+    }
+
+    public void setPathFunc(String topFunc, String funcName) {
+        if(pathFunc.containsKey(topFunc)){
+            pathFunc.get(topFunc).add(funcName);
+        }else{
+            List<String>  func = new ArrayList<>();
+            func.add(funcName);
+            pathFunc.put(topFunc,func);
+        }
+    }
+
     public boolean isRace() {
         return isRace;
     }
@@ -35,12 +61,23 @@ public class DataAccessState implements AbstractState, Graphable {
     public DataAccessState() {
         dataAccess = new ArrayList<DataState>();
         dataRace = new ArrayList<DataState>();
+        pathFunc = new HashMap<String,List<String>>();
     }
 
     //
-    public DataAccessState(List<DataState> dataAccess, List<DataState> dataRace) {
+    public DataAccessState(List<DataState> dataAccess, List<DataState> dataRace,Map<String,List<String>> pathFunc) {
         this.dataAccess = newData(dataAccess);
         this.dataRace = newData(dataRace);
+        this.pathFunc = newPath(pathFunc);
+    }
+
+    private Map<String, List<String>> newPath(Map<String, List<String>> pathFunc) {
+        Map<String,List<String>> ans = new HashMap<String,List<String>>();
+        for(String task: pathFunc.keySet()){
+            List<String> tmp = new ArrayList<>(pathFunc.get(task));
+            ans.put(task,tmp);
+        }
+        return ans;
     }
 
     public List<DataState> newData(List<DataState> dataAccess) {
@@ -62,6 +99,17 @@ public class DataAccessState implements AbstractState, Graphable {
         this.dataAccess.get(actionListPosition(dataAccess.getN())).setAll(dataAccess);
     }
 
+    public void setDataAccess(State ec){
+        int index = this.actionListPosition(ec.getName());
+
+        if (index == -1) {
+            DataState e = new DataState(ec.getName(), ec);
+            dataAccess.add(e);
+            return;
+        }
+
+        dataAccess.get(index).append(ec);
+    }
     public void add(DataState e) {
         dataAccess.add(e);
     }
@@ -168,7 +216,12 @@ public class DataAccessState implements AbstractState, Graphable {
 
     @Override
     public String toString() {
-        return "DataAccessState{" + "\ndataAccess=" + dataAccess + ", \ndataRace=" + dataRace +", \nisRace=" + isRace + '}';
+        return "DataAccessState{" +
+                "dataAccess=" + dataAccess +
+                ",\n dataRace=" + dataRace +
+                ",\n isRace=" + isRace +
+                ",\n pathFunc=" + pathFunc +
+                '}';
     }
 
     @Override
@@ -183,6 +236,7 @@ public class DataAccessState implements AbstractState, Graphable {
     public boolean shouldBeHighlighted() {
         return false;
     }
+
 
 }
 

@@ -86,6 +86,7 @@ public class DataState {
         // 产生了数据冲突
         else if (flag == 0) {
             this.getEmpty();
+            this.append(ec);
         }
 
     }
@@ -97,7 +98,7 @@ public class DataState {
         for (int i = A.size() - 1; i >= 0; i--) {
             State ep = A.get(i);
 
-            if(ep.getTask() == ec.getTask()){
+            if(ep.getTask() == ec.getTask() && ep.getTopfunc() == ec.getTopfunc() && ep.getTimes()==ec.getTimes()){
                 ans.setepPosition(i);
                 return ans;
             }
@@ -106,11 +107,6 @@ public class DataState {
                 ans.setInterLocation(ep.getTask());
                 ans.setInterOperation(ep.getAction());
                 ans.setInter_state(ep);
-            }
-            // 用于在主函数当中在不同函数内其冲突
-            if(ep.getTopfunc() == ec.getTopfunc()){
-                ans.setepPosition(i);
-                return ans;
             }
         }
 

@@ -24,7 +24,7 @@ void svp_simple_023_001_init();
 
 void svp_simple_023_001_main() {
   svp_simple_023_001_init();
-  svp_simple_023_001_func_1(svp_simple_023_001_global_var);  
+  svp_simple_023_001_func_1(svp_simple_023_001_global_var);
 }
 void svp_simple_023_001_init() {
   svp_simple_023_001_global_var = __VERIFER_nondet_int();

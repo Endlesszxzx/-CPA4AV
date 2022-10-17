@@ -1,13 +1,16 @@
 package org.sosy_lab.cpachecker.cpa.dataaccess;
 
 import com.google.common.base.Preconditions;
-import de.uni_freiburg.informatik.ultimate.smtinterpol.Config;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
+import org.sosy_lab.cpachecker.cfa.ast.AStatement;
+import org.sosy_lab.cpachecker.cfa.model.AStatementEdge;
 import org.sosy_lab.cpachecker.cfa.model.CFAEdge;
-import org.sosy_lab.cpachecker.cfa.model.CFANode;
+import org.sosy_lab.cpachecker.cfa.model.CFAEdgeType;
+import org.sosy_lab.cpachecker.cfa.model.FunctionCallEdge;
+import org.sosy_lab.cpachecker.cfa.model.c.CFunctionReturnEdge;
 import org.sosy_lab.cpachecker.core.defaults.SingleEdgeTransferRelation;
 import org.sosy_lab.cpachecker.core.interfaces.AbstractState;
 import org.sosy_lab.cpachecker.core.interfaces.Precision;
@@ -67,20 +70,17 @@ public class DataAccessTransferRelation extends SingleEdgeTransferRelation {
             // 将父节点中的 Dataaccess 取出
             DataAccessState lastDataAccess = (DataAccessState) state;
 
+
             // 若没进入函数主题部分，则不进行冲突性检测
             if (!reachMainFunc) {
                 reachMainFunc = cfaEdge.getFileLocation().equals(edgeInfo.getCfa().getMainFunction().getFileLocation());
-            }
-
-            EdgeVtx edgeVtx = (EdgeVtx) conDepGraph.getDGNode(cfaEdge.hashCode());
-            // 如果边信息为空，则直接返回父节点信息
-            if (!reachMainFunc || edgeVtx == null) {
                 return Collections.singleton(lastDataAccess);
             }
+            String mainFunction = edgeInfo.getCfa().getMainFunction().getFunctionName();
 
-            // use for get calllstack
+//             use for get callstack
             List<String> stack = new ArrayList<>();
-            String isr = null;
+            String topFunc = null;
             for (ThreadingIntpState threadingIntpState : AbstractStates.projectToType(otherStates, ThreadingIntpState.class)) {
                 Preconditions.checkNotNull(threadingIntpState);
                 String activeThread = threadingIntpState.getActiveThread();
@@ -89,24 +89,52 @@ public class DataAccessTransferRelation extends SingleEdgeTransferRelation {
             }
             for (String funcName : stack) {
                 if (funcName.contains("isr")) {
-                    isr = funcName;
+                    topFunc = funcName;
                     break;
                 }
             }
-            if (isr == null) {
-                isr = stack.get(stack.size() - 1);
+            if (topFunc == null) {
+                topFunc = stack.get(0);
             }
 
+//            Deque<String> intpStack = null;
+//            String topFunc = null;
+//            for (ThreadingIntpState threadingIntpState : AbstractStates.projectToType(otherStates, ThreadingIntpState.class)) {
+//                Preconditions.checkNotNull(threadingIntpState);
+//                 intpStack = threadingIntpState.getIntpStack();
+//            }
+//            if (intpStack == null  || intpStack.isEmpty()) {
+//               topFunc = mainFunction;
+//            }else{
+//                topFunc = intpStack.pop();
+//            }
+//
+//            if (lastDataAccess.getPathFunc().isEmpty()) {
+//                lastDataAccess.setPathFunc(mainFunction);
+//            }
 
-            DataAccessState dataAccess = new DataAccessState(lastDataAccess.getDataAccess(), lastDataAccess.getDataRace());
+            EdgeVtx edgeVtx = (EdgeVtx) conDepGraph.getDGNode(cfaEdge.hashCode());
+            // 如果边信息为空，则直接返回父节点信息
+            if (edgeVtx == null) {
+                return Collections.singleton(lastDataAccess);
+            }
 
-            String mainFunction = edgeInfo.getCfa().getMainFunction().getFunctionName();
+            DataAccessState dataAccess = new DataAccessState(lastDataAccess.getDataAccess(), lastDataAccess.getDataRace(), lastDataAccess.getPathFunc());
 
             // 得到读写信息
             Set<Var> gRVars = edgeVtx.getgReadVars(), gWVars = edgeVtx.getgWriteVars();
 
             // 得到边所在的函数名
             String task = edgeVtx.getBlockStartEdge().getPredecessor().getFunctionName();
+            String task1 = null;
+            if (cfaEdge.getDescription().contains("Return edge from")) {
+                lastDataAccess.setPathFunc(topFunc, cfaEdge.getPredecessor().getFunctionName());
+                task1 = edgeVtx.getBlockStartEdge().getSuccessor().getFunctionName();
+            }
+            int times = 1;
+            if (!dataAccess.getPathFunc().containsKey(task)) {
+                times = getFuncTimes(topFunc, dataAccess.getPathFunc(), task);
+            }
 
             // 先判断读   因为对于任何一条语句， 无论怎样都是先读后写
             if (!gRVars.isEmpty()) {
@@ -114,12 +142,28 @@ public class DataAccessTransferRelation extends SingleEdgeTransferRelation {
 
                     //如果变量已经被检测过了，则不在检测
                     if (dataAccess.isInDataRace(var.getName())) continue;
-
                     int location = var.getExp().getFileLocation().getEndingLineNumber();
-                    State ec = new State(var.getName(), task, location, "R", isr);
 
-                    // 进行数据冲突检测
-                    dataAccess.DataRace(ec, mainFunction);
+                    State ec = null;
+                    CFAEdgeType edgeType = cfaEdge.getEdgeType();
+                    switch(cfaEdge.getEdgeType()){
+                        case FunctionCallEdge:
+                            task = stack.get(stack.size()-1);   // 即将进入的函数
+                            task1 = stack.get(stack.size()-2);  // 当前调用函数
+                            ec = new State(var.getName(), task1,location,"R",topFunc,times);
+                            dataAccess.DataRace(ec, mainFunction);
+                            ec = new State(var.getName(), task,location,"R",topFunc,times);
+                            dataAccess.setDataAccess(ec);
+                            break;
+                        case FunctionReturnEdge:
+                            ec = new State(var.getName(), task1, location, "R", topFunc, times);
+                            break;
+                        default:
+                            ec = new State(var.getName(), task, location, "R", topFunc, times);
+                    }
+
+                    Preconditions.checkNotNull(ec);
+                    dataAccess.DataRace(ec, mainFunction); // 进行数据冲突检测
                 }
             }
 
@@ -127,14 +171,21 @@ public class DataAccessTransferRelation extends SingleEdgeTransferRelation {
             if (!gWVars.isEmpty()) {
                 for (Var var : gWVars) {
 
-                    //如果变量已经被检测过了，则不在检测
                     if (dataAccess.isInDataRace(var.getName())) continue;
-
                     int location = var.getExp().getFileLocation().getEndingLineNumber();
-                    State ec = new State(var.getName(), task, location, "W", isr);
 
-                    // 进行数据冲突检测
-                    dataAccess.DataRace(ec, mainFunction);
+                    State ec = null;
+                    CFAEdgeType edgeType = cfaEdge.getEdgeType();
+                    switch(cfaEdge.getEdgeType()){
+                        case FunctionReturnEdge:
+                            ec = new State(var.getName(), task1, location, "W", topFunc, times);
+                            break;
+                        default:
+                            ec = new State(var.getName(), task, location, "W", topFunc, times);
+                    }
+
+                    Preconditions.checkNotNull(ec);
+                    dataAccess.DataRace(ec, mainFunction); // 进行数据冲突检测
                 }
             }
 
@@ -144,5 +195,30 @@ public class DataAccessTransferRelation extends SingleEdgeTransferRelation {
             transferTimer.stop();
         }
     }
+
+    private int getFuncTimes(String topFunc, Map<String, List<String>> pathFunc, String task) {
+        int cnt = 1;
+        if (pathFunc.containsKey(topFunc)) {   // current path already has the corresponding data
+            cnt = getTimes(pathFunc.get(topFunc), task);
+            pathFunc.get(topFunc).add(task);
+            return cnt;
+        } else {
+            cnt = 1;
+            List<String> funcList = new ArrayList<>();
+            funcList.add(task);
+            pathFunc.put(topFunc, funcList);
+            return cnt;
+        }
+    }
+
+    private int getTimes(List<String> funcPath, String task) {
+        int cnt = 1;
+        for (String func : funcPath)
+            if (func == task)
+                cnt++;
+
+        return cnt;
+    }
+
 
 }

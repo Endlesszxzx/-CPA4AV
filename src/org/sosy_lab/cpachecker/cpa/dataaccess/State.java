@@ -10,6 +10,16 @@ public class State {
     private String topfunc;
     private String Action;
 
+    private int Times;
+
+    public int getTimes() {
+        return Times;
+    }
+
+    public void setTimes(int times) {
+        Times = times;
+    }
+
     public String getTopfunc() {
         return topfunc;
     }
@@ -55,17 +65,18 @@ public class State {
     public State() {
     }
 
-    public State(String name, String task, int loaction, String action, String isr) {
+    public State(String name, String task, int loaction, String action, String isr,int times) {
         Name = name;
         Task = task;
         Loaction = loaction;
         Action = action;
         topfunc = isr;
+        Times = times;
     }
 
     @Override
     public String toString() {
-        return "(" + Name + "," + Task + ", '" + Loaction + ", '" + Action + "," + topfunc + ')';
+        return "(" + Name + "," + Task + ", '" + Loaction + ", '" + Action + ", " + topfunc + ", " + Times +')';
     }
 
 

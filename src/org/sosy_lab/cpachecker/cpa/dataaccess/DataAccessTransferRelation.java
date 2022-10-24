@@ -132,7 +132,7 @@ public class DataAccessTransferRelation extends SingleEdgeTransferRelation {
                 task1 = edgeVtx.getBlockStartEdge().getSuccessor().getFunctionName();
             }
             int times = 1;
-            if (!dataAccess.getPathFunc().containsKey(task)) {
+            if(!dataAccess.getPathFunc().containsKey(task) && !dataAccess.getPathFunc().containsKey(task1)){
                 times = getFuncTimes(topFunc, dataAccess.getPathFunc(), task);
             }
 
@@ -153,7 +153,6 @@ public class DataAccessTransferRelation extends SingleEdgeTransferRelation {
                             ec = new State(var.getName(), task1,location,"R",topFunc,times);
                             dataAccess.DataRace(ec, mainFunction);
                             ec = new State(var.getName(), task,location,"R",topFunc,times);
-                            dataAccess.setDataAccess(ec);
                             break;
                         case FunctionReturnEdge:
                             ec = new State(var.getName(), task1, location, "R", topFunc, times);

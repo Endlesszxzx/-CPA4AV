@@ -17,7 +17,7 @@ public class DataAccessState implements AbstractState, Graphable {
 
     private boolean isRace = false;
 
-    private Map<String,List<String>> pathFunc;
+    private Map<String, List<String>> pathFunc;
 
     public Map<String, List<String>> getPathFunc() {
         return pathFunc;
@@ -28,18 +28,18 @@ public class DataAccessState implements AbstractState, Graphable {
     }
 
     public void setPathFunc(String mainFunc) {
-        List<String>  func = new ArrayList<>();
+        List<String> func = new ArrayList<>();
         func.add(mainFunc);
-        pathFunc.put(mainFunc,func);
+        pathFunc.put(mainFunc, func);
     }
 
     public void setPathFunc(String topFunc, String funcName) {
-        if(pathFunc.containsKey(topFunc)){
+        if (pathFunc.containsKey(topFunc)) {
             pathFunc.get(topFunc).add(funcName);
-        }else{
-            List<String>  func = new ArrayList<>();
+        } else {
+            List<String> func = new ArrayList<>();
             func.add(funcName);
-            pathFunc.put(topFunc,func);
+            pathFunc.put(topFunc, func);
         }
     }
 
@@ -61,21 +61,21 @@ public class DataAccessState implements AbstractState, Graphable {
     public DataAccessState() {
         dataAccess = new ArrayList<DataState>();
         dataRace = new ArrayList<DataState>();
-        pathFunc = new HashMap<String,List<String>>();
+        pathFunc = new HashMap<String, List<String>>();
     }
 
     //
-    public DataAccessState(List<DataState> dataAccess, List<DataState> dataRace,Map<String,List<String>> pathFunc) {
+    public DataAccessState(List<DataState> dataAccess, List<DataState> dataRace, Map<String, List<String>> pathFunc) {
         this.dataAccess = newData(dataAccess);
         this.dataRace = newData(dataRace);
         this.pathFunc = newPath(pathFunc);
     }
 
     private Map<String, List<String>> newPath(Map<String, List<String>> pathFunc) {
-        Map<String,List<String>> ans = new HashMap<String,List<String>>();
-        for(String task: pathFunc.keySet()){
+        Map<String, List<String>> ans = new HashMap<String, List<String>>();
+        for (String task : pathFunc.keySet()) {
             List<String> tmp = new ArrayList<>(pathFunc.get(task));
-            ans.put(task,tmp);
+            ans.put(task, tmp);
         }
         return ans;
     }
@@ -99,7 +99,7 @@ public class DataAccessState implements AbstractState, Graphable {
         this.dataAccess.get(actionListPosition(dataAccess.getN())).setAll(dataAccess);
     }
 
-    public void setDataAccess(State ec){
+    public void setDataAccess(State ec) {
         int index = this.actionListPosition(ec.getName());
 
         if (index == -1) {
@@ -110,6 +110,7 @@ public class DataAccessState implements AbstractState, Graphable {
 
         dataAccess.get(index).append(ec);
     }
+
     public void add(DataState e) {
         dataAccess.add(e);
     }
@@ -183,7 +184,8 @@ public class DataAccessState implements AbstractState, Graphable {
             // 冲突检测，是否有 patternList 中的 pattern
             for (int j = 0; j < 4; j++) {
 
-                if (Arrays.equals(patternList[j], pattern) && ep.getLoaction() != ec.getLoaction()) {
+//                if (Arrays.equals(patternList[j], pattern) && ep.getLoaction() != ec.getLoaction()) {
+                if (Arrays.equals(patternList[j], pattern)) {
                     actionList.updateDataAccess(get_race.getepPosition(), ec, 0, mainFunction);
                     isRace = true;
                     DataState race = new DataState(ep.getName(), ep);

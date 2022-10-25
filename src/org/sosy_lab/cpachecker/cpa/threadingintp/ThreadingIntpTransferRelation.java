@@ -73,6 +73,7 @@ import org.sosy_lab.cpachecker.core.interfaces.StateSpacePartition;
 import org.sosy_lab.cpachecker.cpa.automaton.AutomatonState;
 import org.sosy_lab.cpachecker.cpa.automaton.AutomatonVariable;
 import org.sosy_lab.cpachecker.cpa.callstack.CallstackCPA;
+import org.sosy_lab.cpachecker.cpa.ifcsecurity.flowpolicies.Edge;
 import org.sosy_lab.cpachecker.cpa.location.LocationCPA;
 import org.sosy_lab.cpachecker.cpa.threading.GlobalAccessChecker;
 import org.sosy_lab.cpachecker.exceptions.CPATransferException;
@@ -82,6 +83,7 @@ import org.sosy_lab.cpachecker.util.Pair;
 import org.sosy_lab.cpachecker.util.automaton.AutomatonGraphmlCommon.KeyDef;
 import org.sosy_lab.cpachecker.util.dependence.conditional.ConditionalDepGraph;
 import org.sosy_lab.cpachecker.util.dependence.conditional.EdgeVtx;
+import org.sosy_lab.cpachecker.util.dependence.conditional.Var;
 import org.sosy_lab.cpachecker.util.globalinfo.GlobalInfo;
 
 @Options(prefix = "cpa.threadingintp")
@@ -141,6 +143,7 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
 
     @Option(secure = true, description = "Wheter enable the optimization streategy of representative point selecting. (i.e., if not enable this streategy, then all the interruptions can be triggered at almost all the program locations)")
     private boolean enableRepPointSelecting = true;
+
 
     /**
      * The interruption priorities of all the functions obtained from the file 'InterruptPriority.txt'
@@ -322,6 +325,10 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
             Set<CFANode> visitedNodes = new HashSet<>();
             Deque<CFANode> waitlist = new ArrayDeque<>();
 
+            // 用于延迟策略  2022.10.24
+            DelayStrategy delayVar = new DelayStrategy();
+            CFAEdge preEdge = null;
+
             while (!waitFuncList.isEmpty()) {
                 // 对于每个取出来的函数 f ，遍历其所有的 CFANode 对每一个节点，获取该节点的所有出边并逐一处理。 若出边 e 中包含的全局变量和 intpFuncRWSharedVarMap
                 // 中的全局变量有交集，则将边 e 的前驱节点标记为中断点， 并将相应的中断函数和该中断点绑定。
@@ -339,6 +346,8 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
                 waitlist.push(funcEntry);
                 boolean isEnterFuncBody = false;
                 while (!waitlist.isEmpty()) {
+                    Deque<CFAEdge> waitlistforedge = new ArrayDeque<>();
+
                     CFANode node = waitlist.pop();  // 拿到函数入口点
 
                     if (!visitedNodes.contains(node)) {
@@ -356,63 +365,145 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
 
                                 if (edgeInfo != null) {  // 如果边上拥有实际信息    a edge b
                                     // get read/write variables of the main function edge.   获取主函数边的读写信息
-                                    Set<String> edgeRWSharedVarSet = new HashSet<>();
-                                    edgeRWSharedVarSet.addAll(from(edgeInfo.getgReadVars()).transform(v -> v.getName()).toSet());
-                                    edgeRWSharedVarSet.addAll(from(edgeInfo.getgWriteVars()).transform(v -> v.getName()).toSet());
 
-                                    // NOTICE: we need to add selection point to the successor node of current edge.  我们需要对当前边的后继节点添加选择点
-                                    CFANode preNode = edge.getPredecessor();  // 获得 a
-                                    for (String intpFunc : intpFuncRWSharedVarMap.keySet()) {
-                                        // if not allow the feature of interrupt reentrant, then we should skip this case.
-                                        if (!allowInterruptReentrant && curFunc.equals(intpFunc)) {  // 不允许当前中断函数被当前中断函数所打断 即中断重入
-                                            continue;
-                                        }
+                                    if (i != 0) {
+                                        waitlistforedge.push(edge);
+                                        continue;
+                                    }
 
-                                        Set<String> intpRWSharedVarSet = intpFuncRWSharedVarMap.get(intpFunc);   // 得到中断函数 intpFunc 内的共享变量
+                                    if (waitlistforedge != null && !waitlistforedge.isEmpty()) {
+                                        CFAEdge ppEdge = waitlistforedge.getFirst();
+                                        if (ppEdge.getSuccessor() == edge.getPredecessor()) {
+                                            String callFuncName = getCallFuncName(ppEdge);
+                                            EdgeVtx ppedgeInfo = (EdgeVtx) condDepGraph.getDGNode(ppEdge.hashCode());
 
-                                        // current edge has accessed some common shared variables that accessed by the
-                                        // interruption function. we regard the successor node of current edge as an
-                                        // 'representative selection point'.
-                                        if (!Sets.intersection(intpRWSharedVarSet, edgeRWSharedVarSet).isEmpty()) {  // 两 Set 交集不为空，将 preNode 同 intpFunc 放入 pResults
-                                            if (!pResults.containsKey(preNode)) {
-                                                pResults.put(preNode, new HashSet<>());
+                                            Set<String> gRVars = new HashSet<>(), gWVars = new HashSet<>(), edgeRWSharedVarSet = new HashSet<>();
+                                            gRVars.addAll(from(ppedgeInfo.getgReadVars()).transform(v -> v.getName()).toSet());
+                                            gWVars.addAll(from(ppedgeInfo.getgWriteVars()).transform(v -> v.getName()).toSet());
+                                            edgeRWSharedVarSet.addAll(from(gRVars).toSet());
+                                            edgeRWSharedVarSet.addAll(from(gWVars).toSet());
+
+                                            CFAEdge pEdge = null;
+                                            if (!gWVars.isEmpty()) {
+                                                pEdge = delayVar.delayStrategy(gWVars, callFuncName, disIntpFunc, "W", condDepGraph, ppEdge);
+
+                                                if (pEdge != null)
+                                                    pResults = delayStrategy(gWVars, ppEdge, ppedgeInfo, intpFuncRWSharedVarMap, curFunc, edgeRWSharedVarSet, pResults);
+
+                                                delayVar.setDelayVar(gWVars, ppEdge);// 更新 delayVar
                                             }
-                                            pResults.get(preNode).add(intpFunc);
+                                            if (!gRVars.isEmpty()) {
+                                                pEdge = delayVar.delayStrategy(gRVars, callFuncName, disIntpFunc, "R", condDepGraph, ppEdge);
+
+                                                if (pEdge != null)
+                                                    pResults = delayStrategy(gRVars, ppEdge, ppedgeInfo, intpFuncRWSharedVarMap, curFunc, edgeRWSharedVarSet, pResults);
+
+                                                delayVar.setDelayVar(gRVars, ppEdge); // 更新 delayVar
+                                            }
+                                            waitFuncList.removeFirst();
                                         }
                                     }
+
 
                                     //// process the function call statement edges.
                                     // if the current function 'a' call another function 'b', we also should analyze
                                     // the global variable access information of the function 'b'.
-                                    String callFuncName = null;
-                                    if (edge instanceof CFunctionCallEdge) {     // 如果边为函数调用，得到被调用的函数名
-                                        CFunctionCallEdge funcCallEdge = (CFunctionCallEdge) edge;
-                                        callFuncName = funcCallEdge.getSuccessor().getFunctionName();
-                                    } else if (edge instanceof CStatementEdge) {   // 如果边为状态边，得到边上的语句
-                                        CStatementEdge stmtEdge = (CStatementEdge) edge;
-                                        CStatement stmt = stmtEdge.getStatement();
+                                    String callFuncName = getCallFuncName(edge);
 
-                                        if (stmt instanceof CFunctionCallStatement) {  // 如果语句是函数调用语句，获得被调函数名
-                                            CFunctionCallStatement funcCallStmt = (CFunctionCallStatement) stmt;
-                                            callFuncName = funcCallStmt.getFunctionCallExpression().getFunctionNameExpression().toString();
-                                        } else if (stmt instanceof CFunctionCallAssignmentStatement) {  // 如果语句函数调用赋值语句，获得被调函数名
-                                            CFunctionCallAssignmentStatement funcCallAsgnStmt = (CFunctionCallAssignmentStatement) stmt;
-                                            callFuncName = funcCallAsgnStmt.getFunctionCallExpression().getFunctionNameExpression().toString();
-                                        }
-                                    }
                                     // 如果函数名不为 enable or disable  那么将当前函数名放入待插函数中
                                     if (callFuncName != null && !(callFuncName.startsWith(enIntpFunc) || callFuncName.startsWith(disIntpFunc))) {
                                         waitFuncList.push(callFuncName);
                                     }
+
+                                    boolean flag = false; // 当前变量是否是第一个放入delayVar的
+                                    // 延迟策略
+                                    Set<String> gRVars = new HashSet<>(), gWVars = new HashSet<>(), edgeRWSharedVarSet = new HashSet<>();
+                                    gRVars.addAll(from(edgeInfo.getgReadVars()).transform(v -> v.getName()).toSet());
+                                    gWVars.addAll(from(edgeInfo.getgWriteVars()).transform(v -> v.getName()).toSet());
+                                    edgeRWSharedVarSet.addAll(from(gRVars).toSet());
+                                    edgeRWSharedVarSet.addAll(from(gWVars).toSet());
+
+                                    CFAEdge pEdge = null;
+                                    if (!gWVars.isEmpty()) {
+                                        pEdge = delayVar.delayStrategy(gWVars, callFuncName, disIntpFunc, "W", condDepGraph, edge);
+                                        if (pEdge != null)
+                                            pResults = delayStrategy(gWVars, pEdge, edgeInfo, intpFuncRWSharedVarMap, curFunc, edgeRWSharedVarSet, pResults);
+
+                                        delayVar.setDelayVar(gWVars, edge);  // 更新 delayVar
+                                    }
+                                    if (!gRVars.isEmpty()) {
+
+                                        pEdge = delayVar.delayStrategy(gRVars, callFuncName, disIntpFunc, "R", condDepGraph, edge);
+
+                                        if (pEdge != null)
+                                            pResults = delayStrategy(gRVars, pEdge, edgeInfo, intpFuncRWSharedVarMap, curFunc, edgeRWSharedVarSet, pResults);
+
+                                        delayVar.setDelayVar(gRVars, edge);  // 更新 delayVar
+                                    }
+
                                 }
                             }
-
                             waitlist.push(edge.getSuccessor());   // 放入边的后继节点
                         }
-
                         visitedNodes.add(node);          // 将当前节点放入已遍历集合中
                     }
+                    if(waitlist.isEmpty() && !waitlistforedge.isEmpty()){
+                        System.err.println("waitlistforedge has some wrong");
+                    }
                 }
+            }
+        }
+
+        return pResults;
+    }
+
+    private String getCallFuncName(CFAEdge edge) {
+        String callFuncName = null;
+        if (edge instanceof CFunctionCallEdge) {     // 如果边为函数调用，得到被调用的函数名
+            CFunctionCallEdge funcCallEdge = (CFunctionCallEdge) edge;
+            callFuncName = funcCallEdge.getSuccessor().getFunctionName();
+        } else if (edge instanceof CStatementEdge) {   // 如果边为状态边，得到边上的语句
+            CStatementEdge stmtEdge = (CStatementEdge) edge;
+            CStatement stmt = stmtEdge.getStatement();
+
+            if (stmt instanceof CFunctionCallStatement) {  // 如果语句是函数调用语句，获得被调函数名
+                CFunctionCallStatement funcCallStmt = (CFunctionCallStatement) stmt;
+                callFuncName = funcCallStmt.getFunctionCallExpression().getFunctionNameExpression().toString();
+            } else if (stmt instanceof CFunctionCallAssignmentStatement) {  // 如果语句函数调用赋值语句，获得被调函数名
+                CFunctionCallAssignmentStatement funcCallAsgnStmt = (CFunctionCallAssignmentStatement) stmt;
+                callFuncName = funcCallAsgnStmt.getFunctionCallExpression().getFunctionNameExpression().toString();
+            }
+        }
+        return callFuncName;
+    }
+
+
+    private Map<CFANode, Set<String>> delayStrategy(Set<String> gVars, CFAEdge pEdge, EdgeVtx edgeInfo, Map<String, Set<String>> intpFuncRWSharedVarMap, String curFunc,
+                                                    Set<String> edgeRWSharedVarSet, Map<CFANode, Set<String>> pResults) {
+
+        if (gVars.size() > 1) {
+            System.err.println("Error! In " + edgeInfo.toString() + " has two share writing variable.");
+        }
+
+
+        // NOTICE: we need to add selection point to the successor node of current edge.  我们需要对当前边的后继节点添加选择点
+        CFANode preNode = pEdge.getPredecessor();  // 获得 a
+        for (String intpFunc : intpFuncRWSharedVarMap.keySet()) {
+            // if not allow the feature of interrupt reentrant, then we should skip this case.
+            if (!allowInterruptReentrant && curFunc.equals(intpFunc)) {  // 不允许当前中断函数被当前中断函数所打断 即中断重入
+                continue;
+            }
+
+            Set<String> intpRWSharedVarSet = intpFuncRWSharedVarMap.get(intpFunc);   // 得到中断函数 intpFunc 内的共享变量
+
+            // current edge has accessed some common shared variables that accessed by the
+            // interruption function. we regard the successor node of current edge as an
+            // 'representative selection point'.
+            if (!Sets.intersection(intpRWSharedVarSet, edgeRWSharedVarSet).isEmpty()) {  // 两 Set 交集不为空，将 preNode 同 intpFunc 放入 pResults
+                if (!pResults.containsKey(preNode)) {
+                    pResults.put(preNode, new HashSet<>());
+                }
+                pResults.get(preNode).add(intpFunc);
             }
         }
 
@@ -572,7 +663,7 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
     private Map<String, Set<Integer>> addIntpEnableRelationForEdge(String pFunc,  // 函数名
                                                                    CFAEdge pEdge,  // 边
                                                                    Map<String, Set<Integer>> pIntpMap  // Map<函数名，Set<可插入中断函数的优先级>>返回状态
-                                                                   ) {
+    ) {
         Map<String, Set<Integer>> results = new HashMap<>(pIntpMap);
 
         // we only process the interruption enable function. 只处理中断启用功能。

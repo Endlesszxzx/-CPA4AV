@@ -353,6 +353,9 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
                             // enter the body of the current function.  进入当前函数的函数体
                             if (isEnterFuncBody) {
                                 EdgeVtx edgeInfo = (EdgeVtx) condDepGraph.getDGNode(edge.hashCode());  // 根据当前边获取边内读写信息
+                                // obtain additional information: the called function in this edge; the pre/sucNode of this edge.
+                                String callFuncName = getFunctionCallName(edge);
+                                CFANode preNode = edge.getPredecessor(), sucNode = edge.getSuccessor();  // 获得 a
 
                                 if (edgeInfo != null) {  // 如果边上拥有实际信息    a edge b
                                     // get read/write variables of the main function edge.   获取主函数边的读写信息
@@ -361,7 +364,6 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
                                     edgeRWSharedVarSet.addAll(from(edgeInfo.getgWriteVars()).transform(v -> v.getName()).toSet());
 
                                     // NOTICE: we need to add selection point to the successor node of current edge.  我们需要对当前边的后继节点添加选择点
-                                    CFANode preNode = edge.getPredecessor();  // 获得 a
                                     for (String intpFunc : intpFuncRWSharedVarMap.keySet()) {
                                         // if not allow the feature of interrupt reentrant, then we should skip this case.
                                         if (!allowInterruptReentrant && curFunc.equals(intpFunc)) {  // 不允许当前中断函数被当前中断函数所打断 即中断重入
@@ -384,26 +386,31 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
                                     //// process the function call statement edges.
                                     // if the current function 'a' call another function 'b', we also should analyze
                                     // the global variable access information of the function 'b'.
-                                    String callFuncName = null;
-                                    if (edge instanceof CFunctionCallEdge) {     // 如果边为函数调用，得到被调用的函数名
-                                        CFunctionCallEdge funcCallEdge = (CFunctionCallEdge) edge;
-                                        callFuncName = funcCallEdge.getSuccessor().getFunctionName();
-                                    } else if (edge instanceof CStatementEdge) {   // 如果边为状态边，得到边上的语句
-                                        CStatementEdge stmtEdge = (CStatementEdge) edge;
-                                        CStatement stmt = stmtEdge.getStatement();
-
-                                        if (stmt instanceof CFunctionCallStatement) {  // 如果语句是函数调用语句，获得被调函数名
-                                            CFunctionCallStatement funcCallStmt = (CFunctionCallStatement) stmt;
-                                            callFuncName = funcCallStmt.getFunctionCallExpression().getFunctionNameExpression().toString();
-                                        } else if (stmt instanceof CFunctionCallAssignmentStatement) {  // 如果语句函数调用赋值语句，获得被调函数名
-                                            CFunctionCallAssignmentStatement funcCallAsgnStmt = (CFunctionCallAssignmentStatement) stmt;
-                                            callFuncName = funcCallAsgnStmt.getFunctionCallExpression().getFunctionNameExpression().toString();
-                                        }
-                                    }
-                                    // 如果函数名不为 enable or disable  那么将当前函数名放入待插函数中
                                     if (callFuncName != null && !(callFuncName.startsWith(enIntpFunc) || callFuncName.startsWith(disIntpFunc))) {
+                                        // 如果函数名不为 enable or disable  那么将当前函数名放入待插函数中
                                         waitFuncList.push(callFuncName);
                                     }
+                                }
+                                if(callFuncName != null) {
+                                	// special process for interruption enable function: 
+                                	// 	 if the enable_isr function is reached, we may need to add an interruption point.
+                                	// NOTICE: we need to add the successor node of the enable_isr function, since the precursor 
+                                	//         may still disabling the interruptions to be enabled.
+                                	if(callFuncName.startsWith(enIntpFunc)) {
+                                		if(!pResults.containsKey(sucNode)) {
+                                			pResults.put(sucNode, new HashSet<>());
+                                		}
+                                		// obtain the enabled priority.
+                                		Integer intpPri = getIntpEnablePriority(edge);
+                                		if(intpPri != null) {
+                                    		// set the preNode as interruption point when reach the 'enable_isr' function.
+                                			if(intpPri != -1) {
+                                        		pResults.get(sucNode).addAll(from(priorityMap.keySet()).filter(f -> priorityMap.get(f) == intpPri).toList());
+                                			} else {
+                                				pResults.get(sucNode).addAll(priorityMap.keySet());
+                                			}
+                                		}
+                                	}
                                 }
                             }
 
@@ -417,6 +424,26 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
         }
 
         return pResults;
+    }
+    
+    private String getFunctionCallName(CFAEdge pEdge) {
+    	String callFuncName = null;
+        if (pEdge instanceof CFunctionCallEdge) {     // 如果边为函数调用，得到被调用的函数名
+            CFunctionCallEdge funcCallEdge = (CFunctionCallEdge) pEdge;
+            callFuncName = funcCallEdge.getSuccessor().getFunctionName();
+        } else if (pEdge instanceof CStatementEdge) {   // 如果边为状态边，得到边上的语句
+            CStatementEdge stmtEdge = (CStatementEdge) pEdge;
+            CStatement stmt = stmtEdge.getStatement();
+
+            if (stmt instanceof CFunctionCallStatement) {  // 如果语句是函数调用语句，获得被调函数名
+                CFunctionCallStatement funcCallStmt = (CFunctionCallStatement) stmt;
+                callFuncName = funcCallStmt.getFunctionCallExpression().getFunctionNameExpression().toString();
+            } else if (stmt instanceof CFunctionCallAssignmentStatement) {  // 如果语句函数调用赋值语句，获得被调函数名
+                CFunctionCallAssignmentStatement funcCallAsgnStmt = (CFunctionCallAssignmentStatement) stmt;
+                callFuncName = funcCallAsgnStmt.getFunctionCallExpression().getFunctionNameExpression().toString();
+            }
+        }
+        return callFuncName;
     }
 
     private Map<CFANode, Set<String>> handleRepPointCaseEmptyResults(Map<CFANode, Set<String>> pResults) {
@@ -601,6 +628,26 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
         }
 
         return results;
+    }
+    
+    private Integer getIntpEnablePriority(CFAEdge pEdge) {
+    	if (pEdge instanceof AStatementEdge) {
+            AStatement stmt = ((AStatementEdge) pEdge).getStatement();
+            if (stmt instanceof AFunctionCall) {   // judge the edge must be a function call edge, i.e.judge the edge must be a function call edge
+                String funcName = ((AFunctionCall) stmt).getFunctionCallExpression().getFunctionNameExpression().toString();
+                assert funcName.startsWith(enIntpFunc);
+
+                List<? extends AExpression> funcArgs = ((AFunctionCall) stmt).getFunctionCallExpression().getParameterExpressions();
+                // obtain the enabled priority.
+                if (funcArgs.size() == 1) {
+                    AExpression enPriExp = funcArgs.get(0);
+                    if (enPriExp instanceof CIntegerLiteralExpression) {
+                        return ((CIntegerLiteralExpression) enPriExp).getValue().intValue();
+                    }
+                }
+            }
+    	}
+    	return null;
     }
 
     private Map<String, Integer> parseInterruptPriorityFile() {

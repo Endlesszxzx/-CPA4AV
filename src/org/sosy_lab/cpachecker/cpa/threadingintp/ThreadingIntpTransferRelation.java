@@ -396,21 +396,11 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
                                 	// 	 if the enable_isr function is reached, we may need to add an interruption point.
                                 	// NOTICE: we need to add the successor node of the enable_isr function, since the precursor 
                                 	//         may still disabling the interruptions to be enabled.
-                                	if(callFuncName.startsWith(enIntpFunc)) {
-                                		if(!pResults.containsKey(sucNode)) {
-                                			pResults.put(sucNode, new HashSet<>());
-                                		}
-                                		// obtain the enabled priority.
-                                		Integer intpPri = getIntpEnablePriority(edge);
-                                		if(intpPri != null) {
-                                    		// set the preNode as interruption point when reach the 'enable_isr' function.
-                                			if(intpPri != -1) {
-                                        		pResults.get(sucNode).addAll(from(priorityMap.keySet()).filter(f -> priorityMap.get(f) == intpPri).toList());
-                                			} else {
-                                				pResults.get(sucNode).addAll(priorityMap.keySet());
-                                			}
-                                		}
-                                	}
+                                    if (callFuncName.startsWith(enIntpFunc)) {
+                                        pResults = handleDisOrEn(pResults, sucNode, edge);
+                                    } else if (callFuncName.startsWith(disIntpFunc)) {
+                                        pResults = handleDisOrEn(pResults, preNode, edge);
+                                    }
                                 }
                             }
 
@@ -425,7 +415,24 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
 
         return pResults;
     }
-    
+
+    private Map<CFANode, Set<String>> handleDisOrEn(Map<CFANode, Set<String>> pResults, CFANode node, CFAEdge edge) {
+        if (!pResults.containsKey(node)) {
+            pResults.put(node, new HashSet<>());
+        }
+        // obtain the enabled priority.
+        Integer intpPri = getIntpEnablePriority(edge);
+        if (intpPri != null) {
+            // set the preNode as interruption point when reach the 'enable_isr' function.
+            if (intpPri != -1) {
+                pResults.get(node).addAll(from(priorityMap.keySet()).filter(f -> priorityMap.get(f) == intpPri).toList());
+            } else {
+                pResults.get(node).addAll(priorityMap.keySet());
+            }
+        }
+        return pResults;
+    }
+
     private String getFunctionCallName(CFAEdge pEdge) {
     	String callFuncName = null;
         if (pEdge instanceof CFunctionCallEdge) {     // 如果边为函数调用，得到被调用的函数名

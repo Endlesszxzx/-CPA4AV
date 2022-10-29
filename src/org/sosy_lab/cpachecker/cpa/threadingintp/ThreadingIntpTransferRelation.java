@@ -642,11 +642,11 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
             AStatement stmt = ((AStatementEdge) pEdge).getStatement();
             if (stmt instanceof AFunctionCall) {   // judge the edge must be a function call edge, i.e.judge the edge must be a function call edge
                 String funcName = ((AFunctionCall) stmt).getFunctionCallExpression().getFunctionNameExpression().toString();
-                assert funcName.startsWith(enIntpFunc);
+//                assert funcName.startsWith(enIntpFunc);
 
                 List<? extends AExpression> funcArgs = ((AFunctionCall) stmt).getFunctionCallExpression().getParameterExpressions();
                 // obtain the enabled priority.
-                if (funcArgs.size() == 1) {
+                if(funcName.startsWith(enIntpFunc) && funcArgs.size() == 1) {
                     AExpression enPriExp = funcArgs.get(0);
                     if (enPriExp instanceof CIntegerLiteralExpression) {
                         return ((CIntegerLiteralExpression) enPriExp).getValue().intValue();
@@ -749,6 +749,7 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
            results 为经过 threadingTransferRelation 处理后得到的后继状态集合(但是未经过中断处理)。
            最终返回的 results 为经过中断处理之后的后继状态集合。
         */
+
         results = handleInterruption(threadingState, results);
 
         return ImmutableList.copyOf(results);

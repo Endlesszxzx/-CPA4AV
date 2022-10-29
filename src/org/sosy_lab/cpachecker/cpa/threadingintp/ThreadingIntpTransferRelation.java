@@ -646,7 +646,8 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
 
                 List<? extends AExpression> funcArgs = ((AFunctionCall) stmt).getFunctionCallExpression().getParameterExpressions();
                 // obtain the enabled priority.
-                if(funcName.startsWith(enIntpFunc) && funcArgs.size() == 1) {
+                // if(funcName.startsWith(enIntpFunc) && funcArgs.size() == 1) {
+                if(funcArgs.size() == 1) {
                     AExpression enPriExp = funcArgs.get(0);
                     if (enPriExp instanceof CIntegerLiteralExpression) {
                         return ((CIntegerLiteralExpression) enPriExp).getValue().intValue();

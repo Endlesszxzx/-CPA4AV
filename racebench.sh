@@ -78,7 +78,7 @@ do
 	else
 		echo "${task##*/}: m1(RWR) = $m1, m2(WRW) = $m2, m3(RWW) = $m3, m4(WWR) = $m4, state = $exstate, time = $time"
 		total_num=$(($m1+$m2+$m3+$m4))
-		echo "| ${task##*/} | ${m1} | ${m2} | ${m3} | ${m4} | $total_num | $state | $time |" >> $output
+		echo "| ${task##*/} | ${m1} | ${m2} | ${m3} | ${m4} | $total_num | $exstate | $time |" >> $output
 		total_num=0 m1=0 m2=0 m3=0 m4=0 time=0 state=0
 		flag=0
 	fi

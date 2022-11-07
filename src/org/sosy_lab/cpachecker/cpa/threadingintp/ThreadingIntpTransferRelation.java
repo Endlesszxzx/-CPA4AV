@@ -39,10 +39,7 @@ import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.cpachecker.cfa.CFA;
-import org.sosy_lab.cpachecker.cfa.ast.AExpression;
-import org.sosy_lab.cpachecker.cfa.ast.AFunctionCall;
-import org.sosy_lab.cpachecker.cfa.ast.AIdExpression;
-import org.sosy_lab.cpachecker.cfa.ast.AStatement;
+import org.sosy_lab.cpachecker.cfa.ast.*;
 import org.sosy_lab.cpachecker.cfa.ast.c.CExpression;
 import org.sosy_lab.cpachecker.cfa.ast.c.CFunctionCall;
 import org.sosy_lab.cpachecker.cfa.ast.c.CFunctionCallAssignmentStatement;
@@ -56,6 +53,7 @@ import org.sosy_lab.cpachecker.cfa.ast.c.CUnaryExpression;
 import org.sosy_lab.cpachecker.cfa.model.*;
 import org.sosy_lab.cpachecker.cfa.model.c.CFunctionCallEdge;
 import org.sosy_lab.cpachecker.cfa.model.c.CFunctionEntryNode;
+import org.sosy_lab.cpachecker.cfa.model.c.CReturnStatementEdge;
 import org.sosy_lab.cpachecker.cfa.model.c.CStatementEdge;
 import org.sosy_lab.cpachecker.cfa.postprocessing.global.CFACloner;
 import org.sosy_lab.cpachecker.cfa.types.c.CType;
@@ -784,7 +782,6 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
            results 为经过 threadingTransferRelation 处理后得到的后继状态集合(但是未经过中断处理)。
            最终返回的 results 为经过中断处理之后的后继状态集合。
         */
-
 
 
         String callFuncName = getFunctionCallName(cfaEdge);
@@ -1645,27 +1642,32 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
         // 处理当前是 enable 的情况
         String callFuncName = getFunctionCallName(cfaedge);
         if (callFuncName != null && callFuncName.startsWith(enIntpFunc) && !(delayStrategyEdgeW.isEmpty() && delayStrategyEdgeR.isEmpty())) {
-//        if (callFuncName != null && callFuncName.startsWith(enIntpFunc)) {
             canIntpPoints.addAll(from(repPoints.get(sucNode)).transform(f -> Pair.of(sucNode, f)).toSet());
         }
-//        if(repPoints.containsKey(preNode)){
-//            for (int i = 0; i < preNode.getNumEnteringEdges(); ++i) {
-//                CFAEdge preEdge = preNode.getEnteringEdge(i);
-//                String callFuncName = getFunctionCallName(preEdge);
-//                if(callFuncName!=null && callFuncName.startsWith(enIntpFunc)){
-//                    canIntpPoints.addAll(from(repPoints.get(preNode)).transform(f -> Pair.of(preNode, f)).toSet());
-//                }
-//            }
-//        }
 
-        if (repPoints.containsKey(sucNode)) {
-            for (int i = 0; i < sucNode.getNumLeavingEdges(); ++i) {
-                CFAEdge sucedge = sucNode.getLeavingEdge(i);
+        for (int i = 0; i < sucNode.getNumLeavingEdges(); ++i) {
 
+            CFAEdge sucedge = sucNode.getLeavingEdge(i);
+            // 末位触发
+            if (sucedge instanceof CReturnStatementEdge) {
+                String bottomTriggered = threadingState.getBottomTriggered();
+                if (bottomTriggered != null) {
+                    Set<String> intpFuncSet = getcanIntpFunc(threadingState);
+                    for (String intpFunc : intpFuncSet) {
+                        Map<String, Set<String>> intpRWSharedVarSet = intpFuncRWSharedVarMap.get(intpFunc);   //  intpFunc is global variables set in current isr
+                        if (intpRWSharedVarSet.containsKey(bottomTriggered) && intpRWSharedVarSet.get(bottomTriggered).contains("R")) {
+                            canIntpPoints.add(Pair.of(sucNode,intpFunc));
+                        }
+                    }
+                }
+            }
+
+            if (repPoints.containsKey(sucNode)) {
                 EdgeVtx sucedgeInfo = (EdgeVtx) condDepGraph.getDGNode(sucedge.hashCode());
                 callFuncName = getFunctionCallName(sucedge);
 
-                if (callFuncName != null && callFuncName.startsWith(disIntpFunc) && repPoints.containsKey(sucNode)) {   // 如果是 disable
+                // 延迟策略 —— 如果是disbale
+                if (callFuncName != null && callFuncName.startsWith(disIntpFunc) && repPoints.containsKey(sucNode)) {
                     Set<String> sucIntp = repPoints.get(sucNode);
                     if (delayStrategyEdgeR.isEmpty()) {
                         for (String var : delayStrategyEdgeR.keySet()) {

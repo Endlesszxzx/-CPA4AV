@@ -21,14 +21,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
 
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
@@ -53,6 +46,8 @@ import org.sosy_lab.cpachecker.cpa.callstack.CallstackStateEqualsWrapper;
 import org.sosy_lab.cpachecker.cpa.location.LocationState;
 import org.sosy_lab.cpachecker.exceptions.InvalidQueryException;
 import org.sosy_lab.cpachecker.exceptions.UnrecognizedCodeException;
+import org.sosy_lab.cpachecker.util.dependence.conditional.EdgeVtx;
+import org.sosy_lab.cpachecker.util.dependence.conditional.Var;
 import scala.Int;
 
 /**
@@ -148,6 +143,9 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
      */
     private final PersistentMap<String, Integer> threadIdsForWitness;
 
+    private Map<String, List<DelayStrategy>> delayStrategyREdge;
+    private Map<String, List<DelayStrategy>> delayStrategyWEdge;
+
     // ======================================================================== 构造方法 =================================
     public ThreadingIntpState(final int pMaxIntpLevel) {
         /* 构造函数 1  传入参数 pMaxIntpLevel 为最大中断嵌套数 */
@@ -163,6 +161,8 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
         for (int i = 0; i < pMaxIntpLevel; ++i) {
             this.intpLevelEnableFlags[i] = true;
         }
+        this.delayStrategyREdge = new HashMap<>();
+        this.delayStrategyWEdge = new HashMap<>();
     }
 
     private ThreadingIntpState(PersistentMap<String, ThreadIntpState> pThreads,
@@ -172,7 +172,9 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
                                Map<String, Integer> pIntpTimes,
                                String pActiveThread,
                                FunctionCallEdge entryFunction,
-                               PersistentMap<String, Integer> pThreadIdsForWitness) {
+                               PersistentMap<String, Integer> pThreadIdsForWitness,
+                               Map<String, List<DelayStrategy>> delayStrategyREdge,
+                               Map<String, List<DelayStrategy>> delayStrategyWEdge) {
         /* 基于之前的信息，重新生成一个 ThreadingIntpState */
         this.threads = pThreads;
         this.locks = pLocks;
@@ -184,11 +186,153 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
         this.activeThread = pActiveThread;
         this.entryFunction = entryFunction;
         this.threadIdsForWitness = pThreadIdsForWitness;
+        this.delayStrategyREdge = delayStrategyREdge;
+        this.delayStrategyWEdge = delayStrategyWEdge;
+    }
+
+
+    public ThreadingIntpState(ThreadingIntpState state) {
+        this.threads = state.getThreads();
+        this.locks = state.getLocks();
+        this.intpStack = state.getIntpStack();
+        this.intpLevelEnableFlags = state.intpLevelEnableFlags;
+        this.intpTimes = state.getIntpTimes();
+        this.activeThread = state.getActiveThread();
+        this.entryFunction = state.getEntryFunction();
+        this.threadIdsForWitness = state.getThreadIdsForWitness();
+        this.delayStrategyREdge = newData(state.getDelayStrategyREdge());
+        this.delayStrategyWEdge = newData(state.getDelayStrategyWEdge());
+    }
+
+    private Map<String, List<DelayStrategy>> newData(Map<String, List<DelayStrategy>> edgeMap) {
+        Map<String, List<DelayStrategy>> results = new HashMap<>();
+        for (String var : edgeMap.keySet()) {
+            List<DelayStrategy> tmp = new ArrayList<>();
+            for (DelayStrategy edge : edgeMap.get(var)) {
+                DelayStrategy transfer = edge.reNew();
+                tmp.add(transfer);
+            }
+            results.put(var, tmp);
+        }
+        return results;
+    }
+
+    public ThreadingIntpState(PersistentMap<String, ThreadIntpState> threads, PersistentMap<String, String> locks, Map<String, Integer> intpTimes,
+                              boolean[] intpLevelEnableFlags, Deque<String> intpStack, @Nullable String activeThread,
+                              String keptActiveThread, @Nullable FunctionCallEdge entryFunction,
+                              PersistentMap<String, Integer> threadIdsForWitness,
+                              Map<String, List<DelayStrategy>> delayStrategyREdge,
+                              Map<String, List<DelayStrategy>> delayStrategyWEdge) {
+        this.threads = threads;
+        this.locks = locks;
+        this.intpTimes = intpTimes;
+        this.intpLevelEnableFlags = intpLevelEnableFlags;
+        this.intpStack = intpStack;
+        this.activeThread = activeThread;
+        this.keptActiveThread = keptActiveThread;
+        this.entryFunction = entryFunction;
+        this.threadIdsForWitness = threadIdsForWitness;
+        this.delayStrategyREdge = newData(delayStrategyREdge);
+        this.delayStrategyWEdge = newData(delayStrategyWEdge);
+    }
+
+    private Map<String, List<DelayStrategy>> updateEdgeSet(Map<String, List<DelayStrategy>> rwEdge, CFAEdge cfaEdge, String var, Set<String> intpFunc) {
+        DelayStrategy edge = new DelayStrategy(var, cfaEdge, intpFunc);
+        if (rwEdge.containsKey(var)) {
+            if (rwEdge.get(var).contains(edge)) {
+                rwEdge.get(var).remove(edge);
+            }
+            rwEdge.get(var).add(edge);
+        } else {
+            rwEdge.put(var, new ArrayList<>());
+            rwEdge.get(var).add(edge);
+        }
+
+        return rwEdge;
+    }
+
+
+    public ThreadingIntpState updateRW(EdgeVtx edgeInfo, CFAEdge cfaEdge, Set<String> intpFunc) {
+        Map<String, List<DelayStrategy>> rEdge = newData(delayStrategyREdge);
+        Map<String, List<DelayStrategy>> wEdge = newData(delayStrategyWEdge);
+        if (edgeInfo != null && !edgeInfo.getgReadVars().isEmpty()) {
+            for (Var var : edgeInfo.getgReadVars()) {
+                rEdge = updateEdgeSet(rEdge, cfaEdge, var.getName(), intpFunc);
+            }
+        }
+        if (edgeInfo != null && !edgeInfo.getgWriteVars().isEmpty()) {
+            for (Var var : edgeInfo.getgWriteVars()) {
+                wEdge = updateEdgeSet(wEdge, cfaEdge, var.getName(), intpFunc);
+            }
+        }
+        return new ThreadingIntpState(threads, locks, intpTimes, intpLevelEnableFlags, intpStack, activeThread, keptActiveThread, entryFunction, threadIdsForWitness, rEdge, wEdge);
     }
 
     // ============================================================== Get & Set 方法
     // ======================================
     // For IntpStack  中断函数名
+
+    public PersistentMap<String, ThreadIntpState> getThreads() {
+        return threads;
+    }
+
+    public PersistentMap<String, String> getLocks() {
+        return locks;
+    }
+
+    public Map<String, Integer> getIntpTimes() {
+        return intpTimes;
+    }
+
+    public void setIntpTimes(Map<String, Integer> intpTimes) {
+        this.intpTimes = intpTimes;
+    }
+
+    public boolean[] getIntpLevelEnableFlags() {
+        return intpLevelEnableFlags;
+    }
+
+    public void setIntpLevelEnableFlags(boolean[] intpLevelEnableFlags) {
+        this.intpLevelEnableFlags = intpLevelEnableFlags;
+    }
+
+    public PersistentMap<String, Integer> getThreadIdsForWitness() {
+        return threadIdsForWitness;
+    }
+
+    public Map<String, List<DelayStrategy>> getDelayStrategyREdge() {
+        return delayStrategyREdge;
+    }
+
+    public Map<String, List<DelayStrategy>> getDelayStrategyWEdge() {
+        return delayStrategyWEdge;
+    }
+
+    public void setrEdge(Map<String, List<DelayStrategy>> rEdge) {
+        this.delayStrategyREdge = new HashMap<>(rEdge);
+    }
+
+    public void setDelayStrategyREdge(Map<String, List<DelayStrategy>> delayStrategyREdge) {
+        this.delayStrategyREdge = delayStrategyREdge;
+    }
+
+    public void setDelayStrategyWEdge(Map<String, List<DelayStrategy>> delayStrategyWEdge) {
+        this.delayStrategyWEdge = delayStrategyWEdge;
+    }
+
+    public void setrEdge(String var, CFAEdge edge, Set<String> intpFunc) {
+        delayStrategyREdge = updateEdgeSet(delayStrategyREdge, edge, var, intpFunc);
+    }
+
+
+    public void setwEdge(Map<String, List<DelayStrategy>> wEdge) {
+        this.delayStrategyWEdge = new HashMap<>(wEdge);
+    }
+
+    public void setwEdge(String var, CFAEdge edge, Set<String> intpFunc) {
+        delayStrategyWEdge = updateEdgeSet(delayStrategyWEdge, edge, var, intpFunc);
+    }
+
     public Deque<String> getIntpStack() {
         return intpStack;
     }
@@ -295,17 +439,17 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
     // ===============================================
     private ThreadingIntpState withThreads(PersistentMap<String, ThreadIntpState> pThreads) {
         return new ThreadingIntpState(pThreads, locks, new ArrayDeque<>(intpStack), intpLevelEnableFlags,
-                new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness);
+                new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge);
     }
 
     private ThreadingIntpState withLocks(PersistentMap<String, String> pLocks) {
         return new ThreadingIntpState(threads, pLocks, new ArrayDeque<>(intpStack), intpLevelEnableFlags,
-                new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness);
+                new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge);
     }
 
     private ThreadingIntpState withThreadIdsForWitness(PersistentMap<String, Integer> pThreadIdsForWitness) {
         return new ThreadingIntpState(threads, locks, new ArrayDeque<>(intpStack), intpLevelEnableFlags,
-                new HashMap<>(intpTimes), activeThread, entryFunction, pThreadIdsForWitness);
+                new HashMap<>(intpTimes), activeThread, entryFunction, pThreadIdsForWitness, delayStrategyREdge, delayStrategyWEdge);
     }
 
     public ThreadingIntpState addThreadAndCopy(String id, int num, int pri, AbstractState stack, AbstractState loc) {
@@ -335,7 +479,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
         // "the interruption of level " + pLevel + " has already been enabled.");
 
         ThreadingIntpState result = new ThreadingIntpState(threads, locks, new ArrayDeque<>(intpStack),
-                intpLevelEnableFlags, new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness);
+                intpLevelEnableFlags, new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge);
         result.intpLevelEnableFlags[pLevel] = true;
 
         return result;
@@ -343,7 +487,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
 
     public ThreadingIntpState enableAllIntpAndCopy() {
         ThreadingIntpState result = new ThreadingIntpState(threads, locks, new ArrayDeque<>(intpStack),
-                intpLevelEnableFlags, new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness);
+                intpLevelEnableFlags, new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge);
         for (int i = 0; i < result.intpLevelEnableFlags.length; ++i) {
             result.intpLevelEnableFlags[i] = true;
         }
@@ -359,7 +503,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
         // "the interruption of level " + pLevel + " has already been disabled.");
 
         ThreadingIntpState result = new ThreadingIntpState(threads, locks, new ArrayDeque<>(intpStack),
-                intpLevelEnableFlags, new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness);
+                intpLevelEnableFlags, new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge);
         result.intpLevelEnableFlags[pLevel] = false;
 
         return result;
@@ -367,7 +511,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
 
     public ThreadingIntpState disableAllIntpAndCopy() {
         ThreadingIntpState result = new ThreadingIntpState(threads, locks, new ArrayDeque<>(intpStack),
-                intpLevelEnableFlags, new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness);
+                intpLevelEnableFlags, new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge);
         for (int i = 0; i < result.intpLevelEnableFlags.length; ++i) {
             result.intpLevelEnableFlags[i] = false;
         }
@@ -439,14 +583,16 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
     @Override
     public String toDOTLabel() {
         StringBuilder sb = new StringBuilder();
-
-        sb.append("[");
-        Joiner.on(",\n ").withKeyValueSeparator("=").appendTo(sb, threads);
-        sb.append("]");
-        sb.append("\nenable flags: [");
-        for (int i = 0; i < intpLevelEnableFlags.length; ++i) {
-            sb.append(" " + intpLevelEnableFlags[i] + " ");
-        }
+//
+//        sb.append("[");
+////        Joiner.on(",\n ").withKeyValueSeparator("=").appendTo(sb, threads);
+////        sb.append("]");
+////        sb.append("\nenable flags: [");
+////        for (int i = 0; i < intpLevelEnableFlags.length; ++i) {
+////            sb.append(" " + intpLevelEnableFlags[i] + " ");
+////        }
+        sb.append("rEdge : " + delayStrategyREdge).append("\n");
+        sb.append("wEdge : " + delayStrategyWEdge).append("\n");
         sb.append("]");
 
         return sb.toString();
@@ -537,6 +683,30 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
         return false;
     }
 
+    public void checkIntpisNull() {
+        if (!delayStrategyREdge.isEmpty())
+            delayStrategyREdge = checkIntpisNullReal(delayStrategyREdge);
+        if (!delayStrategyWEdge.isEmpty())
+            delayStrategyWEdge = checkIntpisNullReal(delayStrategyWEdge);
+    }
+
+    public Map<String, List<DelayStrategy>> checkIntpisNullReal(Map<String, List<DelayStrategy>> rwEdge) {
+        for (String var : rwEdge.keySet()) {
+            List<DelayStrategy> wantToDel = new ArrayList<>();
+            for (DelayStrategy delayStrategy : rwEdge.get(var)) {
+                if (delayStrategy.getIntpFunc() == null || delayStrategy.getIntpFunc().isEmpty()) {
+                    wantToDel.add(delayStrategy);
+                }
+            }
+            if (wantToDel.isEmpty()) {
+                for (DelayStrategy delayStrategy : wantToDel) {
+                    rwEdge.get(var).remove(delayStrategy);
+                }
+            }
+        }
+        return rwEdge;
+    }
+
     /**
      * A ThreadState describes the state of a single thread.
      */
@@ -606,8 +776,9 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
      */
     public ThreadingIntpState withActiveThread(@Nullable String pActiveThread) {
         return new ThreadingIntpState(threads, locks, new ArrayDeque<>(intpStack), intpLevelEnableFlags,
-                new HashMap<>(intpTimes), pActiveThread, entryFunction, threadIdsForWitness);
+                new HashMap<>(intpTimes), pActiveThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge);
     }
+
     // modified by xhr: 22-10-09
     // default to public
     public String getActiveThread() {
@@ -619,7 +790,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
      */
     public ThreadingIntpState withEntryFunction(@Nullable FunctionCallEdge pEntryFunction) {
         return new ThreadingIntpState(threads, locks, new ArrayDeque<>(intpStack), intpLevelEnableFlags,
-                new HashMap<>(intpTimes), activeThread, pEntryFunction, threadIdsForWitness);
+                new HashMap<>(intpTimes), activeThread, pEntryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge);
     }
 
     /**

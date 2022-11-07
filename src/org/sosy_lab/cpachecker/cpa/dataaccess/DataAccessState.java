@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DataAccessState implements AbstractState, Graphable {
-    //public class DataAccessState implements AbstractState {
+//public class DataAccessState implements AbstractState {
     private List<DataState> dataAccess;
 
     private List<DataState> dataRace;

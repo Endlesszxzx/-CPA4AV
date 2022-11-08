@@ -1656,7 +1656,7 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
                     for (String intpFunc : intpFuncSet) {
                         Map<String, Set<String>> intpRWSharedVarSet = intpFuncRWSharedVarMap.get(intpFunc);   //  intpFunc is global variables set in current isr
                         if (intpRWSharedVarSet.containsKey(bottomTriggered) && intpRWSharedVarSet.get(bottomTriggered).contains("R")) {
-                            canIntpPoints.add(Pair.of(sucNode,intpFunc));
+                            canIntpPoints.add(Pair.of(sucNode, intpFunc));
                         }
                     }
                 }
@@ -1699,7 +1699,6 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
                 }
 
                 if (sucedgeInfo != null) { // the edge has global variables
-
                     // read or write of the subsequent edge
                     Set<String> edgeRWSharedVarSet = new HashSet<>();
                     edgeRWSharedVarSet.addAll(from(sucedgeInfo.getgReadVars()).transform(v -> v.getName()).toSet());
@@ -1709,6 +1708,7 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
                     Set<String> intpFuncSet = repPoints.get(sucNode);
                     for (String intpFunc : intpFuncSet) {
                         Map<String, Set<String>> intpRWSharedVarSet = intpFuncRWSharedVarMap.get(intpFunc);   //  intpFunc is global variables set in current isr
+                        // 延迟策略
                         for (String var : edgeRWSharedVarSet) {     // var in subsequent edge
                             if (intpRWSharedVarSet.containsKey(var) && intpRWSharedVarSet.get(var).contains("W")) {   // if var in isr and write it
                                 for (String var1 : delayStrategyEdgeR.keySet()) {  // Iterate over the previous read and write information that occurred
@@ -1727,6 +1727,30 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
                             if (!delayStrategyEdgeW.isEmpty() && intpRWSharedVarSet.containsKey(var)) {
                                 for (String var1 : delayStrategyEdgeW.keySet()) {    // 之前有写就插
                                     if (intpRWSharedVarSet.containsKey(var1)) {
+                                        canIntpPoints.addAll(from(repPoints.get(sucNode)).transform(f -> Pair.of(sucNode, f)).toSet());
+                                    }
+                                }
+                            }
+                        }
+
+
+                        // 首位触发
+                        if (!threadingState.getIntpStack().contains(intpFunc)) {
+                            Set<String> rSet = new HashSet<>();
+                            Set<String> wSet = new HashSet<>();
+                            rSet.addAll(from(sucedgeInfo.getgReadVars()).transform(v -> v.getName()).toSet());
+                            wSet.addAll(from(sucedgeInfo.getgWriteVars()).transform(v -> v.getName()).toSet());
+
+                            if (!rSet.isEmpty()) {
+                                for (String var : rSet) {
+                                    if (!delayStrategyEdgeW.containsKey(var) && !delayStrategyEdgeR.containsKey(var) && intpRWSharedVarSet.containsKey(var) && intpRWSharedVarSet.get(var).contains("W")) {
+                                        canIntpPoints.addAll(from(repPoints.get(sucNode)).transform(f -> Pair.of(sucNode, f)).toSet());
+                                    }
+                                }
+                            }
+                            if(!wSet.isEmpty()){
+                                for(String var: wSet){
+                                    if(!delayStrategyEdgeR.containsKey(var) && delayStrategyEdgeW.containsKey(var) && intpRWSharedVarSet.containsKey(var) && intpRWSharedVarSet.get(var).contains("R")){
                                         canIntpPoints.addAll(from(repPoints.get(sucNode)).transform(f -> Pair.of(sucNode, f)).toSet());
                                     }
                                 }

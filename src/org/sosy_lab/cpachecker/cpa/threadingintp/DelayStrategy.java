@@ -51,4 +51,11 @@ public class DelayStrategy {
     public void removeIntpFunc(String intpFunc){
         this.intpFunc.remove(intpFunc);
     }
+
+    @Override
+    public String toString() {
+        return  "var='" + var + '\'' +
+                ", cfaEdge=" + cfaEdge +
+                ", intpFunc=" + intpFunc ;
+    }
 }

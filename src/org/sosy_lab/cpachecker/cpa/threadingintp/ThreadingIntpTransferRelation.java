@@ -528,7 +528,9 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
                                     // add by xhr:
                                     Set<Var> gRVars = edgeInfo.getgReadVars(), gWVars = edgeInfo.getgWriteVars();
                                     for (Var var : gRVars) {
-                                        if (funcReadWriteSharedVars.containsKey(var.getName())) funcReadWriteSharedVars.get(var.getName()).add("R");
+                                        if (funcReadWriteSharedVars.containsKey(var.getName())) {
+                                            funcReadWriteSharedVars.get(var.getName()).add("R");
+                                        }
                                         else {
                                             Set<String> tmp = new HashSet<>();
                                             tmp.add("R");
@@ -536,8 +538,9 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
                                         }
                                     }
                                     for (Var var : gWVars) {
-                                        if (funcReadWriteSharedVars.containsKey(var.getName())) funcReadWriteSharedVars.get(var.getName()).add("W");
-                                        else {
+                                        if (funcReadWriteSharedVars.containsKey(var.getName())){
+                                            funcReadWriteSharedVars.get(var.getName()).add("W");
+                                        }  else {
                                             Set<String> tmp = new HashSet<>();
                                             tmp.add("W");
                                             funcReadWriteSharedVars.put(var.getName(), tmp);
@@ -791,12 +794,16 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
 //                if (!(threadingState.getDelayStrategyREdge().isEmpty() && threadingState.getDelayStrategyWEdge().isEmpty()))
                 threadingState = threadingState.enableAllIntpAndCopy();
 
-            } else
+            } else {
                 threadingState = threadingState.enableIntpAndCopy(pLevel - 1);
+            }
+
         }
-
+//        System.out.println("R:"+threadingState.getDelayStrategyREdgeTostring());
+//        System.out.println("W:"+threadingState.getDelayStrategyWEdgeTostring());
         results = handleInterruption(threadingState, results, cfaEdge);
-
+//        System.out.println("R:"+threadingState.getDelayStrategyREdgeTostring());
+//        System.out.println("W:"+threadingState.getDelayStrategyWEdgeTostring());
         for (ThreadingIntpState threadingIntpState : results) {
             threadingIntpState.checkIntpisNull();
         }
@@ -808,7 +815,7 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
 
     private Set<String> getcanIntpFunc(ThreadingIntpState threadingIntpState) {
         Set<String> intpFunc = new HashSet<>();
-        boolean[] intpLevelEnableFlags = threadingIntpState.getIntpLevelEnableFlags();
+        boolean[] intpLevelEnableFlags = threadingIntpState.getIntpLevelEnableFlags();  // 获取当前可中断的函数集合
         for (int i = 0; i < intpLevelEnableFlags.length; i++) {
             if (intpLevelEnableFlags[i]) {
                 for (String func : priorityMap.keySet()) {
@@ -1453,6 +1460,13 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
             Set<Pair<Integer, String>> canIntpPoints = filterOutInvalidInterruptPoints(threadingState, intpPoints);
             /* 到此为止， canIntpPoints 包含了将要触发的中断函数及其对应的优先级。 */
 
+            if(canIntpPoints!=null || !canIntpPoints.isEmpty()){
+                for(Pair pair:canIntpPoints){
+                    String intpFunc = (String) pair.getSecond();
+                    threadingState.dealDrop(intpFunc);
+                }
+            }
+
             // third step: group and re-order these interrupt points according to their priorities.
             /* 这里将 canIntpPoints 中的中断函数按照优先级形成不同的列表(每个中断函数被放在一个列表中)，得到列表集合 orderedIntpPoints 。*/
             Set<List<String>> orderedIntpPoints = createInteruptCreationSet(canIntpPoints);
@@ -1636,8 +1650,8 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
     private Collection<Pair<CFANode, String>> obtainInterruptPoints(final ThreadingIntpState threadingState, CFAEdge cfaedge) {
         Set<Pair<CFANode, String>> canIntpPoints = new HashSet<>();
         CFANode sucNode = cfaedge.getSuccessor(), preNode = cfaedge.getPredecessor();
-        Map<String, List<DelayStrategy>> delayStrategyEdgeR = threadingState.getDelayStrategyREdge();
-        Map<String, List<DelayStrategy>> delayStrategyEdgeW = threadingState.getDelayStrategyWEdge();
+        Map<String, Set<DelayStrategy>> delayStrategyEdgeR = threadingState.getDelayStrategyREdge();
+        Map<String, Set<DelayStrategy>> delayStrategyEdgeW = threadingState.getDelayStrategyWEdge();
 
         // 处理当前是 enable 的情况
         String callFuncName = getFunctionCallName(cfaedge);
@@ -1671,12 +1685,11 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
                     Set<String> sucIntp = repPoints.get(sucNode);
                     if (delayStrategyEdgeR.isEmpty()) {
                         for (String var : delayStrategyEdgeR.keySet()) {
-                            List<DelayStrategy> delayStrategiesList = delayStrategyEdgeR.get(var);
+                            Set<DelayStrategy> delayStrategiesList = delayStrategyEdgeR.get(var);
                             for (DelayStrategy delayStrategy : delayStrategiesList) {
                                 Set<String> lastNodeIntp = delayStrategy.getIntpFunc();
                                 if (!Sets.intersection(lastNodeIntp, sucIntp).isEmpty()) {
                                     canIntpPoints.addAll(from(repPoints.get(sucNode)).transform(f -> Pair.of(sucNode, f)).toSet());
-                                    delayStrategy.drop(sucIntp);
                                 }
                             }
 
@@ -1685,12 +1698,11 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
                     }
                     if (delayStrategyEdgeW.isEmpty()) {
                         for (String var : delayStrategyEdgeW.keySet()) {
-                            List<DelayStrategy> delayStrategiesList = delayStrategyEdgeW.get(var);
+                            Set<DelayStrategy> delayStrategiesList = delayStrategyEdgeW.get(var);
                             for (DelayStrategy delayStrategy : delayStrategiesList) {
                                 CFANode lastNode = delayStrategy.getCfaEdge().getPredecessor();
                                 if (!Sets.intersection(repPoints.get(lastNode), sucIntp).isEmpty()) {
                                     canIntpPoints.addAll(from(repPoints.get(sucNode)).transform(f -> Pair.of(sucNode, f)).toSet());
-                                    delayStrategy.drop(sucIntp);
                                 }
                             }
                         }
@@ -1716,7 +1728,6 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
                                         for (DelayStrategy delayStrategy : delayStrategyEdgeR.get(var1)) {
                                             if (delayStrategy.getIntpFunc().contains(intpFunc)) {    // if the delayed interrupt is not inserted
                                                 canIntpPoints.addAll(from(repPoints.get(sucNode)).transform(f -> Pair.of(sucNode, f)).toSet());
-                                                delayStrategy.removeIntpFunc(intpFunc);
                                             }
                                         }
 
@@ -1748,9 +1759,9 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
                                     }
                                 }
                             }
-                            if(!wSet.isEmpty()){
-                                for(String var: wSet){
-                                    if(!delayStrategyEdgeR.containsKey(var) && delayStrategyEdgeW.containsKey(var) && intpRWSharedVarSet.containsKey(var) && intpRWSharedVarSet.get(var).contains("R")){
+                            if (!wSet.isEmpty()) {
+                                for (String var : wSet) {
+                                    if (!delayStrategyEdgeR.containsKey(var) && delayStrategyEdgeW.containsKey(var) && intpRWSharedVarSet.containsKey(var) && intpRWSharedVarSet.get(var).contains("R")) {
                                         canIntpPoints.addAll(from(repPoints.get(sucNode)).transform(f -> Pair.of(sucNode, f)).toSet());
                                     }
                                 }

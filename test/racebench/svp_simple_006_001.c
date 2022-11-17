@@ -1,5 +1,5 @@
 extern void idlerun();
-
+extern int __VERIFIER_nondet_int();
 extern void enable_isr(int);
 
 extern void disable_isr(int);

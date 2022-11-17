@@ -3,7 +3,7 @@ extern void idlerun();
 extern void enable_isr(int);
 
 extern void disable_isr(int);
-
+extern int __VERIFIER_nondet_int();
 extern int rand();
 
 void init();
@@ -34,8 +34,8 @@ int svp_simple_028_001_main() {
 }
 
 void svp_simple_028_001_init() {
-  svp_simple_028_001_gloable_var = rand();
-  svp_simple_028_001_isr_1_flag = rand();
+  svp_simple_028_001_gloable_var = __VERIFIER_nondet_int();
+  svp_simple_028_001_isr_1_flag = __VERIFIER_nondet_int();
 
   init();
 }
@@ -47,7 +47,7 @@ void svp_simple_001_001_isr_1() {
 }
 void svp_simple_001_001_isr_2() {
   if (svp_simple_028_001_isr_1_flag) {
-    svp_simple_028_001_gloable_var++;  
+    svp_simple_028_001_gloable_var++;
   }
 }
 

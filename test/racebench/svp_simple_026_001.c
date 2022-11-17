@@ -1,5 +1,5 @@
 extern void idlerun();
-
+extern int __VERIFIER_nondet_int();
 extern void enable_isr(int);
 
 extern void disable_isr(int);
@@ -34,7 +34,7 @@ int svp_simple_026_001_main() {
   return 0;
 }
 void svp_simple_026_001_init() {
-  svp_simple_026_001_gloable_var = rand();
+  svp_simple_026_001_gloable_var =  __VERIFER_nondet_int();
 
   init();
 }

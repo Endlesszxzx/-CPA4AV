@@ -3,7 +3,7 @@ extern void idlerun();
 extern void enable_isr(int);
 
 extern void disable_isr(int);
-
+extern int __VERIFIER_nondet_int();
 extern int rand();
 
 

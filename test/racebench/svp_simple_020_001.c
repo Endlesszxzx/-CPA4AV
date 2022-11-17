@@ -17,7 +17,7 @@
 #include "../common.h"
 
 volatile int svp_simple_020_001_global_var;
-
+extern int __VERIFIER_nondet_int();
 volatile int svp_simple_020_001_global_para;
 
 volatile int svp_simple_020_001_global_flag = 0;

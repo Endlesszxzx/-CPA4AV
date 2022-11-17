@@ -34,7 +34,7 @@ echo "| task-name | RWR | WRW | RWW | WWR | total-bugs| state | total time(ms) |
 echo "| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | " >> $output
 
 # run the ./scripts/cpa.sh for task in 'racebench'
-for task in $(ls $test_file_dir | grep -E ".*\.i")
+for task in $(ls $test_file_dir | grep -E ".*\.c")
 do
 	# m1:RWR, m2:WRW, m3:RWW, m4:WWR
 	total_num=0 m1=0 m2=0 m3=0 m4=0 exstate=0 time=0 i=1 flag=0 

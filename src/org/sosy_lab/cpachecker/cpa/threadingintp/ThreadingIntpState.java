@@ -225,7 +225,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
         this.delayStrategyREdge = newData(state.getDelayStrategyREdge());
         this.delayStrategyWEdge = newData(state.getDelayStrategyWEdge());
         this.bottomTriggered = state.bottomTriggered;
-        this.firstTriggerPool = state.firstTriggerPool;
+        this.firstTriggerPool = new HashSet<>(state.firstTriggerPool);
         this.firstDelayStrategyPool = newData(state.getFirstDelayStrategyPool());
     }
 
@@ -267,7 +267,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
         this.delayStrategyREdge = newData(delayStrategyREdge);
         this.delayStrategyWEdge = newData(delayStrategyWEdge);
         this.bottomTriggered = bottomTriggered;
-        this.firstTriggerPool = firstTriggerPool;
+        this.firstTriggerPool = new HashSet<>(firstTriggerPool);
         this.firstDelayStrategyPool = newData(firstDelayStrategyPool);
     }
 
@@ -409,8 +409,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
     }
 
     public void setFirstDelayStrategyPool(String var, CFAEdge edge, Set<String> intpFunc, Set<String> disableFunc) {
-        this.firstDelayStrategyPool = updateEdgeSet(delayStrategyREdge, edge, var, intpFunc, disableFunc);
-        ;
+        this.firstDelayStrategyPool = updateEdgeSet(firstDelayStrategyPool, edge, var, intpFunc, disableFunc);
     }
 
     public void setDelayStrategyWEdge(Map<String, Map<String, Set<DelayStrategy>>> delayStrategyWEdge) {
@@ -683,6 +682,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
 //
 //        sb.append("[");
 ////        Joiner.on(",\n ").withKeyValueSeparator("=").appendTo(sb, threads);
+////        Joiner.on(",\n ").withKeyValueSeparator("=").appendTo(sb, threads);
 ////        sb.append("]");
 ////        sb.append("\nenable flags: [");
 ////        for (int i = 0; i < intpLevelEnableFlags.length; ++i) {
@@ -690,6 +690,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
 ////        }
         sb.append("rEdge : " + getDelayStrategyRWEdgeTostring(delayStrategyREdge)).append("\n");
         sb.append("wEdge : " + getDelayStrategyRWEdgeTostring(delayStrategyWEdge)).append("\n");
+        sb.append("First:"+getFirstTriggerPool().toString()).append("\n");
         sb.append("]");
 
         return sb.toString();

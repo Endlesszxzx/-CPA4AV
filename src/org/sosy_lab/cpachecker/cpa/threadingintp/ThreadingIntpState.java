@@ -143,9 +143,20 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
      */
     private final PersistentMap<String, Integer> threadIdsForWitness;
 
-    private Map<String, Set<DelayStrategy>> delayStrategyREdge;
-    private Map<String, Set<DelayStrategy>> delayStrategyWEdge;
+    private Map<String, Map<String, Set<DelayStrategy>>> delayStrategyREdge;
+    private Map<String, Map<String, Set<DelayStrategy>>> delayStrategyWEdge;
 
+    public Set<String> getFirstTriggerPool() {
+        return firstTriggerPool;
+    }
+
+    public void setFirstTriggerPool(String var) {
+        this.firstTriggerPool.add(var);
+    }
+
+    private Set<String> firstTriggerPool;
+
+    private Map<String, Map<String, Set<DelayStrategy>>> firstDelayStrategyPool;
     private String bottomTriggered;
 
     // ======================================================================== 构造方法 =================================
@@ -166,6 +177,8 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
         this.delayStrategyREdge = new HashMap<>();
         this.delayStrategyWEdge = new HashMap<>();
         bottomTriggered = null;
+        firstTriggerPool = new HashSet<>();
+        firstDelayStrategyPool = new HashMap<>();
     }
 
     private ThreadingIntpState(PersistentMap<String, ThreadIntpState> pThreads,
@@ -176,9 +189,11 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
                                String pActiveThread,
                                FunctionCallEdge entryFunction,
                                PersistentMap<String, Integer> pThreadIdsForWitness,
-                               Map<String, Set<DelayStrategy>> delayStrategyREdge,
-                               Map<String, Set<DelayStrategy>> delayStrategyWEdge,
-                               String bottomTriggered) {
+                               Map<String, Map<String, Set<DelayStrategy>>> delayStrategyREdge,
+                               Map<String, Map<String, Set<DelayStrategy>>> delayStrategyWEdge,
+                               String bottomTriggered,
+                               Set<String> firstTriggerPool,
+                               Map<String, Map<String, Set<DelayStrategy>>> firstDelayStrategyPool) {
         /* 基于之前的信息，重新生成一个 ThreadingIntpState */
         this.threads = pThreads;
         this.locks = pLocks;
@@ -193,6 +208,8 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
         this.delayStrategyREdge = delayStrategyREdge;
         this.delayStrategyWEdge = delayStrategyWEdge;
         this.bottomTriggered = bottomTriggered;
+        this.firstTriggerPool = firstTriggerPool;
+        this.firstDelayStrategyPool = firstDelayStrategyPool;
     }
 
 
@@ -208,18 +225,25 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
         this.delayStrategyREdge = newData(state.getDelayStrategyREdge());
         this.delayStrategyWEdge = newData(state.getDelayStrategyWEdge());
         this.bottomTriggered = state.bottomTriggered;
+        this.firstTriggerPool = state.firstTriggerPool;
+        this.firstDelayStrategyPool = newData(state.getFirstDelayStrategyPool());
     }
 
-    private Map<String, Set<DelayStrategy>> newData(Map<String, Set<DelayStrategy>> edgeMap) {
-        Map<String, Set<DelayStrategy>> results = new HashMap<>();
-        for (String var : edgeMap.keySet()) {
-            Set<DelayStrategy> tmp = new HashSet<>();
-            for (DelayStrategy edge : edgeMap.get(var)) {
-                DelayStrategy transfer = edge.reNew();
-                tmp.add(transfer);
+    private Map<String, Map<String, Set<DelayStrategy>>> newData(Map<String, Map<String, Set<DelayStrategy>>> edgeMap) {
+        Map<String, Map<String, Set<DelayStrategy>>> results = new HashMap<>();
+        for (String funcName : edgeMap.keySet()) {
+            Map<String, Set<DelayStrategy>> res = new HashMap<>();
+            for (String var : edgeMap.get(funcName).keySet()) {
+                Set<DelayStrategy> tmp = new HashSet<>();
+                for (DelayStrategy edge : edgeMap.get(funcName).get(var)) {
+                    DelayStrategy transfer = edge.reNew();
+                    tmp.add(transfer);
+                }
+                res.put(var, tmp);
             }
-            results.put(var, tmp);
+            results.put(funcName, res);
         }
+
         return results;
     }
 
@@ -227,9 +251,10 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
                               boolean[] intpLevelEnableFlags, Deque<String> intpStack, @Nullable String activeThread,
                               String keptActiveThread, @Nullable FunctionCallEdge entryFunction,
                               PersistentMap<String, Integer> threadIdsForWitness,
-                              Map<String, Set<DelayStrategy>> delayStrategyREdge,
-                              Map<String, Set<DelayStrategy>> delayStrategyWEdge,
-                              String bottomTriggered) {
+                              Map<String, Map<String, Set<DelayStrategy>>> delayStrategyREdge,
+                              Map<String, Map<String, Set<DelayStrategy>>> delayStrategyWEdge,
+                              String bottomTriggered,
+                              Set<String> firstTriggerPool, Map<String, Map<String, Set<DelayStrategy>>> firstDelayStrategyPool) {
         this.threads = threads;
         this.locks = locks;
         this.intpTimes = intpTimes;
@@ -242,6 +267,8 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
         this.delayStrategyREdge = newData(delayStrategyREdge);
         this.delayStrategyWEdge = newData(delayStrategyWEdge);
         this.bottomTriggered = bottomTriggered;
+        this.firstTriggerPool = firstTriggerPool;
+        this.firstDelayStrategyPool = newData(firstDelayStrategyPool);
     }
 
     public String getBottomTriggered() {
@@ -252,25 +279,32 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
         bottomTriggered = var;
     }
 
-    private Map<String, Set<DelayStrategy>> updateEdgeSet(Map<String, Set<DelayStrategy>> rwEdge, CFAEdge cfaEdge, String var, Set<String> intpFunc, Set<String> disableFunc) {
+    private Map<String, Map<String, Set<DelayStrategy>>> updateEdgeSet(Map<String, Map<String, Set<DelayStrategy>>> rwEdge, CFAEdge cfaEdge, String var, Set<String> intpFunc, Set<String> disableFunc) {
         DelayStrategy edge = new DelayStrategy(var, cfaEdge, intpFunc, disableFunc);
-        if (rwEdge.containsKey(var)) {
-            if (rwEdge.get(var).contains(edge)) {
-                rwEdge.get(var).remove(edge);
+        String funcName = cfaEdge.getPredecessor().getFunctionName();
+        if (rwEdge.containsKey(funcName)) {
+            if (rwEdge.get(funcName).containsKey(var)) {
+                if (rwEdge.get(funcName).get(var).contains(edge)) {
+                    rwEdge.get(funcName).get(var).remove(edge);
+                }
+                rwEdge.get(funcName).get(var).add(edge);
+            } else {
+                rwEdge.get(funcName).put(var, new HashSet<>());
+                rwEdge.get(funcName).get(var).add(edge);
             }
-            rwEdge.get(var).add(edge);
         } else {
-            rwEdge.put(var, new HashSet<>());
-            rwEdge.get(var).add(edge);
+            Map<String, Set<DelayStrategy>> tmp = new HashMap<>();
+            tmp.put(var, new HashSet<>());
+            tmp.get(var).add(edge);
+            rwEdge.put(funcName, tmp);
         }
-
         return rwEdge;
     }
 
 
     public ThreadingIntpState updateRW(EdgeVtx edgeInfo, CFAEdge cfaEdge, Set<String> intpFunc, Set<String> disableFunc) {
-        Map<String, Set<DelayStrategy>> rEdge = newData(delayStrategyREdge);
-        Map<String, Set<DelayStrategy>> wEdge = newData(delayStrategyWEdge);
+        Map<String, Map<String, Set<DelayStrategy>>> rEdge = newData(delayStrategyREdge);
+        Map<String, Map<String, Set<DelayStrategy>>> wEdge = newData(delayStrategyWEdge);
         if (edgeInfo != null && !edgeInfo.getgReadVars().isEmpty()) {
             for (Var var : edgeInfo.getgReadVars()) {
                 rEdge = updateEdgeSet(rEdge, cfaEdge, var.getName(), intpFunc, disableFunc);
@@ -282,7 +316,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
                 setBottomTriggered(var.getName());
             }
         }
-        return new ThreadingIntpState(threads, locks, intpTimes, intpLevelEnableFlags, intpStack, activeThread, keptActiveThread, entryFunction, threadIdsForWitness, rEdge, wEdge, bottomTriggered);
+        return new ThreadingIntpState(threads, locks, intpTimes, intpLevelEnableFlags, intpStack, activeThread, keptActiveThread, entryFunction, threadIdsForWitness, rEdge, wEdge, bottomTriggered, firstTriggerPool, firstDelayStrategyPool);
     }
 
     // ============================================================== Get & Set 方法
@@ -317,49 +351,69 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
         return threadIdsForWitness;
     }
 
-    public Map<String, Set<DelayStrategy>> getDelayStrategyREdge() {
+    public Map<String, Map<String, Set<DelayStrategy>>> getDelayStrategyREdge() {
         return delayStrategyREdge;
     }
 
-    public String getDelayStrategyREdgeTostring() {
+    public String getDelayStrategyRWEdgeTostring(Map<String, Map<String, Set<DelayStrategy>>> delayStrategyRWEdge) {
         StringBuilder sb = new StringBuilder();
-        for (String var : delayStrategyREdge.keySet()) {
+        for (String funcName : delayStrategyRWEdge.keySet()) {
             StringBuilder s = new StringBuilder();
-            s.append(var).append(":");
-            for (DelayStrategy delayStrategy : delayStrategyREdge.get(var)) {
-                s.append(delayStrategy.toString()).append(",");
+            s.append(funcName).append(":");
+//            for (DelayStrategy delayStrategy : delayStrategyREdge.get(var)) {
+//                s.append(delayStrategy.toString()).append(",");
+//            }
+            for (String var : delayStrategyRWEdge.get(funcName).keySet()) {
+                s.append(var).append(":");
+                for (DelayStrategy delayStrategy : delayStrategyRWEdge.get(funcName).get(var)) {
+                    s.append(delayStrategy.toString()).append(",");
+                }
             }
             sb.append(s).append("\n");
         }
         return sb.toString();
     }
 
-    public String getDelayStrategyWEdgeTostring() {
-        StringBuilder sb = new StringBuilder();
-        for (String var : delayStrategyWEdge.keySet()) {
-            StringBuilder s = new StringBuilder();
-            s.append(var).append(":");
-            for (DelayStrategy delayStrategy : delayStrategyWEdge.get(var)) {
-                s.append(delayStrategy.toString()).append(",");
-            }
-            sb.append(s).append("\n");
-        }
-        return sb.toString();
-    }
+//    public String getDelayStrategyWEdgeTostring() {
+//        StringBuilder sb = new StringBuilder();
+//        for (String var : delayStrategyWEdge.keySet()) {
+//            StringBuilder s = new StringBuilder();
+//            s.append(var).append(":");
+//            for (DelayStrategy delayStrategy : delayStrategyWEdge.get(var)) {
+//                s.append(delayStrategy.toString()).append(",");
+//            }
+//            sb.append(s).append("\n");
+//        }
+//        return sb.toString();
+//    }
 
-    public Map<String, Set<DelayStrategy>> getDelayStrategyWEdge() {
+    public Map<String, Map<String, Set<DelayStrategy>>> getDelayStrategyWEdge() {
         return delayStrategyWEdge;
     }
 
-    public void setrEdge(Map<String, Set<DelayStrategy>> rEdge) {
+    public void setrEdge(Map<String, Map<String, Set<DelayStrategy>>> rEdge) {
         this.delayStrategyREdge = new HashMap<>(rEdge);
     }
 
-    public void setDelayStrategyREdge(Map<String, Set<DelayStrategy>> delayStrategyREdge) {
+    public void setDelayStrategyREdge(Map<String, Map<String, Set<DelayStrategy>>> delayStrategyREdge) {
         this.delayStrategyREdge = delayStrategyREdge;
     }
 
-    public void setDelayStrategyWEdge(Map<String, Set<DelayStrategy>> delayStrategyWEdge) {
+    public Map<String, Map<String, Set<DelayStrategy>>> getFirstDelayStrategyPool() {
+        return firstDelayStrategyPool;
+    }
+    public void removeDelayStrategyPool(String funcName) {
+        firstDelayStrategyPool.remove(funcName);
+        delayStrategyWEdge.remove(funcName);
+        delayStrategyREdge.remove(funcName);
+    }
+
+    public void setFirstDelayStrategyPool(String var, CFAEdge edge, Set<String> intpFunc, Set<String> disableFunc) {
+        this.firstDelayStrategyPool = updateEdgeSet(delayStrategyREdge, edge, var, intpFunc, disableFunc);
+        ;
+    }
+
+    public void setDelayStrategyWEdge(Map<String, Map<String, Set<DelayStrategy>>> delayStrategyWEdge) {
         this.delayStrategyWEdge = delayStrategyWEdge;
     }
 
@@ -368,7 +422,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
     }
 
 
-    public void setwEdge(Map<String, Set<DelayStrategy>> wEdge) {
+    public void setwEdge(Map<String, Map<String, Set<DelayStrategy>>> wEdge) {
         this.delayStrategyWEdge = new HashMap<>(wEdge);
     }
 
@@ -482,17 +536,17 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
     // ===============================================
     private ThreadingIntpState withThreads(PersistentMap<String, ThreadIntpState> pThreads) {
         return new ThreadingIntpState(pThreads, locks, new ArrayDeque<>(intpStack), intpLevelEnableFlags,
-                new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered);
+                new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered, firstTriggerPool, firstDelayStrategyPool);
     }
 
     private ThreadingIntpState withLocks(PersistentMap<String, String> pLocks) {
         return new ThreadingIntpState(threads, pLocks, new ArrayDeque<>(intpStack), intpLevelEnableFlags,
-                new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered);
+                new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered, firstTriggerPool, firstDelayStrategyPool);
     }
 
     private ThreadingIntpState withThreadIdsForWitness(PersistentMap<String, Integer> pThreadIdsForWitness) {
         return new ThreadingIntpState(threads, locks, new ArrayDeque<>(intpStack), intpLevelEnableFlags,
-                new HashMap<>(intpTimes), activeThread, entryFunction, pThreadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered);
+                new HashMap<>(intpTimes), activeThread, entryFunction, pThreadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered, firstTriggerPool, firstDelayStrategyPool);
     }
 
     public ThreadingIntpState addThreadAndCopy(String id, int num, int pri, AbstractState stack, AbstractState loc) {
@@ -522,7 +576,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
         // "the interruption of level " + pLevel + " has already been enabled.");
 
         ThreadingIntpState result = new ThreadingIntpState(threads, locks, new ArrayDeque<>(intpStack),
-                intpLevelEnableFlags, new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered);
+                intpLevelEnableFlags, new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered, firstTriggerPool, firstDelayStrategyPool);
         result.intpLevelEnableFlags[pLevel] = true;
 
         return result;
@@ -530,7 +584,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
 
     public ThreadingIntpState enableAllIntpAndCopy() {
         ThreadingIntpState result = new ThreadingIntpState(threads, locks, new ArrayDeque<>(intpStack),
-                intpLevelEnableFlags, new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered);
+                intpLevelEnableFlags, new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered, firstTriggerPool, firstDelayStrategyPool);
         for (int i = 0; i < result.intpLevelEnableFlags.length; ++i) {
             result.intpLevelEnableFlags[i] = true;
         }
@@ -546,7 +600,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
         // "the interruption of level " + pLevel + " has already been disabled.");
 
         ThreadingIntpState result = new ThreadingIntpState(threads, locks, new ArrayDeque<>(intpStack),
-                intpLevelEnableFlags, new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered);
+                intpLevelEnableFlags, new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered, firstTriggerPool, firstDelayStrategyPool);
         result.intpLevelEnableFlags[pLevel] = false;
 
         return result;
@@ -554,7 +608,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
 
     public ThreadingIntpState disableAllIntpAndCopy() {
         ThreadingIntpState result = new ThreadingIntpState(threads, locks, new ArrayDeque<>(intpStack),
-                intpLevelEnableFlags, new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered);
+                intpLevelEnableFlags, new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered, firstTriggerPool, firstDelayStrategyPool);
         for (int i = 0; i < result.intpLevelEnableFlags.length; ++i) {
             result.intpLevelEnableFlags[i] = false;
         }
@@ -634,8 +688,8 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
 ////        for (int i = 0; i < intpLevelEnableFlags.length; ++i) {
 ////            sb.append(" " + intpLevelEnableFlags[i] + " ");
 ////        }
-        sb.append("rEdge : " + getDelayStrategyREdgeTostring()).append("\n");
-        sb.append("wEdge : " + getDelayStrategyWEdgeTostring()).append("\n");
+        sb.append("rEdge : " + getDelayStrategyRWEdgeTostring(delayStrategyREdge)).append("\n");
+        sb.append("wEdge : " + getDelayStrategyRWEdgeTostring(delayStrategyWEdge)).append("\n");
         sb.append("]");
 
         return sb.toString();
@@ -733,17 +787,19 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
             delayStrategyWEdge = checkIntpisNullReal(delayStrategyWEdge);
     }
 
-    public Map<String, Set<DelayStrategy>> checkIntpisNullReal(Map<String, Set<DelayStrategy>> rwEdge) {
-        for (String var : rwEdge.keySet()) {
-            List<DelayStrategy> wantToDel = new ArrayList<>();
-            for (DelayStrategy delayStrategy : rwEdge.get(var)) {
-                if (delayStrategy.getIntpFunc() == null || delayStrategy.getIntpFunc().isEmpty()) {
-                    wantToDel.add(delayStrategy);
+    public Map<String, Map<String, Set<DelayStrategy>>> checkIntpisNullReal(Map<String, Map<String, Set<DelayStrategy>>> rwEdge) {
+        for (String funcName : rwEdge.keySet()) {
+            for (String var : rwEdge.get(funcName).keySet()) {
+                List<DelayStrategy> wantToDel = new ArrayList<>();
+                for (DelayStrategy delayStrategy : rwEdge.get(funcName).get(var)) {
+                    if (delayStrategy.getIntpFunc() == null || delayStrategy.getIntpFunc().isEmpty()) {
+                        wantToDel.add(delayStrategy);
+                    }
                 }
-            }
-            if (wantToDel.isEmpty()) {
-                for (DelayStrategy delayStrategy : wantToDel) {
-                    rwEdge.get(var).remove(delayStrategy);
+                if (wantToDel.isEmpty()) {
+                    for (DelayStrategy delayStrategy : wantToDel) {
+                        rwEdge.get(funcName).get(var).remove(delayStrategy);
+                    }
                 }
             }
         }
@@ -751,35 +807,62 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
     }
 
     public void dealDrop(String intpFunc) {
-        for (String var : delayStrategyREdge.keySet()) {
-            Set<DelayStrategy> tmp = new HashSet<>();
-            for (DelayStrategy delayStrategy : delayStrategyREdge.get(var)) {
-                if (delayStrategy.getIntpFunc().contains(intpFunc)) {
-                    delayStrategy.removeIntpFunc(intpFunc);
-                    if (delayStrategy.getIntpFunc().isEmpty() && delayStrategy.getDisableFunc().isEmpty()) {
-                        tmp.add(delayStrategy);
+        // 延迟 R 删除已插入 func
+        for (String funcNmae : delayStrategyREdge.keySet()) {
+            for (String var : delayStrategyREdge.get(funcNmae).keySet()) {
+                Set<DelayStrategy> tmp = new HashSet<>();
+                for (DelayStrategy delayStrategy : delayStrategyREdge.get(funcNmae).get(var)) {
+                    if (delayStrategy.getIntpFunc().contains(intpFunc)) {
+                        delayStrategy.removeIntpFunc(intpFunc);
+                        if (delayStrategy.getIntpFunc().isEmpty() && delayStrategy.getDisableFunc().isEmpty()) {
+                            tmp.add(delayStrategy);
+                        }
                     }
                 }
+                delayStrategyREdge.get(funcNmae).get(var).removeAll(tmp);
             }
-            delayStrategyREdge.get(var).removeAll(tmp);
+            delayStrategyREdge.get(funcNmae).values().removeIf(value -> value.isEmpty());
         }
 
         delayStrategyREdge.values().removeIf(value -> value.isEmpty());
 
-        for (String var : delayStrategyWEdge.keySet()) {
-            Set<DelayStrategy> tmp = new HashSet<>();
-            for (DelayStrategy delayStrategy : delayStrategyWEdge.get(var)) {
-                if (delayStrategy.getIntpFunc().contains(intpFunc)) {
-                    delayStrategy.removeIntpFunc(intpFunc);
-                    if (delayStrategy.getIntpFunc().isEmpty() && delayStrategy.getDisableFunc().isEmpty()) {
-                        tmp.add(delayStrategy);
+        // 延迟 W 删除已插入 func
+        for(String funcName:delayStrategyWEdge.keySet()) {
+            for (String var : delayStrategyWEdge.get(funcName).keySet()) {
+                Set<DelayStrategy> tmp = new HashSet<>();
+                for (DelayStrategy delayStrategy : delayStrategyWEdge.get(funcName).get(var)) {
+                    if (delayStrategy.getIntpFunc().contains(intpFunc)) {
+                        delayStrategy.removeIntpFunc(intpFunc);
+                        if (delayStrategy.getIntpFunc().isEmpty() && delayStrategy.getDisableFunc().isEmpty()) {
+                            tmp.add(delayStrategy);
+                        }
                     }
                 }
+                delayStrategyWEdge.get(funcName).get(var).removeAll(tmp);
             }
-            delayStrategyWEdge.get(var).removeAll(tmp);
+            delayStrategyWEdge.get(funcName).values().removeIf(value -> value.isEmpty());
         }
-
         delayStrategyWEdge.values().removeIf(value -> value.isEmpty());
+
+
+        // 首位中断点延迟池 删除已插入 func
+        for(String funcName:firstDelayStrategyPool.keySet()){
+            for (String var : firstDelayStrategyPool.get(funcName).keySet()) {
+                Set<DelayStrategy> tmp = new HashSet<>();
+                for (DelayStrategy delayStrategy : firstDelayStrategyPool.get(funcName).get(var)) {
+                    if (delayStrategy.getIntpFunc().contains(intpFunc)) {
+                        delayStrategy.removeIntpFunc(intpFunc);
+                        if (delayStrategy.getIntpFunc().isEmpty() && delayStrategy.getDisableFunc().isEmpty()) {
+                            tmp.add(delayStrategy);
+                        }
+                    }
+                }
+                firstDelayStrategyPool.get(funcName).get(var).removeAll(tmp);
+            }
+            firstDelayStrategyPool.get(funcName).values().removeIf(value -> value.isEmpty());
+        }
+        firstDelayStrategyPool.values().removeIf(value -> value.isEmpty());
+
     }
 
     /**
@@ -851,7 +934,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
      */
     public ThreadingIntpState withActiveThread(@Nullable String pActiveThread) {
         return new ThreadingIntpState(threads, locks, new ArrayDeque<>(intpStack), intpLevelEnableFlags,
-                new HashMap<>(intpTimes), pActiveThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered);
+                new HashMap<>(intpTimes), pActiveThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered, firstTriggerPool, firstDelayStrategyPool);
     }
 
     // modified by xhr: 22-10-09
@@ -865,7 +948,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
      */
     public ThreadingIntpState withEntryFunction(@Nullable FunctionCallEdge pEntryFunction) {
         return new ThreadingIntpState(threads, locks, new ArrayDeque<>(intpStack), intpLevelEnableFlags,
-                new HashMap<>(intpTimes), activeThread, pEntryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered);
+                new HashMap<>(intpTimes), activeThread, pEntryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered, firstTriggerPool, firstDelayStrategyPool);
     }
 
     /**

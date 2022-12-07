@@ -39,9 +39,13 @@ void svp_simple_004_001_main() {
     reader6 = svp_simple_004_001_global_var3;
   }
 
-  if (svp_simple_004_001_condition4 == 1) reader3 = svp_simple_004_001_global_var2;
+  if (svp_simple_004_001_condition4 == 1){
+    reader3 = svp_simple_004_001_global_var2;
+  }
 
-  if (svp_simple_004_001_condition5 == 1) reader4 = svp_simple_004_001_global_var2;
+  if (svp_simple_004_001_condition5 == 1) {
+    reader4 = svp_simple_004_001_global_var2;
+  }
 }
 
 void svp_simple_001_001_isr_1() {

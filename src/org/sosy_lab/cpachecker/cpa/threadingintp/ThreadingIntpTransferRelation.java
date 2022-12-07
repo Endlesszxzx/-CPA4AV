@@ -1669,7 +1669,7 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
 //            System.out.println("-------进入延迟策略 enable: ");
 //            System.out.println("              之前R："+threadingState.getDelayStrategyREdgeTostring());
 //            System.out.println("              之前W："+threadingState.getDelayStrategyWEdgeTostring());
-            enableForDelayStrategy(threadingState, canIntpPoints, sucNode, cfaedge,curFuncName);
+            enableForDelayStrategy(threadingState, canIntpPoints, sucNode, cfaedge, curFuncName);
 //            System.out.println("              * 之后R："+threadingState.getDelayStrategyREdgeTostring());
 //            System.out.println("              * 之后W："+threadingState.getDelayStrategyWEdgeTostring());
         }
@@ -1759,8 +1759,10 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
         Map<String, Set<DelayStrategy>> delayStrategyEdgeR = threadingState.getDelayStrategyREdge().get(curFuncName);
         Map<String, Set<DelayStrategy>> delayStrategyEdgeW = threadingState.getDelayStrategyWEdge().get(curFuncName);
         for (String func : intpfunc) {
-            delayStrategyEdgeR = enableForDelayStrategyEdgeInfo(delayStrategyEdgeR, func, canIntpPoints, sucNode);
-            delayStrategyEdgeW = enableForDelayStrategyEdgeInfo(delayStrategyEdgeW, func, canIntpPoints, sucNode);
+            if (delayStrategyEdgeR != null && !delayStrategyEdgeR.isEmpty())
+                delayStrategyEdgeR = enableForDelayStrategyEdgeInfo(delayStrategyEdgeR, func, canIntpPoints, sucNode);
+            if (delayStrategyEdgeW != null && !delayStrategyEdgeW.isEmpty())
+                delayStrategyEdgeW = enableForDelayStrategyEdgeInfo(delayStrategyEdgeW, func, canIntpPoints, sucNode);
         }
     }
 

@@ -1943,7 +1943,7 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
                 intpFuncSet = getintpFunc(intpFuncSet, wEdge.get(funcName));
         }
 
-        if (firstDelayStrategyPool != null && firstDelayStrategyPool != null) {
+        if (firstDelayStrategyPool != null) {
             intpFuncSet.addAll(firstDelayStrategyPool.getIntpFunc());
         }
 

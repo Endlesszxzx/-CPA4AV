@@ -803,9 +803,6 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
         }
 //        System.out.println("R:"+threadingState.getDelayStrategyREdgeTostring());
 //        System.out.println("W:"+threadingState.getDelayStrategyWEdgeTostring());
-        if (cfaEdge.toString().contains("N24")) {
-            System.out.println("Debug");
-        }
         results = handleInterruption(threadingState, results, cfaEdge);
 //        System.out.println("R:"+threadingState.getDelayStrategyREdgeTostring());
 //        System.out.println("W:"+threadingState.getDelayStrategyWEdgeTostring());

@@ -53,7 +53,8 @@ import scala.Int;
 /**
  * This immutable state represents a location state combined with a callstack state.
  */
-public class ThreadingIntpState implements AbstractState, AbstractStateWithLocations, Graphable, Partitionable,
+//Graphable
+public class ThreadingIntpState implements AbstractState, AbstractStateWithLocations, Partitionable,
         AbstractQueryableState {
 
     private static final String PROPERTY_DEADLOCK = "deadlock";
@@ -156,7 +157,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
 
     private Set<String> firstTriggerPool;
 
-    private Map<String, Map<String, Set<DelayStrategy>>> firstDelayStrategyPool;
+    private Map<String, DelayStrategy> firstDelayStrategyPool;
     private String bottomTriggered;
 
     // ======================================================================== 构造方法 =================================
@@ -193,7 +194,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
                                Map<String, Map<String, Set<DelayStrategy>>> delayStrategyWEdge,
                                String bottomTriggered,
                                Set<String> firstTriggerPool,
-                               Map<String, Map<String, Set<DelayStrategy>>> firstDelayStrategyPool) {
+                               Map<String, DelayStrategy> firstDelayStrategyPool) {
         /* 基于之前的信息，重新生成一个 ThreadingIntpState */
         this.threads = pThreads;
         this.locks = pLocks;
@@ -226,8 +227,19 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
         this.delayStrategyWEdge = newData(state.getDelayStrategyWEdge());
         this.bottomTriggered = state.bottomTriggered;
         this.firstTriggerPool = new HashSet<>(state.firstTriggerPool);
-        this.firstDelayStrategyPool = newData(state.getFirstDelayStrategyPool());
+        this.firstDelayStrategyPool = newPool(state.getFirstDelayStrategyPool());
     }
+
+    private Map<String, DelayStrategy> newPool(Map<String, DelayStrategy> firstDelayStrategyPool) {
+        Map<String, DelayStrategy> res = new HashMap<>();
+        for (String func : firstDelayStrategyPool.keySet()) {
+            DelayStrategy delayStrategy = firstDelayStrategyPool.get(func);
+            DelayStrategy tmp = new DelayStrategy(delayStrategy.getVar(), delayStrategy.getCfaEdge(), delayStrategy.getIntpFunc(), delayStrategy.getDisableFunc());
+            res.put(func, tmp);
+        }
+        return res;
+    }
+
 
     private Map<String, Map<String, Set<DelayStrategy>>> newData(Map<String, Map<String, Set<DelayStrategy>>> edgeMap) {
         Map<String, Map<String, Set<DelayStrategy>>> results = new HashMap<>();
@@ -254,7 +266,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
                               Map<String, Map<String, Set<DelayStrategy>>> delayStrategyREdge,
                               Map<String, Map<String, Set<DelayStrategy>>> delayStrategyWEdge,
                               String bottomTriggered,
-                              Set<String> firstTriggerPool, Map<String, Map<String, Set<DelayStrategy>>> firstDelayStrategyPool) {
+                              Set<String> firstTriggerPool, Map<String, DelayStrategy> firstDelayStrategyPool) {
         this.threads = threads;
         this.locks = locks;
         this.intpTimes = intpTimes;
@@ -268,7 +280,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
         this.delayStrategyWEdge = newData(delayStrategyWEdge);
         this.bottomTriggered = bottomTriggered;
         this.firstTriggerPool = new HashSet<>(firstTriggerPool);
-        this.firstDelayStrategyPool = newData(firstDelayStrategyPool);
+        this.firstDelayStrategyPool = newPool(firstDelayStrategyPool);
     }
 
     public String getBottomTriggered() {
@@ -399,17 +411,23 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
         this.delayStrategyREdge = delayStrategyREdge;
     }
 
-    public Map<String, Map<String, Set<DelayStrategy>>> getFirstDelayStrategyPool() {
+    public Map<String, DelayStrategy> getFirstDelayStrategyPool() {
         return firstDelayStrategyPool;
     }
+
     public void removeDelayStrategyPool(String funcName) {
         firstDelayStrategyPool.remove(funcName);
         delayStrategyWEdge.remove(funcName);
         delayStrategyREdge.remove(funcName);
     }
 
-    public void setFirstDelayStrategyPool(String var, CFAEdge edge, Set<String> intpFunc, Set<String> disableFunc) {
-        this.firstDelayStrategyPool = updateEdgeSet(firstDelayStrategyPool, edge, var, intpFunc, disableFunc);
+    public void setFirstDelayStrategyPool(String funcName, CFAEdge edge, Set<String> intpFunc, Set<String> disableFunc) {
+        if (firstDelayStrategyPool.containsKey(funcName)) {
+            System.out.println("Attention! firstDelayStrategyPool has two " + funcName + " in the pool, we will drop the old one. The current edge is " + edge.toString() + " . And the old firstDelayStrategyPool is " + firstDelayStrategyPool.toString() + " .");
+            firstDelayStrategyPool.remove(funcName);
+        }
+        DelayStrategy tmp = new DelayStrategy(funcName, edge, intpFunc, disableFunc);
+        firstDelayStrategyPool.put(funcName, tmp);
     }
 
     public void setDelayStrategyWEdge(Map<String, Map<String, Set<DelayStrategy>>> delayStrategyWEdge) {
@@ -676,30 +694,30 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
                 threadIdsForWitness);
     }
 
-    @Override
-    public String toDOTLabel() {
-        StringBuilder sb = new StringBuilder();
+//    @Override
+//    public String toDOTLabel() {
+//        StringBuilder sb = new StringBuilder();
+////
+////        sb.append("[");
+//////        Joiner.on(",\n ").withKeyValueSeparator("=").appendTo(sb, threads);
+//////        Joiner.on(",\n ").withKeyValueSeparator("=").appendTo(sb, threads);
+//////        sb.append("]");
+//////        sb.append("\nenable flags: [");
+//////        for (int i = 0; i < intpLevelEnableFlags.length; ++i) {
+//////            sb.append(" " + intpLevelEnableFlags[i] + " ");
+//////        }
+//        sb.append("rEdge : " + getDelayStrategyRWEdgeTostring(delayStrategyREdge)).append("\n");
+//        sb.append("wEdge : " + getDelayStrategyRWEdgeTostring(delayStrategyWEdge)).append("\n");
+//        sb.append("First:" + getFirstTriggerPool().toString()).append("\n");
+//        sb.append("]");
 //
-//        sb.append("[");
-////        Joiner.on(",\n ").withKeyValueSeparator("=").appendTo(sb, threads);
-////        Joiner.on(",\n ").withKeyValueSeparator("=").appendTo(sb, threads);
-////        sb.append("]");
-////        sb.append("\nenable flags: [");
-////        for (int i = 0; i < intpLevelEnableFlags.length; ++i) {
-////            sb.append(" " + intpLevelEnableFlags[i] + " ");
-////        }
-        sb.append("rEdge : " + getDelayStrategyRWEdgeTostring(delayStrategyREdge)).append("\n");
-        sb.append("wEdge : " + getDelayStrategyRWEdgeTostring(delayStrategyWEdge)).append("\n");
-        sb.append("First:"+getFirstTriggerPool().toString()).append("\n");
-        sb.append("]");
-
-        return sb.toString();
-    }
-
-    @Override
-    public boolean shouldBeHighlighted() {
-        return false;
-    }
+//        return sb.toString();
+//    }
+//
+//    @Override
+//    public boolean shouldBeHighlighted() {
+//        return false;
+//    }
 
 
     @Override
@@ -828,7 +846,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
         delayStrategyREdge.values().removeIf(value -> value.isEmpty());
 
         // 延迟 W 删除已插入 func
-        for(String funcName:delayStrategyWEdge.keySet()) {
+        for (String funcName : delayStrategyWEdge.keySet()) {
             for (String var : delayStrategyWEdge.get(funcName).keySet()) {
                 Set<DelayStrategy> tmp = new HashSet<>();
                 for (DelayStrategy delayStrategy : delayStrategyWEdge.get(funcName).get(var)) {
@@ -847,23 +865,19 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
 
 
         // 首位中断点延迟池 删除已插入 func
-        for(String funcName:firstDelayStrategyPool.keySet()){
-            for (String var : firstDelayStrategyPool.get(funcName).keySet()) {
-                Set<DelayStrategy> tmp = new HashSet<>();
-                for (DelayStrategy delayStrategy : firstDelayStrategyPool.get(funcName).get(var)) {
-                    if (delayStrategy.getIntpFunc().contains(intpFunc)) {
-                        delayStrategy.removeIntpFunc(intpFunc);
-                        if (delayStrategy.getIntpFunc().isEmpty() && delayStrategy.getDisableFunc().isEmpty()) {
-                            tmp.add(delayStrategy);
-                        }
+        if(firstDelayStrategyPool!=null && firstDelayStrategyPool.isEmpty()) {
+            for (String funcName : firstDelayStrategyPool.keySet()) {
+                DelayStrategy delayStrategy = firstDelayStrategyPool.get(funcName);
+                Set<String> tmp = new HashSet<>();
+                if (delayStrategy.getIntpFunc().contains(intpFunc)) {
+                    delayStrategy.removeIntpFunc(intpFunc);
+                    if (delayStrategy.getIntpFunc().isEmpty() && delayStrategy.getDisableFunc().isEmpty()) {
+                        tmp.add(funcName);
                     }
                 }
-                firstDelayStrategyPool.get(funcName).get(var).removeAll(tmp);
+                firstDelayStrategyPool.remove(funcName);
             }
-            firstDelayStrategyPool.get(funcName).values().removeIf(value -> value.isEmpty());
         }
-        firstDelayStrategyPool.values().removeIf(value -> value.isEmpty());
-
     }
 
     /**
@@ -928,6 +942,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
         public int hashCode() {
             return Objects.hash(location, callstack, priority, num);
         }
+
     }
 
     /**

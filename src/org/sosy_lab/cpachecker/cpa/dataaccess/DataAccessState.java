@@ -9,8 +9,8 @@ import java.util.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DataAccessState implements AbstractState, Graphable {
-//public class DataAccessState implements AbstractState {
+//public class DataAccessState implements AbstractState, Graphable {
+public class DataAccessState implements AbstractState {
     private List<DataState> dataAccess;
 
     private List<DataState> dataRace;
@@ -226,18 +226,18 @@ public class DataAccessState implements AbstractState, Graphable {
                 '}';
     }
 
-    @Override
-    public String toDOTLabel() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("\n--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
-        sb.append(this.toString());
-        return sb.toString();
-    }
-
-    @Override
-    public boolean shouldBeHighlighted() {
-        return false;
-    }
+//    @Override
+//    public String toDOTLabel() {
+//        StringBuilder sb = new StringBuilder();
+//        sb.append("\n--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
+//        sb.append(this.toString());
+//        return sb.toString();
+//    }
+//
+//    @Override
+//    public boolean shouldBeHighlighted() {
+//        return false;
+//    }
 
 
 }

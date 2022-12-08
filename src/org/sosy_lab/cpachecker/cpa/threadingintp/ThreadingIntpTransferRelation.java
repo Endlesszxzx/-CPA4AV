@@ -422,7 +422,7 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
             pResults.put(node, new HashSet<>());
         }
         // obtain the enabled priority.
-        Integer intpPri = getIntpEnablePriority(edge);
+        Integer intpPri = getIntpPriority(edge);
         if (intpPri != null) {
             // set the preNode as interruption point when reach the 'enable_isr' function.
             if (intpPri != -1) {
@@ -662,7 +662,7 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
         return results;
     }
 
-    private Integer getIntpEnablePriority(CFAEdge pEdge) {
+    private Integer getIntpPriority(CFAEdge pEdge) {
         if (pEdge instanceof AStatementEdge) {
             AStatement stmt = ((AStatementEdge) pEdge).getStatement();
             if (stmt instanceof AFunctionCall) {   // judge the edge must be a function call edge, i.e.judge the edge must be a function call edge
@@ -791,7 +791,7 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
 
         String callFuncName = getFunctionCallName(cfaEdge);
         if (callFuncName != null && callFuncName.startsWith(enIntpFunc)) {
-            int pLevel = getIntpEnablePriority(cfaEdge);
+            int pLevel = getIntpPriority(cfaEdge);
             if (pLevel == -1) {
 //                if (!(threadingState.getDelayStrategyREdge().isEmpty() && threadingState.getDelayStrategyWEdge().isEmpty()))
                 threadingState = threadingState.enableAllIntpAndCopy();
@@ -803,7 +803,7 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
         }
 //        System.out.println("R:"+threadingState.getDelayStrategyREdgeTostring());
 //        System.out.println("W:"+threadingState.getDelayStrategyWEdgeTostring());
-        if (cfaEdge.toString().contains("N15")) {
+        if (cfaEdge.toString().contains("N24")) {
             System.out.println("Debug");
         }
         results = handleInterruption(threadingState, results, cfaEdge);
@@ -1676,6 +1676,14 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
 //            System.out.println("              * 之后R："+threadingState.getDelayStrategyREdgeTostring());
 //            System.out.println("              * 之后W："+threadingState.getDelayStrategyWEdgeTostring());
         }
+        if (callFuncName != null && callFuncName.startsWith(disIntpFunc)) {
+//            System.out.println("-------进入延迟策略 enable: ");
+//            System.out.println("              之前R："+threadingState.getDelayStrategyREdgeTostring());
+//            System.out.println("              之前W："+threadingState.getDelayStrategyWEdgeTostring());
+            disableForDelayStrategy(threadingState, canIntpPoints, sucNode, cfaedge, curFuncName);
+//            System.out.println("              * 之后R："+threadingState.getDelayStrategyREdgeTostring());
+//            System.out.println("              * 之后W："+threadingState.getDelayStrategyWEdgeTostring());
+        }
 
         // 首位延迟点
         if (cfaedge.getDescription().equals("Function start dummy edge")) {
@@ -1755,17 +1763,64 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
         return canIntpPoints;
     }
 
-    private void enableForDelayStrategy(ThreadingIntpState
-                                                threadingState, Set<Pair<CFANode, String>> canIntpPoints, CFANode sucNode, CFAEdge cfaedge, String curFuncName) {
-        int pri = getIntpEnablePriority(cfaedge);
+    private void disableForDelayStrategy(ThreadingIntpState threadingState, Set<Pair<CFANode, String>> canIntpPoints, CFANode sucNode, CFAEdge cfaedge, String curFuncName) {
+        int pri = getIntpPriority(cfaedge);
         Set<String> intpfunc = from(priorityMap.keySet()).filter(f -> priorityMap.get(f) == pri).toSet();
         Map<String, Set<DelayStrategy>> delayStrategyEdgeR = threadingState.getDelayStrategyREdge().get(curFuncName);
         Map<String, Set<DelayStrategy>> delayStrategyEdgeW = threadingState.getDelayStrategyWEdge().get(curFuncName);
+        Map<String, DelayStrategy> firstDelayStragePool = threadingState.getFirstDelayStrategyPool();
+        for (String func : intpfunc) {
+            if (delayStrategyEdgeR != null && !delayStrategyEdgeR.isEmpty())
+                delayStrategyEdgeR = disableForDelayStrategyEdgeInfo(delayStrategyEdgeR, func, canIntpPoints, sucNode);
+            if (delayStrategyEdgeW != null && !delayStrategyEdgeW.isEmpty())
+                delayStrategyEdgeW = disableForDelayStrategyEdgeInfo(delayStrategyEdgeW, func, canIntpPoints, sucNode);
+            if (firstDelayStragePool != null && !firstDelayStragePool.isEmpty()) {
+                for (String funcName : firstDelayStragePool.keySet()) {
+                    DelayStrategy delayStrategy = firstDelayStragePool.get(funcName);
+                    if (delayStrategy.getIntpFunc().contains(func)) {
+                        delayStrategy.removeIntpFunc(func);
+                        delayStrategy.getDisableFunc().add(func);
+                    }
+                }
+            }
+        }
+    }
+
+
+
+    private Map<String, Set<DelayStrategy>> disableForDelayStrategyEdgeInfo(Map<String, Set<DelayStrategy>> delayStrategyEdge, String func, Set<Pair<CFANode, String>> canIntpPoints, CFANode sucNode) {
+        for (String var : delayStrategyEdge.keySet()) {
+            for (DelayStrategy delayStrategy : delayStrategyEdge.get(var)) {
+                if (delayStrategy.getIntpFunc().contains(func)) {
+                    delayStrategy.removeIntpFunc(func);
+                    delayStrategy.getDisableFunc().add(func);
+                }
+            }
+        }
+        return delayStrategyEdge;
+    }
+
+    private void enableForDelayStrategy(ThreadingIntpState
+                                                threadingState, Set<Pair<CFANode, String>> canIntpPoints, CFANode sucNode, CFAEdge cfaedge, String curFuncName) {
+        int pri = getIntpPriority(cfaedge);
+        Set<String> intpfunc = from(priorityMap.keySet()).filter(f -> priorityMap.get(f) == pri).toSet();
+        Map<String, Set<DelayStrategy>> delayStrategyEdgeR = threadingState.getDelayStrategyREdge().get(curFuncName);
+        Map<String, Set<DelayStrategy>> delayStrategyEdgeW = threadingState.getDelayStrategyWEdge().get(curFuncName);
+        Map<String, DelayStrategy> firstDelayStragePool = threadingState.getFirstDelayStrategyPool();
         for (String func : intpfunc) {
             if (delayStrategyEdgeR != null && !delayStrategyEdgeR.isEmpty())
                 delayStrategyEdgeR = enableForDelayStrategyEdgeInfo(delayStrategyEdgeR, func, canIntpPoints, sucNode);
             if (delayStrategyEdgeW != null && !delayStrategyEdgeW.isEmpty())
                 delayStrategyEdgeW = enableForDelayStrategyEdgeInfo(delayStrategyEdgeW, func, canIntpPoints, sucNode);
+            if (firstDelayStragePool != null && !firstDelayStragePool.isEmpty()) {
+                for (String funcName : firstDelayStragePool.keySet()) {
+                    DelayStrategy delayStrategy = firstDelayStragePool.get(funcName);
+                    if (delayStrategy.getDisableFunc().contains(func)) {
+                        delayStrategy.removeDisableFunc(func);
+                        delayStrategy.getIntpFunc().add(func);
+                    }
+                }
+            }
         }
     }
 
@@ -1818,7 +1873,7 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
 
     // 延迟策略AB
     private Set<Pair<CFANode, String>> delayStrategyEdgeAB
-    (Map<String, Set<String>> intpRWSharedVarSet, Set<String> edgeRWSharedVarSet, Map<String,Map<String, Set<DelayStrategy>>> delayStrategyEdgeR, Map<String,Map<String, Set<DelayStrategy>>> delayStrategyEdgeW, Set<Pair<CFANode, String>> canIntpPoints, CFANode
+    (Map<String, Set<String>> intpRWSharedVarSet, Set<String> edgeRWSharedVarSet, Map<String, Map<String, Set<DelayStrategy>>> delayStrategyEdgeR, Map<String, Map<String, Set<DelayStrategy>>> delayStrategyEdgeW, Set<Pair<CFANode, String>> canIntpPoints, CFANode
             sucNode, String intpFunc) {
         for (String var : edgeRWSharedVarSet) {     // var in subsequent edge
             if (delayStrategyEdgeR != null && intpRWSharedVarSet.containsKey(var) && intpRWSharedVarSet.get(var).contains("W")) {   // if var in isr and write it
@@ -1838,7 +1893,7 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
 
             }
             if (delayStrategyEdgeW != null && !delayStrategyEdgeW.isEmpty() && intpRWSharedVarSet.containsKey(var)) {
-                for(String funcName:delayStrategyEdgeW.keySet()) {
+                for (String funcName : delayStrategyEdgeW.keySet()) {
                     for (String var1 : delayStrategyEdgeW.get(funcName).keySet()) {    // 之前有写就插
                         if (intpRWSharedVarSet.containsKey(var1)) {
                             for (DelayStrategy delayStrategy : delayStrategyEdgeW.get(funcName).get(var1)) {
@@ -1877,7 +1932,7 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
     // 末位触发策略
     private Set<Pair<CFANode, String>> LastBitTrigger(Map<String, Map<String, Set<DelayStrategy>>> rEdge,
                                                       Map<String, Map<String, Set<DelayStrategy>>> wEdge,
-                                                      Map<String, Set<DelayStrategy>> firstDelayStrategyPool,
+                                                      DelayStrategy firstDelayStrategyPool,
                                                       Set<Pair<CFANode, String>> canIntpPoints,
                                                       CFANode sucNode) {
         Set<String> intpFuncSet = new HashSet<>();
@@ -1891,8 +1946,8 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
                 intpFuncSet = getintpFunc(intpFuncSet, wEdge.get(funcName));
         }
 
-        if (firstDelayStrategyPool != null && !firstDelayStrategyPool.isEmpty()) {
-            intpFuncSet = getintpFunc(intpFuncSet, firstDelayStrategyPool);
+        if (firstDelayStrategyPool != null && firstDelayStrategyPool != null) {
+            intpFuncSet.addAll(firstDelayStrategyPool.getIntpFunc());
         }
 
         for (String intpFunc : intpFuncSet) {
@@ -1916,10 +1971,7 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
     private Set<Pair<CFANode, String>> disableForDelayStrategy
     (ThreadingIntpState threadingState, Map<String, Map<String, Set<DelayStrategy>>> delayStrategyEdge, Set<String> sucIntp, Set<Pair<CFANode, String>> canIntpPoints, CFANode
             sucNode) {
-        Map<String, Map<String, Set<DelayStrategy>>> firstDelayStrategyPool = new HashMap<>();
-        if (threadingState.getFirstDelayStrategyPool() != null && !threadingState.getFirstDelayStrategyPool().isEmpty()) {
-            firstDelayStrategyPool = threadingState.getFirstDelayStrategyPool();
-        }
+
         for (String funcName : delayStrategyEdge.keySet()) {
             for (String var : delayStrategyEdge.get(funcName).keySet()) {
                 Set<DelayStrategy> delayStrategiesList = delayStrategyEdge.get(funcName).get(var);

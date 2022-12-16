@@ -194,8 +194,8 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
 
     private final GlobalAccessChecker globalAccessChecker = new GlobalAccessChecker();
 
-    private final ConditionalDepGraph condDepGraph;
-    private Map<String, Map<String, Set<String>>> intpFuncRWSharedVarMap;
+    private static ConditionalDepGraph condDepGraph;
+    private static Map<String, Map<String, Set<String>>> intpFuncRWSharedVarMap;
     private boolean reachMainFunc;
     private EdgeInfo edgeInfo;
 
@@ -725,6 +725,11 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
 //    private Map<String, CFAEdge> delayStrategyEdgeW = new HashMap<>();
 //    private Map<String, CFAEdge> delayStrategyEdgeR = new HashMap<>();
 
+    public static Map<String, Integer> getPriorityMap() {
+        return priorityMap;
+    }
+
+
     @Override
     public Collection<ThreadingIntpState> getAbstractSuccessorsForEdge(AbstractState pState, Precision precision, CFAEdge cfaEdge) throws CPATransferException, InterruptedException {
         Preconditions.checkNotNull(cfaEdge);   // 判空
@@ -788,6 +793,13 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
            最终返回的 results 为经过中断处理之后的后继状态集合。
         */
 
+        String intpFuncName = cfaEdge.getPredecessor().getFunctionName();
+        if (edgeVtx != null && priorityMap.containsKey(intpFuncName)) {
+            Set<String> edgeRWSharedVarSet = new HashSet<>();
+            edgeRWSharedVarSet.addAll(from(edgeVtx.getgReadVars()).transform(v -> v.getName()).toSet());
+            edgeRWSharedVarSet.addAll(from(edgeVtx.getgWriteVars()).transform(v -> v.getName()).toSet());
+            threadingState = threadingState.setOptimizingVarInISR(intpFuncName, edgeRWSharedVarSet);
+        }
 
         String callFuncName = getFunctionCallName(cfaEdge);
         if (callFuncName != null && callFuncName.startsWith(enIntpFunc)) {
@@ -808,17 +820,151 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
 //        System.out.println("W:"+threadingState.getDelayStrategyWEdgeTostring());
 
 
+        if (cfaEdge.toString().contains("N37")) {
+            System.out.println("Debug");
+        }
+
+        hasISR[0] = false;
+        hasISR[1] = false;
+        Set<ThreadingIntpState> storeNoISRState = new HashSet<>();
         for (ThreadingIntpState threadingIntpState : results) {
             threadingIntpState.checkIntpisNull();
             String intpFunc = threadingIntpState.getActiveThread();
+            if (!threadingIntpState.getIntpStack().isEmpty()) {
+                intpFunc = threadingIntpState.getIntpStack().getLast();
+            }
             if (priorityMap.containsKey(intpFunc)) {
+                hasISR[0] = true;
                 threadingIntpState.dealDrop(intpFunc);
+            }else {
+                hasISR[1] = true;
             }
         }
+
+
+//        // 如果当前 result 中有中断节点，且节点数量大于 2 时，进行存放
+//        if (getHasISR() && results.size() > 1) {
+//            optimizingStrategyStore(results, cfaEdge);
+//        }
+//
+//        // 进行匹配测试，看是否可以进行优化
+//        results = optimizingStrategy(results, cfaEdge, storeNoISRState);
+
+
         return ImmutableList.copyOf(results);
         // 到这里，新的中断开启完毕。中断开启后，后继状态( results 中的状态)中的调用栈和所
         // 处位置 被更新，同时当中还记录了新开启中断的优先级等信息。
     }
+
+    public static Map<String, Map<String, Set<String>>> getIntpFuncRWSharedVarMap() {
+        return intpFuncRWSharedVarMap;
+    }
+
+    public static ConditionalDepGraph getCondDepGraph() {
+        return condDepGraph;
+    }
+
+    public static boolean getHasISR() {
+        if(hasISR[0] && hasISR[1])
+                return true;
+        return false;
+    }
+
+    private static boolean[] hasISR = {false,false};
+
+    private Collection<ThreadingIntpState> optimizingStrategy(Collection<ThreadingIntpState> results, CFAEdge cfaEdge, Set<ThreadingIntpState> storeNoISRState) {
+        Set<String> noInsertISR = new HashSet<>();     // 用于存放不用插入的中断函数
+        for (ThreadingIntpState threadingIntpState : results) {
+            // Copy the information of node
+            threadingIntpState.checkIntpisNull();
+            String intpFunc = threadingIntpState.getActiveThread();
+            if (!threadingIntpState.getIntpStack().isEmpty()) {
+                intpFunc = threadingIntpState.getIntpStack().getLast();
+            }
+            if (priorityMap.containsKey(intpFunc)) {
+                continue;
+            }
+
+            for (CFAEdge preCfaEdge : optimizingStrategy.keySet()) {  // 得到之前存储的边 edge1
+                CFANode preSucNode = preCfaEdge.getSuccessor();    // 得到节点 c
+                for (int i = 0; i < preSucNode.getNumLeavingEdges(); i++) {  //遍历节点 c 的出边，找到 d
+                    CFAEdge preSucEdge = preSucNode.getLeavingEdge(i);
+
+                    if (cfaEdge == preSucEdge) { // 判断当前边是否位于 edge3
+                        // 将 d' 中得到的关于中断的信息交付给 d
+                        optimizingStrategy.get(preCfaEdge).setOptimizingVarInISR(threadingIntpState.getOptimizingVarInISR());
+                    }
+                }
+            }
+
+            // Judge whether using this strategy
+            EdgeVtx sucedgeInfo = (EdgeVtx) condDepGraph.getDGNode(cfaEdge.hashCode());   // 得到 edge3 的边信息
+            if (sucedgeInfo != null) {
+                Set<String> edgeRWSharedVarSet = new HashSet<>(); // 得到边上都有哪些变量
+                edgeRWSharedVarSet.addAll(from(sucedgeInfo.getgReadVars()).transform(v -> v.getName()).toSet());
+                edgeRWSharedVarSet.addAll(from(sucedgeInfo.getgWriteVars()).transform(v -> v.getName()).toSet());
+                for (String var : edgeRWSharedVarSet) {
+                    Map<String, Set<String>> optimizingVarInISR = threadingIntpState.getOptimizingVarInISR();
+                    for (String intpFuncName : optimizingVarInISR.keySet()) {
+                        Set<String> intpNoUseingVarSet = optimizingVarInISR.get(intpFuncName);
+                        if (intpFuncRWSharedVarMap.get(intpFuncName).containsKey(var) && intpNoUseingVarSet.contains(var)) {
+                            // 如果当前变量 var 在 ISR 中有，但实际并未使用，则将当前中断函数删除。
+                            noInsertISR.add(intpFuncName);
+                        }
+                    }
+                }
+            }
+        }
+
+
+        // 删除多余状态
+        List<ThreadingIntpState> tmp = new ArrayList<>();
+        if (noInsertISR != null && !noInsertISR.isEmpty()) {
+            for (ThreadingIntpState threadingIntpState : results) {
+                threadingIntpState.checkIntpisNull();
+                String funcName = threadingIntpState.getActiveThread();
+                if (!threadingIntpState.getIntpStack().isEmpty()) {  // 首先检测 intpStack 中是否有中断
+                    String intpFunc = threadingIntpState.getIntpStack().getLast(); // 得到最新的一个中断函数
+                    if (noInsertISR.contains(intpFunc) && funcName != intpFunc) {
+                        tmp.add(threadingIntpState);
+                    }
+                }
+            }
+        }
+
+        results.removeAll(tmp);
+        return results;
+    }
+
+    private void optimizingStrategyStore(Collection<ThreadingIntpState> results, CFAEdge cfaEdge) {
+        for (ThreadingIntpState threadingIntpState : results) {
+            String curFuncName = threadingIntpState.getActiveThread(); // 获取当前函数名
+
+            if (priorityMap.containsKey(curFuncName)) { // 当前位于中断函数内
+                continue;
+            }
+
+            // 因为，在主函数某节点后开启中断后，该 threadingIntpState 节点中的 activeThread 仍为主函数，但会将该函数名放入 intpStack 里，不会对这种节点进行处理，因此做以下判断
+            if (!threadingIntpState.getIntpStack().isEmpty()) {  // 首先检测 intpStack 中是否有中断
+                if (threadingIntpState.getOptimizingVarInISR() == null || threadingIntpState.getOptimizingVarInISR().isEmpty()) {
+                    // 当前节点内的优化池中无中断，但 intpStack 不空，说明，当前节点是新开的
+                    continue;
+                }
+                String intpFuncName = threadingIntpState.getIntpStack().getLast(); // 得到最新的一个中断函数
+                if (!threadingIntpState.getOptimizingVarInISR().containsKey(intpFuncName) || threadingIntpState.getOptimizingVarInISR().get(intpFuncName).isEmpty()) {
+                    // 当优化策略存储集中没有最新的中断信息 或者 其对应的中断内的变量信息为空，就将当前 threadingIntpState 节点视为中断内的节点，返回
+                    continue;
+                }
+
+            }
+
+            // 将当前非中断节点加入
+            optimizingStrategy.put(cfaEdge, threadingIntpState);
+
+        }
+    }
+
+    private Map<CFAEdge, ThreadingIntpState> optimizingStrategy = new HashMap<>();
 
     private Map<String, Set<String>> getcanIntpFunc(ThreadingIntpState threadingIntpState) {
         Map<String, Set<String>> result = new HashMap<>();
@@ -1674,7 +1820,7 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
 //            System.out.println("              * 之后W："+threadingState.getDelayStrategyWEdgeTostring());
         }
         if (callFuncName != null && callFuncName.startsWith(disIntpFunc)) {
-//            System.out.println("-------进入延迟策略 enable: ");
+//            System.out.println("-------进入 disable: ");
 //            System.out.println("              之前R："+threadingState.getDelayStrategyREdgeTostring());
 //            System.out.println("              之前W："+threadingState.getDelayStrategyWEdgeTostring());
             disableForDelayStrategy(threadingState, canIntpPoints, sucNode, cfaedge, curFuncName);
@@ -1693,8 +1839,8 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
             CFAEdge sucedge = sucNode.getLeavingEdge(i);
 
 //             末位触发
-//            if (sucedge instanceof CReturnStatementEdge || ((sucedge.getSuccessor() instanceof  FunctionExitNode) && (priorityMap.containsKey(sucNode.getFunctionName()))) ) {
-            if ((sucedge instanceof CReturnStatementEdge || sucedge.getSuccessor() instanceof FunctionExitNode)) {
+            if (sucedge instanceof CReturnStatementEdge || ((sucedge.getSuccessor() instanceof FunctionExitNode) && (priorityMap.containsKey(sucNode.getFunctionName())))) {
+//            if ((sucedge instanceof CReturnStatementEdge || sucedge.getSuccessor() instanceof FunctionExitNode)) {
                 canIntpPoints = LastBitTrigger(delayStrategyEdgeR, delayStrategyEdgeW, threadingState.getFirstDelayStrategyPool().get(curFuncName), canIntpPoints, sucNode);
                 threadingState.removeDelayStrategyPool(curFuncName);
             }
@@ -1708,13 +1854,13 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
                 if (callFuncName != null && callFuncName.startsWith(disIntpFunc) && repPoints.containsKey(sucNode)) {
                     Set<String> sucIntp = repPoints.get(sucNode);
 
-//                    // 首位触发 —— 主程序遇到 disable(ISR)，若在此之前中断 ISR 从未触发，则在主程序 disable(ISR) 之前插入中断 ISR；
-//                    for (String intpFunc : sucIntp) {
-//                        if (!threadingState.getIntpStack().contains(intpFunc)) {
-////                            System.out.println("-------首位触发 disable: " + "    触发中断"+intpFunc + "    之前中断 ISR 从未触发");
-//                            canIntpPoints.addAll(from(repPoints.get(sucNode)).transform(f -> Pair.of(sucNode, f)).toSet());
-//                        }
-//                    }
+                    // 首位触发 —— 主程序遇到 disable(ISR)，若在此之前中断 ISR 从未触发，则在主程序 disable(ISR) 之前插入中断 ISR；
+                    for (String intpFunc : sucIntp) {
+                        if (!threadingState.getIntpStack().contains(intpFunc)) {
+//                            System.out.println("-------首位触发 disable: " + "    触发中断"+intpFunc + "    之前中断 ISR 从未触发");
+                            canIntpPoints.addAll(from(repPoints.get(sucNode)).transform(f -> Pair.of(sucNode, f)).toSet());
+                        }
+                    }
 
                     // 延迟策略 —— 将之前延迟的该中断打开
                     if (delayStrategyEdgeR != null && !delayStrategyEdgeR.isEmpty()) {
@@ -1784,7 +1930,6 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
     }
 
 
-
     private Map<String, Set<DelayStrategy>> disableForDelayStrategyEdgeInfo(Map<String, Set<DelayStrategy>> delayStrategyEdge, String func, Set<Pair<CFANode, String>> canIntpPoints, CFANode sucNode) {
         for (String var : delayStrategyEdge.keySet()) {
             for (DelayStrategy delayStrategy : delayStrategyEdge.get(var)) {
@@ -1804,11 +1949,13 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
         Map<String, Set<DelayStrategy>> delayStrategyEdgeR = threadingState.getDelayStrategyREdge().get(curFuncName);
         Map<String, Set<DelayStrategy>> delayStrategyEdgeW = threadingState.getDelayStrategyWEdge().get(curFuncName);
         Map<String, DelayStrategy> firstDelayStragePool = threadingState.getFirstDelayStrategyPool();
+
         for (String func : intpfunc) {
+            Map<String, Set<String>> intpRWSharedVarSet = intpFuncRWSharedVarMap.get(func);
             if (delayStrategyEdgeR != null && !delayStrategyEdgeR.isEmpty())
-                delayStrategyEdgeR = enableForDelayStrategyEdgeInfo(delayStrategyEdgeR, func, canIntpPoints, sucNode);
+                delayStrategyEdgeR = enableForDelayStrategyEdgeInfo(delayStrategyEdgeR, func, canIntpPoints, sucNode, intpRWSharedVarSet);
             if (delayStrategyEdgeW != null && !delayStrategyEdgeW.isEmpty())
-                delayStrategyEdgeW = enableForDelayStrategyEdgeInfo(delayStrategyEdgeW, func, canIntpPoints, sucNode);
+                delayStrategyEdgeW = enableForDelayStrategyEdgeInfo(delayStrategyEdgeW, func, canIntpPoints, sucNode, intpRWSharedVarSet);
             if (firstDelayStragePool != null && !firstDelayStragePool.isEmpty()) {
                 for (String funcName : firstDelayStragePool.keySet()) {
                     DelayStrategy delayStrategy = firstDelayStragePool.get(funcName);
@@ -1823,12 +1970,17 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
 
     private Map<String, Set<DelayStrategy>> enableForDelayStrategyEdgeInfo
             (Map<String, Set<DelayStrategy>> delayStrategyEdge, String
-                    func, Set<Pair<CFANode, String>> canIntpPoints, CFANode sucNode) {
+                    func, Set<Pair<CFANode, String>> canIntpPoints, CFANode sucNode, Map<String, Set<String>> intpRWSharedVarSet) {
         for (String var : delayStrategyEdge.keySet()) {
             for (DelayStrategy delayStrategy : delayStrategyEdge.get(var)) {
-                if (delayStrategy.getDisableFunc().contains(func)) {
+
+                if (intpRWSharedVarSet.containsKey(var)) {
+                    if (delayStrategy.getDisableFunc().contains(func)) {
+                        delayStrategy.removeDisableFunc(func);
+                        delayStrategy.getIntpFunc().add(func);
+                    }
+                } else {
                     delayStrategy.removeDisableFunc(func);
-                    delayStrategy.getIntpFunc().add(func);
                 }
             }
         }
@@ -1974,17 +2126,11 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
                 Set<DelayStrategy> delayStrategiesList = delayStrategyEdge.get(funcName).get(var);
                 for (DelayStrategy delayStrategy : delayStrategiesList) {
                     Set<String> lastNodeIntp = delayStrategy.getIntpFunc();
-                    if (!Sets.intersection(lastNodeIntp, sucIntp).isEmpty()) {
-//                    System.out.println("    之前中断 ISR 从未触发");
-                        canIntpPoints.addAll(from(repPoints.get(sucNode)).transform(f -> Pair.of(sucNode, f)).toSet());
+                    for (String intpFunc : sucIntp) {
+                        if (lastNodeIntp.contains(intpFunc)) {
+                            canIntpPoints.add(Pair.of(sucNode, intpFunc));
+                        }
                     }
-
-                    if (!Sets.intersection(lastNodeIntp, sucIntp).isEmpty()) {
-//                    System.out.println("    之前中断 ISR 从未触发");
-                        canIntpPoints.addAll(from(repPoints.get(sucNode)).transform(f -> Pair.of(sucNode, f)).toSet());
-                    }
-
-
                 }
             }
         }

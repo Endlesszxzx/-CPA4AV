@@ -3119,6 +3119,9 @@ cpa.threadingintp.maxLevelInterruptNesting = 2
 # 'cfa.cfaCloner.numberOfCopies' should be set to N.
 cpa.threadingintp.maxNumberOfThreads = 5
 
+# This option indicates the maximum interrupt level
+cpa.threadingintp.maxPriorityLevel = no default value
+
 # This string spefies the file extension of the priority file name.
 cpa.threadingintp.priorityFileExtSuffix = "_priority.txt"
 

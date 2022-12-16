@@ -54,7 +54,7 @@ import scala.Int;
  * This immutable state represents a location state combined with a callstack state.
  */
 //Graphable
-public class ThreadingIntpState implements AbstractState, AbstractStateWithLocations, Partitionable,
+public class ThreadingIntpState implements AbstractState, AbstractStateWithLocations, Partitionable,Graphable,
         AbstractQueryableState {
 
     private static final String PROPERTY_DEADLOCK = "deadlock";
@@ -160,6 +160,8 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
     private Map<String, DelayStrategy> firstDelayStrategyPool;
     private String bottomTriggered;
 
+    private Map<String, Set<String>> optimizingVarInISR;
+
     // ======================================================================== 构造方法 =================================
     public ThreadingIntpState(final int pMaxIntpLevel) {
         /* 构造函数 1  传入参数 pMaxIntpLevel 为最大中断嵌套数 */
@@ -180,6 +182,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
         bottomTriggered = null;
         firstTriggerPool = new HashSet<>();
         firstDelayStrategyPool = new HashMap<>();
+        optimizingVarInISR = new HashMap<>();
     }
 
     private ThreadingIntpState(PersistentMap<String, ThreadIntpState> pThreads,
@@ -194,7 +197,8 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
                                Map<String, Map<String, Set<DelayStrategy>>> delayStrategyWEdge,
                                String bottomTriggered,
                                Set<String> firstTriggerPool,
-                               Map<String, DelayStrategy> firstDelayStrategyPool) {
+                               Map<String, DelayStrategy> firstDelayStrategyPool,
+                               Map<String, Set<String>> optimizingVarInISR) {
         /* 基于之前的信息，重新生成一个 ThreadingIntpState */
         this.threads = pThreads;
         this.locks = pLocks;
@@ -211,6 +215,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
         this.bottomTriggered = bottomTriggered;
         this.firstTriggerPool = firstTriggerPool;
         this.firstDelayStrategyPool = firstDelayStrategyPool;
+        this.optimizingVarInISR = optimizingVarInISR;
     }
 
 
@@ -228,7 +233,21 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
         this.bottomTriggered = state.bottomTriggered;
         this.firstTriggerPool = new HashSet<>(state.firstTriggerPool);
         this.firstDelayStrategyPool = newPool(state.getFirstDelayStrategyPool());
+        this.optimizingVarInISR = newOpt(state.getOptimizingVarInISR());
     }
+
+    private Map<String, Set<String>> newOpt(Map<String, Set<String>> optimizingVarInISR) {
+        Map<String, Set<String>> res = new HashMap<>();
+        for (String funcName : optimizingVarInISR.keySet()) {
+            Set<String> tmp = new HashSet<>();
+            for (String var : optimizingVarInISR.get(funcName)) {
+                tmp.add(var);
+            }
+            res.put(funcName, tmp);
+        }
+        return res;
+    }
+
 
     private Map<String, DelayStrategy> newPool(Map<String, DelayStrategy> firstDelayStrategyPool) {
         Map<String, DelayStrategy> res = new HashMap<>();
@@ -266,7 +285,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
                               Map<String, Map<String, Set<DelayStrategy>>> delayStrategyREdge,
                               Map<String, Map<String, Set<DelayStrategy>>> delayStrategyWEdge,
                               String bottomTriggered,
-                              Set<String> firstTriggerPool, Map<String, DelayStrategy> firstDelayStrategyPool) {
+                              Set<String> firstTriggerPool, Map<String, DelayStrategy> firstDelayStrategyPool, Map<String, Set<String>> optimizingVarInISR) {
         this.threads = threads;
         this.locks = locks;
         this.intpTimes = intpTimes;
@@ -281,6 +300,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
         this.bottomTriggered = bottomTriggered;
         this.firstTriggerPool = new HashSet<>(firstTriggerPool);
         this.firstDelayStrategyPool = newPool(firstDelayStrategyPool);
+        this.optimizingVarInISR = newOpt(optimizingVarInISR);
     }
 
     public String getBottomTriggered() {
@@ -328,12 +348,44 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
                 setBottomTriggered(var.getName());
             }
         }
-        return new ThreadingIntpState(threads, locks, intpTimes, intpLevelEnableFlags, intpStack, activeThread, keptActiveThread, entryFunction, threadIdsForWitness, rEdge, wEdge, bottomTriggered, firstTriggerPool, firstDelayStrategyPool);
+        return new ThreadingIntpState(threads, locks, intpTimes, intpLevelEnableFlags, intpStack, activeThread, keptActiveThread, entryFunction, threadIdsForWitness, rEdge, wEdge, bottomTriggered, firstTriggerPool, firstDelayStrategyPool, optimizingVarInISR);
     }
 
     // ============================================================== Get & Set 方法
     // ======================================
     // For IntpStack  中断函数名
+
+
+    public Map<String, Set<String>> getOptimizingVarInISR() {
+        return optimizingVarInISR;
+    }
+
+    public ThreadingIntpState setOptimizingVarInISR(String funcName, String var) {
+        if (optimizingVarInISR.containsKey(funcName)) {
+            optimizingVarInISR.get(funcName).add(var);
+        } else {
+            Set<String> tmp = new HashSet<>();
+            tmp.add(var);
+            optimizingVarInISR.put(funcName, tmp);
+        }
+        return new ThreadingIntpState(this);
+    }
+
+    public ThreadingIntpState setOptimizingVarInISR(String funcName, Set<String> varSet) {
+        if (optimizingVarInISR.containsKey(funcName)) {
+            optimizingVarInISR.get(funcName).addAll(varSet);
+        } else {
+            optimizingVarInISR.put(funcName, varSet);
+        }
+
+        return new ThreadingIntpState(this);
+    }
+
+
+    public void setOptimizingVarInISR(Map<String, Set<String>> optimizingVarInISR) {
+        this.optimizingVarInISR = optimizingVarInISR;
+    }
+
 
     public PersistentMap<String, ThreadIntpState> getThreads() {
         return threads;
@@ -553,17 +605,17 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
     // ===============================================
     private ThreadingIntpState withThreads(PersistentMap<String, ThreadIntpState> pThreads) {
         return new ThreadingIntpState(pThreads, locks, new ArrayDeque<>(intpStack), intpLevelEnableFlags,
-                new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered, firstTriggerPool, firstDelayStrategyPool);
+                new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered, firstTriggerPool, firstDelayStrategyPool, optimizingVarInISR);
     }
 
     private ThreadingIntpState withLocks(PersistentMap<String, String> pLocks) {
         return new ThreadingIntpState(threads, pLocks, new ArrayDeque<>(intpStack), intpLevelEnableFlags,
-                new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered, firstTriggerPool, firstDelayStrategyPool);
+                new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered, firstTriggerPool, firstDelayStrategyPool, optimizingVarInISR);
     }
 
     private ThreadingIntpState withThreadIdsForWitness(PersistentMap<String, Integer> pThreadIdsForWitness) {
         return new ThreadingIntpState(threads, locks, new ArrayDeque<>(intpStack), intpLevelEnableFlags,
-                new HashMap<>(intpTimes), activeThread, entryFunction, pThreadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered, firstTriggerPool, firstDelayStrategyPool);
+                new HashMap<>(intpTimes), activeThread, entryFunction, pThreadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered, firstTriggerPool, firstDelayStrategyPool, optimizingVarInISR);
     }
 
     public ThreadingIntpState addThreadAndCopy(String id, int num, int pri, AbstractState stack, AbstractState loc) {
@@ -593,7 +645,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
         // "the interruption of level " + pLevel + " has already been enabled.");
 
         ThreadingIntpState result = new ThreadingIntpState(threads, locks, new ArrayDeque<>(intpStack),
-                intpLevelEnableFlags, new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered, firstTriggerPool, firstDelayStrategyPool);
+                intpLevelEnableFlags, new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered, firstTriggerPool, firstDelayStrategyPool, optimizingVarInISR);
         result.intpLevelEnableFlags[pLevel] = true;
 
         return result;
@@ -601,7 +653,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
 
     public ThreadingIntpState enableAllIntpAndCopy() {
         ThreadingIntpState result = new ThreadingIntpState(threads, locks, new ArrayDeque<>(intpStack),
-                intpLevelEnableFlags, new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered, firstTriggerPool, firstDelayStrategyPool);
+                intpLevelEnableFlags, new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered, firstTriggerPool, firstDelayStrategyPool, optimizingVarInISR);
         for (int i = 0; i < result.intpLevelEnableFlags.length; ++i) {
             result.intpLevelEnableFlags[i] = true;
         }
@@ -617,7 +669,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
         // "the interruption of level " + pLevel + " has already been disabled.");
 
         ThreadingIntpState result = new ThreadingIntpState(threads, locks, new ArrayDeque<>(intpStack),
-                intpLevelEnableFlags, new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered, firstTriggerPool, firstDelayStrategyPool);
+                intpLevelEnableFlags, new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered, firstTriggerPool, firstDelayStrategyPool, optimizingVarInISR);
         result.intpLevelEnableFlags[pLevel] = false;
 
         return result;
@@ -625,7 +677,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
 
     public ThreadingIntpState disableAllIntpAndCopy() {
         ThreadingIntpState result = new ThreadingIntpState(threads, locks, new ArrayDeque<>(intpStack),
-                intpLevelEnableFlags, new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered, firstTriggerPool, firstDelayStrategyPool);
+                intpLevelEnableFlags, new HashMap<>(intpTimes), activeThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered, firstTriggerPool, firstDelayStrategyPool, optimizingVarInISR);
         for (int i = 0; i < result.intpLevelEnableFlags.length; ++i) {
             result.intpLevelEnableFlags[i] = false;
         }
@@ -694,30 +746,42 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
                 threadIdsForWitness);
     }
 
-//    @Override
-//    public String toDOTLabel() {
-//        StringBuilder sb = new StringBuilder();
-////
-////        sb.append("[");
-//////        Joiner.on(",\n ").withKeyValueSeparator("=").appendTo(sb, threads);
-//////        Joiner.on(",\n ").withKeyValueSeparator("=").appendTo(sb, threads);
-//////        sb.append("]");
-//////        sb.append("\nenable flags: [");
-//////        for (int i = 0; i < intpLevelEnableFlags.length; ++i) {
-//////            sb.append(" " + intpLevelEnableFlags[i] + " ");
-//////        }
+    @Override
+    public String toDOTLabel() {
+        StringBuilder sb = new StringBuilder();
+//
+//        sb.append("[");
+////        Joiner.on(",\n ").withKeyValueSeparator("=").appendTo(sb, threads);
+////        Joiner.on(",\n ").withKeyValueSeparator("=").appendTo(sb, threads);
+////        sb.append("]");
+////        sb.append("\nenable flags: [");
+////        for (int i = 0; i < intpLevelEnableFlags.length; ++i) {
+////            sb.append(" " + intpLevelEnableFlags[i] + " ");
+////        }
 //        sb.append("rEdge : " + getDelayStrategyRWEdgeTostring(delayStrategyREdge)).append("\n");
 //        sb.append("wEdge : " + getDelayStrategyRWEdgeTostring(delayStrategyWEdge)).append("\n");
 //        sb.append("First:" + getFirstTriggerPool().toString()).append("\n");
 //        sb.append("]");
-//
-//        return sb.toString();
-//    }
-//
-//    @Override
-//    public boolean shouldBeHighlighted() {
-//        return false;
-//    }
+        sb.append(getOptimizingVarInISRToString()).append("\n");
+        return sb.toString();
+    }
+
+    private String getOptimizingVarInISRToString() {
+        StringBuilder sb = new StringBuilder();
+        for(String funcName:optimizingVarInISR.keySet()){
+            sb.append(funcName).append(":");
+            for (String var:optimizingVarInISR.get(funcName)){
+                sb.append(var).append(", ");
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
+    @Override
+    public boolean shouldBeHighlighted() {
+        return false;
+    }
 
 
     @Override
@@ -865,7 +929,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
 
 
         // 首位中断点延迟池 删除已插入 func
-        if(firstDelayStrategyPool!=null && firstDelayStrategyPool.isEmpty()) {
+        if (firstDelayStrategyPool != null && firstDelayStrategyPool.isEmpty()) {
             for (String funcName : firstDelayStrategyPool.keySet()) {
                 DelayStrategy delayStrategy = firstDelayStrategyPool.get(funcName);
                 Set<String> tmp = new HashSet<>();
@@ -950,7 +1014,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
      */
     public ThreadingIntpState withActiveThread(@Nullable String pActiveThread) {
         return new ThreadingIntpState(threads, locks, new ArrayDeque<>(intpStack), intpLevelEnableFlags,
-                new HashMap<>(intpTimes), pActiveThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered, firstTriggerPool, firstDelayStrategyPool);
+                new HashMap<>(intpTimes), pActiveThread, entryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered, firstTriggerPool, firstDelayStrategyPool, optimizingVarInISR);
     }
 
     // modified by xhr: 22-10-09
@@ -964,7 +1028,7 @@ public class ThreadingIntpState implements AbstractState, AbstractStateWithLocat
      */
     public ThreadingIntpState withEntryFunction(@Nullable FunctionCallEdge pEntryFunction) {
         return new ThreadingIntpState(threads, locks, new ArrayDeque<>(intpStack), intpLevelEnableFlags,
-                new HashMap<>(intpTimes), activeThread, pEntryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered, firstTriggerPool, firstDelayStrategyPool);
+                new HashMap<>(intpTimes), activeThread, pEntryFunction, threadIdsForWitness, delayStrategyREdge, delayStrategyWEdge, bottomTriggered, firstTriggerPool, firstDelayStrategyPool, optimizingVarInISR);
     }
 
     /**

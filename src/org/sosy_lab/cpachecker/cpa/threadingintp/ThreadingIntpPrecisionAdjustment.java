@@ -49,7 +49,6 @@ public class ThreadingIntpPrecisionAdjustment implements PrecisionAdjustment {
             AbstractState pFullState)
             throws CPAException, InterruptedException {
 
-        System.out.println("Test");
         ThreadingIntpState threadingIntpState = (ThreadingIntpState) pState;
 
         // 得到 cfaEdge
@@ -63,13 +62,13 @@ public class ThreadingIntpPrecisionAdjustment implements PrecisionAdjustment {
         }
 
         // 获得当前节点所在函数
-        String intpFunc = threadingIntpState.getActiveThread();
+        String intpFunc = threadingIntpState.getKeptActiveThread();
         if (!threadingIntpState.getIntpStack().isEmpty()) {
             intpFunc = threadingIntpState.getIntpStack().getLast();
         }
 
         // 先使用 hasISR 判断是否同时存在中断节点与非中断节点
-        if (ThreadingIntpTransferRelation.getHasISR()) {
+        if (threadingIntpState.getHasISR()) {
             if (ThreadingIntpTransferRelation.getPriorityMap().containsKey(intpFunc)) {
                 return Optional.of(
                         PrecisionAdjustmentResult
@@ -105,11 +104,30 @@ public class ThreadingIntpPrecisionAdjustment implements PrecisionAdjustment {
 //        }
 //
 
-        boolean canNotInsertISR = false;
         if (curEdge != null) {
-            Set<String> noInsertISR = judgeCanInsertISR(threadingIntpState, curEdge);
-            if (!noInsertISR.isEmpty() && noInsertISR.contains(intpFunc)) {
-                return Optional.empty();
+            // Copy the information of node
+            Set<CFAEdge> removeUsedOptEdge = new HashSet<>();
+            if (!ThreadingIntpTransferRelation.getPriorityMap().containsKey(intpFunc)) {
+                for (CFAEdge preCfaEdge : optimizingStrategy.keySet()) {  // 得到之前存储的边 edge1
+                    CFANode preSucNode = preCfaEdge.getSuccessor();    // 得到节点 c
+                    for (int i = 0; i < preSucNode.getNumLeavingEdges(); i++) {  //遍历节点 c 的出边，找到 d
+                        CFAEdge preSucEdge = preSucNode.getLeavingEdge(i);
+
+                        if (curEdge == preSucEdge) { // 判断当前边是否位于 edge3
+                            // 将 d' 中得到的关于中断的信息交付给 d
+                            optimizingStrategy.get(preCfaEdge).setOptimizingVarInISR(threadingIntpState.getOptimizingVarInISR());
+                            if (threadingIntpState.getIntpTimes().isEmpty()){
+                                removeUsedOptEdge.add(preCfaEdge);
+                            }
+                        }
+                    }
+                }
+
+                if(!removeUsedOptEdge.isEmpty()){
+                    for(CFAEdge cfaEdge:removeUsedOptEdge){
+                        optimizingStrategy.remove(cfaEdge);
+                    }
+                }
             }
         }
 
@@ -117,48 +135,5 @@ public class ThreadingIntpPrecisionAdjustment implements PrecisionAdjustment {
                 PrecisionAdjustmentResult
                         .create(pState, pPrecision, PrecisionAdjustmentResult.Action.CONTINUE));
     }
-
-    private Set<String> judgeCanInsertISR(ThreadingIntpState threadingIntpState, CFAEdge curEdge) {
-        // Copy the information of node
-        String intpFunc = threadingIntpState.getActiveThread();
-        Set<String> noInsertISR = new HashSet<>();     // 用于存放不用插入的中断函数
-        if (!threadingIntpState.getIntpStack().isEmpty()) {
-            intpFunc = threadingIntpState.getIntpStack().getLast();
-        }
-        if (!ThreadingIntpTransferRelation.getPriorityMap().containsKey(intpFunc)) {
-            for (CFAEdge preCfaEdge : optimizingStrategy.keySet()) {  // 得到之前存储的边 edge1
-                CFANode preSucNode = preCfaEdge.getSuccessor();    // 得到节点 c
-                for (int i = 0; i < preSucNode.getNumLeavingEdges(); i++) {  //遍历节点 c 的出边，找到 d
-                    CFAEdge preSucEdge = preSucNode.getLeavingEdge(i);
-
-                    if (curEdge == preSucEdge) { // 判断当前边是否位于 edge3
-                        // 将 d' 中得到的关于中断的信息交付给 d
-                        optimizingStrategy.get(preCfaEdge).setOptimizingVarInISR(threadingIntpState.getOptimizingVarInISR());
-                    }
-                }
-            }
-
-
-            // Judge whether using this strategy
-            EdgeVtx sucedgeInfo = (EdgeVtx) ThreadingIntpTransferRelation.getCondDepGraph().getDGNode(curEdge.hashCode());   // 得到 edge3 的边信息
-            if (sucedgeInfo != null) {
-                Set<String> edgeRWSharedVarSet = new HashSet<>(); // 得到边上都有哪些变量
-                edgeRWSharedVarSet.addAll(from(sucedgeInfo.getgReadVars()).transform(v -> v.getName()).toSet());
-                edgeRWSharedVarSet.addAll(from(sucedgeInfo.getgWriteVars()).transform(v -> v.getName()).toSet());
-                for (String var : edgeRWSharedVarSet) {
-                    Map<String, Set<String>> optimizingVarInISR = threadingIntpState.getOptimizingVarInISR();
-                    for (String intpFuncName : optimizingVarInISR.keySet()) {
-                        Set<String> intpNoUseingVarSet = optimizingVarInISR.get(intpFuncName);
-                        if (ThreadingIntpTransferRelation.getIntpFuncRWSharedVarMap().get(intpFuncName).containsKey(var) && intpNoUseingVarSet.contains(var)) {
-                            // 如果当前变量 var 在 ISR 中有，但实际并未使用，则将当前中断函数删除。
-                            noInsertISR.add(intpFuncName);
-                        }
-                    }
-                }
-            }
-        }
-        return noInsertISR;
-    }
-
 
 }

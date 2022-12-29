@@ -741,7 +741,7 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
         EdgeVtx edgeVtx = (EdgeVtx) condDepGraph.getDGNode(cfaEdge.hashCode());
         if (!reachMainFunc) {
             reachMainFunc = cfaEdge.getFileLocation().equals(edgeInfo.getCfa().getMainFunction().getFileLocation());
-        } else if(!JudgeUseOrNotOpt(cfaEdge,threadingState)){
+        } else{
             Map<String, Set<String>> intpFunc = getcanIntpFunc(threadingState);
 //            state = state.updateRW(edgeVtx, cfaEdge, intpFunc.get(enIntpFunc), intpFunc.get(disIntpFunc));
             threadingState = threadingState.updateRW(edgeVtx, cfaEdge, intpFunc.get(enIntpFunc), intpFunc.get(disIntpFunc));
@@ -813,12 +813,6 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
             }
 
         }
-
-
-        if (cfaEdge.toString().contains("N13")) {
-            System.out.println("Debug");
-        }
-
 
 //        System.out.println("R:"+threadingState.getDelayStrategyREdgeTostring());
 //        System.out.println("W:"+threadingState.getDelayStrategyWEdgeTostring());
@@ -1882,19 +1876,33 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
 
                 if (sucedgeInfo != null) { // the edge has global variables
                     // read or write of the subsequent edge
-                    if(JudgeUseOrNotOpt(sucedge,threadingState)){
-                        continue;
-                    }
+
 
                     Set<String> edgeRWSharedVarSet = new HashSet<>();
                     edgeRWSharedVarSet.addAll(from(sucedgeInfo.getgReadVars()).transform(v -> v.getName()).toSet());
                     edgeRWSharedVarSet.addAll(from(sucedgeInfo.getgWriteVars()).transform(v -> v.getName()).toSet());
+
+                    Map<String, Set<String>> optimizingVarInISR = threadingState.getOptimizingVarInISR();
 
                     // successor can be interrupted isr and traverse it
                     Set<String> intpFuncSet = repPoints.get(sucNode);
                     for (String intpFunc : intpFuncSet) {
 //                        System.out.println("-------对于中断: "+intpFunc);
                         Map<String, Set<String>> intpRWSharedVarSet = intpFuncRWSharedVarMap.get(intpFunc);   //  intpFunc is global variables set in current isr
+
+                        boolean canUseOpt = false;
+                        if(optimizingVarInISR!=null && optimizingVarInISR.containsKey(intpFunc)){
+                            Set<String> intpNoUseingVarSet = optimizingVarInISR.get(intpFunc);
+                            for(String var:edgeRWSharedVarSet)
+                                if (intpRWSharedVarSet.containsKey(var) && !intpNoUseingVarSet.contains(var)) {
+                                    // 如果当前变量 var 在 ISR 中有，但实际并未使用，则将当前中断函数删除。
+                                    canUseOpt = true;
+                                }
+                        }
+
+                        if(canUseOpt){
+                            continue;
+                        }
 
                         // 延迟策略
                         canIntpPoints = delayStrategyEdgeAB(intpRWSharedVarSet, edgeRWSharedVarSet, delayStrategyEdgeR, delayStrategyEdgeW, canIntpPoints, sucNode, intpFunc);
@@ -1913,26 +1921,21 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
 //        System.out.println();
         return canIntpPoints;
     }
- private boolean JudgeUseOrNotOpt(CFAEdge curEdge,ThreadingIntpState threadingIntpState){
-     // Judge whether using this strategy
-     EdgeVtx sucedgeInfo = (EdgeVtx) ThreadingIntpTransferRelation.getCondDepGraph().getDGNode(curEdge.hashCode());   // 得到 edge3 的边信息
-     if (sucedgeInfo != null) {
-         Set<String> edgeRWSharedVarSet = new HashSet<>(); // 得到边上都有哪些变量
-         edgeRWSharedVarSet.addAll(from(sucedgeInfo.getgReadVars()).transform(v -> v.getName()).toSet());
-         edgeRWSharedVarSet.addAll(from(sucedgeInfo.getgWriteVars()).transform(v -> v.getName()).toSet());
-         for (String var : edgeRWSharedVarSet) {
-             Map<String, Set<String>> optimizingVarInISR = threadingIntpState.getOptimizingVarInISR();
-             for (String intpFuncName : optimizingVarInISR.keySet()) {
-                 Set<String> intpNoUseingVarSet = optimizingVarInISR.get(intpFuncName);
-                 if (intpFuncRWSharedVarMap.get(intpFuncName).containsKey(var) && !intpNoUseingVarSet.contains(var)) {
-                     // 如果当前变量 var 在 ISR 中有，但实际并未使用，则将当前中断函数删除。
-                     return true;
-                 }
-             }
-         }
-     }
-     return false;
- }
+// private boolean JudgeUseOrNotOpt(Set<String> edgeRWSharedVarSet,ThreadingIntpState threadingIntpState){
+//     // Judge whether using this strategy
+//         for (String var : edgeRWSharedVarSet) {
+//             Map<String, Set<String>> optimizingVarInISR = threadingIntpState.getOptimizingVarInISR();
+//             for (String intpFuncName : optimizingVarInISR.keySet()) {
+//                 Set<String> intpNoUseingVarSet = optimizingVarInISR.get(intpFuncName);
+//                 if (intpFuncRWSharedVarMap.get(intpFuncName).containsKey(var) && !intpNoUseingVarSet.contains(var)) {
+//                     // 如果当前变量 var 在 ISR 中有，但实际并未使用，则将当前中断函数删除。
+//                     return true;
+//                 }
+//             }
+//         }
+//
+//     return false;
+// }
     private void disableForDelayStrategy(ThreadingIntpState threadingState, Set<Pair<CFANode, String>> canIntpPoints, CFANode sucNode, CFAEdge cfaedge, String curFuncName) {
         int pri = getIntpPriority(cfaedge);
         Set<String> intpfunc = from(priorityMap.keySet()).filter(f -> priorityMap.get(f) == pri).toSet();

@@ -41,14 +41,21 @@ void svp_simple_028_001_init() {
 }
 
 void svp_simple_001_001_isr_1() {
-  svp_simple_028_001_gloable_var++; 
+  int tmp = svp_simple_028_001_gloable_var + 1;
+  svp_simple_028_001_gloable_var=tmp; 
   svp_simple_028_001_isr_1_flag = 0;
   enable_isr(2);
 }
 void svp_simple_001_001_isr_2() {
   if (svp_simple_028_001_isr_1_flag) {
-    svp_simple_028_001_gloable_var++;
+    int tmp = svp_simple_028_001_gloable_var + 1;
+    svp_simple_028_001_gloable_var=tmp; 
   }
+}
+
+void svp_simple_028_001_isr_3() {
+  int tmp = svp_simple_028_001_gloable_var + 1;
+  svp_simple_028_001_gloable_var=tmp; 
 }
 
 // bug点：

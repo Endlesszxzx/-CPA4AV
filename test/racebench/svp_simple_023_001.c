@@ -34,7 +34,8 @@ void svp_simple_023_001_init() {
 
 void svp_simple_023_001_func_1(int var) {
   if (var > 0 && var < 12) {
-    svp_simple_023_001_global_var = svp_simple_023_001_global_var + 1;  
+    int tmp = svp_simple_023_001_global_var+1;
+    svp_simple_023_001_global_var = tmp;  
   }
 }
 void svp_simple_001_001_isr_1() {
@@ -45,7 +46,7 @@ void init() { enable_isr(-1); }
 
 void idlerun() {
   int i = 0;
-  for (i = 0; i <= 10; i++) {
+  for (i = 0; i <= 100; i++) {
     //		print2("Running....");
   }
 }

@@ -16,8 +16,8 @@ void init();
 
 
 
-#define MAX_LENGTH 10
-#define TRIGGER 9
+#define MAX_LENGTH 100
+#define TRIGGER 99
 
 volatile int svp_simple_006_001_global_var1;
 volatile int svp_simple_006_001_global_var2;
@@ -47,7 +47,7 @@ void svp_simple_006_001_main() {
 
 void svp_simple_001_001_isr_1() {
   int reader2;
-
+  idlerun();
 
   svp_simple_006_001_global_var1 = 0;
   reader2 = svp_simple_006_001_global_var2;
@@ -56,7 +56,7 @@ void init() { enable_isr(-1); }
 
 void idlerun() {
   int i = 0;
-  for (i = 0; i <= 10; i++) {
+  for (i = 0; i <= 100; i++) {
     //		print2("Running....");
   }
 }

@@ -41,7 +41,8 @@ void svp_simple_030_001_init() {
 }
 
 void addData() {
-  svp_simple_030_001_gloable_var++;  
+  int tmp = svp_simple_030_001_gloable_var+1;
+  svp_simple_030_001_gloable_var=tmp;  
 }
 
 void svp_simple_001_001_isr_1() {
@@ -51,14 +52,15 @@ void svp_simple_001_001_isr_1() {
 }
 void svp_simple_001_001_isr_2() {
   if (svp_simple_030_001_isr_1_flag) {
-    svp_simple_030_001_gloable_var++;  
+    int tmp = svp_simple_030_001_gloable_var+1;
+    svp_simple_030_001_gloable_var=tmp;  
   }
 }
 void init() { enable_isr(-1); }
 
 void idlerun() {
   int i = 0;
-  for (i = 0; i <= 10; i++) {
+  for (i = 0; i <= 100; i++) {
     //		print2("Running....");
   }
 }

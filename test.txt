@@ -1,0 +1,9 @@
+ant build
+./racebench.sh config/myAnalysis-concurrent-interrupt-benchmark-racebench.properties test/racebench
+sleep 20s
+./racebench.sh config/myAnalysis-concurrent-interrupt-benchmark-ldv-races.properties test/new/Idv-races
+sleep 20s
+./racebench.sh config/myAnalysis-concurrent-interrupt-benchmark-goblint-regression.properties test/new/goblint-regression
+sleep 20s
+./racebench.sh config/myAnalysis-concurrent-interrupt-benchmark-pthread.properties test/new/pthread
+

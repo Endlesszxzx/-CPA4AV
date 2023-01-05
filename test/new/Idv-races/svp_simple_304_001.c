@@ -10,9 +10,9 @@ void ldv_assert(int expression) { if (!expression) { ERROR: {reach_error();abort
 int pdev;
 
 void svp_simple_304_001_isr_1(void *arg) {
-   __VERIFIER_atomic_begin();
+
    pdev = 6;
-   __VERIFIER_atomic_end();
+
 }
 
 int module_init() {
@@ -28,13 +28,8 @@ int module_init() {
 
 void module_exit() {
    void *status;
-   __VERIFIER_atomic_begin();
    pdev = 4;
-   __VERIFIER_atomic_end();
-   __VERIFIER_atomic_begin();
    ldv_assert(pdev==4);
-   __VERIFIER_atomic_end();
-
    pdev = 5;
    ldv_assert(pdev==5);
 }

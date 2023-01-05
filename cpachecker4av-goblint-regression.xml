@@ -14,12 +14,4 @@
   </tasks>
 </rundefinition>
 
-<rundefinition name="all-points">
-  <option name="-config">./config/myAnalysis-concurrent-interrupt-benchmark-goblint-regression-all-points.properties</option>
-  <tasks name="goblint-regression">
-	  <includesfile>./test/new/goblint-regression/Tasks.set</includesfile>
-	  <propertyfile>./test/unreach-call.prp</propertyfile>
-  </tasks>
-</rundefinition>
-
 </benchmark>

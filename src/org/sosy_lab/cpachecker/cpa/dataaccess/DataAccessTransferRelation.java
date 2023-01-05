@@ -5,12 +5,11 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
-import org.sosy_lab.cpachecker.cfa.ast.AStatement;
-import org.sosy_lab.cpachecker.cfa.model.AStatementEdge;
 import org.sosy_lab.cpachecker.cfa.model.CFAEdge;
 import org.sosy_lab.cpachecker.cfa.model.CFAEdgeType;
-import org.sosy_lab.cpachecker.cfa.model.FunctionCallEdge;
+import org.sosy_lab.cpachecker.cfa.model.*;
 import org.sosy_lab.cpachecker.cfa.model.c.CFunctionReturnEdge;
+import org.sosy_lab.cpachecker.cfa.model.c.CReturnStatementEdge;
 import org.sosy_lab.cpachecker.core.defaults.SingleEdgeTransferRelation;
 import org.sosy_lab.cpachecker.core.interfaces.AbstractState;
 import org.sosy_lab.cpachecker.core.interfaces.Precision;
@@ -112,25 +111,27 @@ public class DataAccessTransferRelation extends SingleEdgeTransferRelation {
 //            if (lastDataAccess.getPathFunc().isEmpty()) {
 //                lastDataAccess.setPathFunc(mainFunction);
 //            }
+            DataAccessState dataAccess = new DataAccessState(lastDataAccess.getDataAccess(), lastDataAccess.getDataRace(), lastDataAccess.getPathFunc());
+
+            String task1 = null;
+            if (cfaEdge instanceof CReturnStatementEdge || cfaEdge instanceof FunctionExitNode|| cfaEdge instanceof CFunctionReturnEdge || cfaEdge.toString().contains("default return")) {
+                dataAccess.setPathFunc(topFunc, cfaEdge.getPredecessor().getFunctionName());
+                task1 = cfaEdge.getSuccessor().getFunctionName();
+            }
 
             EdgeVtx edgeVtx = (EdgeVtx) conDepGraph.getDGNode(cfaEdge.hashCode());
             // 如果边信息为空，则直接返回父节点信息
             if (edgeVtx == null) {
-                return Collections.singleton(lastDataAccess);
+                return Collections.singleton(dataAccess);
             }
 
-            DataAccessState dataAccess = new DataAccessState(lastDataAccess.getDataAccess(), lastDataAccess.getDataRace(), lastDataAccess.getPathFunc());
+
 
             // 得到读写信息
             Set<Var> gRVars = edgeVtx.getgReadVars(), gWVars = edgeVtx.getgWriteVars();
 
             // 得到边所在的函数名
             String task = edgeVtx.getBlockStartEdge().getPredecessor().getFunctionName();
-            String task1 = null;
-            if (cfaEdge.getDescription().contains("Return edge from")) {
-                lastDataAccess.setPathFunc(topFunc, cfaEdge.getPredecessor().getFunctionName());
-                task1 = edgeVtx.getBlockStartEdge().getSuccessor().getFunctionName();
-            }
             int times = 1;
             if(!dataAccess.getPathFunc().containsKey(task) && !dataAccess.getPathFunc().containsKey(task1)){
                 times = getFuncTimes(topFunc, dataAccess.getPathFunc(), task);
@@ -198,14 +199,14 @@ public class DataAccessTransferRelation extends SingleEdgeTransferRelation {
     private int getFuncTimes(String topFunc, Map<String, List<String>> pathFunc, String task) {
         int cnt = 1;
         if (pathFunc.containsKey(topFunc)) {   // current path already has the corresponding data
-//            cnt = getTimes(pathFunc.get(topFunc), task);
+            cnt = getTimes(pathFunc.get(topFunc), task);
 //            pathFunc.get(topFunc).add(task);
             return cnt;
         } else {
             cnt = 1;
             List<String> funcList = new ArrayList<>();
             funcList.add(task);
-            pathFunc.put(topFunc, funcList);
+//            pathFunc.put(topFunc, funcList);
             return cnt;
         }
     }

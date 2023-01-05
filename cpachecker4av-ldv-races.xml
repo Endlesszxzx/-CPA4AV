@@ -14,12 +14,4 @@
   </tasks>
 </rundefinition>
 
-<rundefinition name="all-points">
-  <option name="-config">./config/myAnalysis-concurrent-interrupt-benchmark-ldv-races-all-points.properties</option>
-  <tasks name="ldv-races">
-	  <includesfile>./test/new/Idv-races/Tasks.set</includesfile>
-	  <propertyfile>./test/unreach-call.prp</propertyfile>
-  </tasks>
-</rundefinition>
-
 </benchmark>

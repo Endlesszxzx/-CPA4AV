@@ -9,7 +9,7 @@
 <rundefinition name="select-points">
   <option name="-config">./config/myAnalysis-concurrent-interrupt-benchmark-goblint-regression.properties</option>
   <tasks name="goblint-regression">
-	  <includesfile>./test/svcomp-benchmarks/goblint-regression_interrupt/goblint-regression_interrupt/Tasks.set</includesfile>
+	  <includesfile>./test/new/goblint-regression/Tasks.set</includesfile>
 	  <propertyfile>./test/unreach-call.prp</propertyfile>
   </tasks>
 </rundefinition>
@@ -17,7 +17,7 @@
 <rundefinition name="all-points">
   <option name="-config">./config/myAnalysis-concurrent-interrupt-benchmark-goblint-regression-all-points.properties</option>
   <tasks name="goblint-regression">
-	  <includesfile>./test/svcomp-benchmarks/goblint-regression_interrupt/goblint-regression_interrupt/Tasks.set</includesfile>
+	  <includesfile>./test/new/goblint-regression/Tasks.set</includesfile>
 	  <propertyfile>./test/unreach-call.prp</propertyfile>
   </tasks>
 </rundefinition>

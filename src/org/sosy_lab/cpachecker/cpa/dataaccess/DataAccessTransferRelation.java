@@ -198,8 +198,8 @@ public class DataAccessTransferRelation extends SingleEdgeTransferRelation {
     private int getFuncTimes(String topFunc, Map<String, List<String>> pathFunc, String task) {
         int cnt = 1;
         if (pathFunc.containsKey(topFunc)) {   // current path already has the corresponding data
-            cnt = getTimes(pathFunc.get(topFunc), task);
-            pathFunc.get(topFunc).add(task);
+//            cnt = getTimes(pathFunc.get(topFunc), task);
+//            pathFunc.get(topFunc).add(task);
             return cnt;
         } else {
             cnt = 1;

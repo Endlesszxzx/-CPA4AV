@@ -18,16 +18,13 @@ import org.sosy_lab.cpachecker.cfa.CFA;
 import org.sosy_lab.cpachecker.cfa.model.CFANode;
 import org.sosy_lab.cpachecker.core.defaults.AbstractCPA;
 import org.sosy_lab.cpachecker.core.defaults.AutomaticCPAFactory;
-import org.sosy_lab.cpachecker.core.interfaces.*;
-import org.sosy_lab.cpachecker.cpa.cintp.CIntpPrecisionAdjustment;
-import org.sosy_lab.cpachecker.cpa.predicate.PredicateCPA;
-import org.sosy_lab.cpachecker.util.globalinfo.GlobalInfo;
-
-import java.util.Optional;
-import java.util.logging.Level;
+import org.sosy_lab.cpachecker.core.interfaces.AbstractState;
+import org.sosy_lab.cpachecker.core.interfaces.CPAFactory;
+import org.sosy_lab.cpachecker.core.interfaces.StateSpacePartition;
 
 @Options(prefix = "cpa.threadingintp")
 public class ThreadingIntpCPA extends AbstractCPA {
+
     @Option(secure = true, description = "How many levels of interruption is support?")
     private int maxInterruptLevel = 3;
 
@@ -60,10 +57,5 @@ public class ThreadingIntpCPA extends AbstractCPA {
                         : ThreadingIntpState.MAX_PRIORITY_NUMBER,
                 ThreadingIntpState.MIN_THREAD_NUM,
                 mainThread);
-    }
-
-    @Override
-    public PrecisionAdjustment getPrecisionAdjustment() {
-        return new ThreadingIntpPrecisionAdjustment();
     }
 }

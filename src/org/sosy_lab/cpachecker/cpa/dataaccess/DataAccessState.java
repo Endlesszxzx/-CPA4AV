@@ -74,11 +74,7 @@ public class DataAccessState implements AbstractState, Graphable {
     private Map<String, List<String>> newPath(Map<String, List<String>> pathFunc) {
         Map<String, List<String>> ans = new HashMap<String, List<String>>();
         for (String task : pathFunc.keySet()) {
-            List<String> tmp = new ArrayList<>();
-            for(String task1:pathFunc.get(task)){
-                tmp.add(task1);
-            }
-
+            List<String> tmp = new ArrayList<>(pathFunc.get(task));
             ans.put(task, tmp);
         }
         return ans;

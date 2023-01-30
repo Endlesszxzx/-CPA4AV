@@ -3136,7 +3136,7 @@ cpa.threadingintp.priorityRegex = "^([a-zA-Z_]+[a-zA-Z0-9_]*)\\s+(\\d+)"
 cpa.threadingintp.simulateInterruption = true
 
 # What optimization strategy does this option represent
-cpa.threadingintp.strategy = "D+O"
+cpa.threadingintp.strategy = "D+L+F"
 
 # in case of witness validation we need to check all possible function calls
 # of cloned CFAs.

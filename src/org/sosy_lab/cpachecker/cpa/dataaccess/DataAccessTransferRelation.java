@@ -111,21 +111,20 @@ public class DataAccessTransferRelation extends SingleEdgeTransferRelation {
 //            if (lastDataAccess.getPathFunc().isEmpty()) {
 //                lastDataAccess.setPathFunc(mainFunction);
 //            }
-            DataAccessState dataAccess = new DataAccessState(lastDataAccess.getDataAccess(), lastDataAccess.getDataRace(), lastDataAccess.getPathFunc());
 
             String task1 = null;
             if (cfaEdge instanceof CReturnStatementEdge || cfaEdge instanceof FunctionExitNode|| cfaEdge instanceof CFunctionReturnEdge || cfaEdge.toString().contains("default return")) {
-                dataAccess.setPathFunc(topFunc, cfaEdge.getPredecessor().getFunctionName());
+                lastDataAccess.setPathFunc(topFunc, cfaEdge.getPredecessor().getFunctionName());
                 task1 = cfaEdge.getSuccessor().getFunctionName();
             }
 
             EdgeVtx edgeVtx = (EdgeVtx) conDepGraph.getDGNode(cfaEdge.hashCode());
             // 如果边信息为空，则直接返回父节点信息
             if (edgeVtx == null) {
-                return Collections.singleton(dataAccess);
+                return Collections.singleton(lastDataAccess);
             }
 
-
+            DataAccessState dataAccess = new DataAccessState(lastDataAccess.getDataAccess(), lastDataAccess.getDataRace(), lastDataAccess.getPathFunc());
 
             // 得到读写信息
             Set<Var> gRVars = edgeVtx.getgReadVars(), gWVars = edgeVtx.getgWriteVars();

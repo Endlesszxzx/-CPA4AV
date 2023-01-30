@@ -139,8 +139,10 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
     private boolean enableRepPointSelecting = true;
 
     @Option(secure = true, description = "What optimization strategy does this option represent")
-    private String strategy = "D+O";
-
+   private String strategy = "D+L+F";
+    // private String strategy = "D+F";
+//    private String strategy = "D+L";
+//    private String strategy = "D";
     /**
      * The interruption priorities of all the functions obtained from the file 'InterruptPriority.txt'
      * will put into this map. The rules for interruption are:
@@ -1842,7 +1844,7 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
 
             // 末位触发
             if (strategy.contains("L")) {
-                if (sucedge instanceof CReturnStatementEdge || ((sucedge.getSuccessor() instanceof FunctionExitNode) && (priorityMap.containsKey(sucNode.getFunctionName())))) {
+                if ((sucNode.getFunctionName().contains("main") && sucedge.toString().contains("default return")) || ((sucedge.getSuccessor() instanceof FunctionExitNode) && (priorityMap.containsKey(sucNode.getFunctionName())))) {
 //            if ((sucedge instanceof CReturnStatementEdge || sucedge.getSuccessor() instanceof FunctionExitNode)) {
                     canIntpPoints = LastBitTrigger(delayStrategyEdgeR, delayStrategyEdgeW, threadingState.getFirstDelayStrategyPool().get(curFuncName), canIntpPoints, sucNode);
                     threadingState.removeDelayStrategyPool(curFuncName);

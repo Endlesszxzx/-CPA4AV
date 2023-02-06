@@ -1,7 +1,7 @@
 extern void idlerun();
 
 extern void enable_isr(int);
-
+extern int __VERIFIER_nondet_int();
 extern void disable_isr(int);
 
 extern int rand();
@@ -74,7 +74,7 @@ void init() { enable_isr(-1); }
 
 void idlerun() {
   int i = 0;
-  for (i = 0; i <= 10; i++) {
+  for (i = 0; i <= 100; i++) {
     //		print2("Running....");
   }
 }

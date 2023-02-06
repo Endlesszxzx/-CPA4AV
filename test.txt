@@ -1,9 +1,3 @@
-ant build
-./racebench.sh config/myAnalysis-concurrent-interrupt-benchmark-racebench.properties test/racebench
-sleep 20s
-./racebench.sh config/myAnalysis-concurrent-interrupt-benchmark-ldv-races.properties test/new/Idv-races
-sleep 20s
-./racebench.sh config/myAnalysis-concurrent-interrupt-benchmark-goblint-regression.properties test/new/goblint-regression
-sleep 20s
-./racebench.sh config/myAnalysis-concurrent-interrupt-benchmark-pthread.properties test/new/pthread
-
+./scripts/benchmark.py cpachecker4av-ldv-races.xml --no-container
+./scripts/benchmark.py cpachecker4av-goblint-regression.xml --no-container
+./scripts/benchmark.py cpachecker4av-pthread.xml --no-container

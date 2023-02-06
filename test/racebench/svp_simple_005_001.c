@@ -1,5 +1,5 @@
 extern void idlerun();
-
+extern int __VERIFIER_nondet_int();
 extern void enable_isr(int);
 
 extern void disable_isr(int);
@@ -14,9 +14,9 @@ void init();
 
 
 
-#define MAX_LENGTH 10
-#define TRIGGER 9
-#define TRIGGER1 1
+#define MAX_LENGTH 100
+#define TRIGGER 99
+#define TRIGGER1 10
 
 volatile int svp_simple_005_001_global_condition = 0;
 

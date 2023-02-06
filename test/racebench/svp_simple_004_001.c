@@ -1,5 +1,5 @@
 extern void idlerun();
-
+extern int __VERIFIER_nondet_int();
 extern void enable_isr(int);
 
 extern void disable_isr(int);
@@ -8,8 +8,8 @@ extern int rand();
 
 void init();
 
-#define MAX_LENGTH 10
-#define TRIGGER 9
+#define MAX_LENGTH 100
+#define TRIGGER 99
 
 volatile int svp_simple_004_001_condition1 = 1;
 volatile int svp_simple_004_001_condition2 = 1;
@@ -39,9 +39,13 @@ void svp_simple_004_001_main() {
     reader6 = svp_simple_004_001_global_var3;
   }
 
-  if (svp_simple_004_001_condition4 == 1) reader3 = svp_simple_004_001_global_var2;
+  if (svp_simple_004_001_condition4 == 1){
+    reader3 = svp_simple_004_001_global_var2;
+  }
 
-  if (svp_simple_004_001_condition5 == 1) reader4 = svp_simple_004_001_global_var2;
+  if (svp_simple_004_001_condition5 == 1) {
+    reader4 = svp_simple_004_001_global_var2;
+  }
 }
 
 void svp_simple_001_001_isr_1() {
@@ -63,7 +67,7 @@ void init() { enable_isr(-1); }
 
 void idlerun() {
   int i = 0;
-  for (i = 0; i <= 10; i++) {
+  for (i = 0; i <= 100; i++) {
     //		print2("Running....");
   }
 }

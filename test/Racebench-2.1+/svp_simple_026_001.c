@@ -32,7 +32,7 @@ int svp_simple_026_001_main() {
     svp_simple_026_001_gloable_var = 0;
     svp_simple_026_001_gloable_var = 3;
   }
-//  enable_isr(1);
+  enable_isr(1);
 
   return 0;
 }

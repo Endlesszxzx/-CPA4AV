@@ -139,9 +139,9 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
     private boolean enableRepPointSelecting = true;
 
     @Option(secure = true, description = "What optimization strategy does this option represent")
-   private String strategy = "D+L+F";
-    // private String strategy = "D+F";
-//    private String strategy = "D+L";
+   private String strategy = "D+I+F";
+//     private String strategy = "D+I";
+//    private String strategy = "D+F";
 //    private String strategy = "D";
     /**
      * The interruption priorities of all the functions obtained from the file 'InterruptPriority.txt'
@@ -206,7 +206,7 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
 
 
     public ThreadingIntpTransferRelation(Configuration pConfig, CFA pCfa, LogManager pLogger) throws InvalidConfigurationException {
-        System.out.println("当前选择的策略是"+strategy);
+        System.out.println("当前选择的策略是 "+strategy);
         pConfig.inject(this);
         cfa = pCfa;
         locationCPA = LocationCPA.create(pCfa, pConfig);
@@ -1843,8 +1843,8 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
             CFAEdge sucedge = sucNode.getLeavingEdge(i);
 
             // 末位触发
-            if (strategy.contains("L")) {
-                if ((sucNode.getFunctionName().contains("main") && sucedge.toString().contains("default return")) || ((sucedge.getSuccessor() instanceof FunctionExitNode) && (priorityMap.containsKey(sucNode.getFunctionName())))) {
+            if (strategy.contains("F")) {
+                if ((sucNode.getFunctionName().contains("main") && sucedge.toString().contains("return")) || ((sucedge.getSuccessor() instanceof FunctionExitNode) && (priorityMap.containsKey(sucNode.getFunctionName())))) {
 //            if ((sucedge instanceof CReturnStatementEdge || sucedge.getSuccessor() instanceof FunctionExitNode)) {
                     canIntpPoints = LastBitTrigger(delayStrategyEdgeR, delayStrategyEdgeW, threadingState.getFirstDelayStrategyPool().get(curFuncName), canIntpPoints, sucNode);
                     threadingState.removeDelayStrategyPool(curFuncName);
@@ -1859,7 +1859,7 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
                 if (callFuncName != null && callFuncName.startsWith(disIntpFunc) && repPoints.containsKey(sucNode)) {
                     Set<String> sucIntp = repPoints.get(sucNode);
 
-                    if (strategy.contains("F")) {
+                    if (strategy.contains("I")) {
                         System.out.println("shouwei");
                         // 首位触发 —— 主程序遇到 disable(ISR)，若在此之前中断 ISR 从未触发，则在主程序 disable(ISR) 之前插入中断 ISR；
                         for (String intpFunc : sucIntp) {
@@ -1922,7 +1922,7 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
                             canIntpPoints = delayStrategyEdgeAB(intpRWSharedVarSet, edgeRWSharedVarSet, delayStrategyEdgeR, delayStrategyEdgeW, canIntpPoints, sucNode, intpFunc);
 
                         // 首位触发
-                        if (strategy.contains("F"))
+                        if (strategy.contains("I"))
                             if (!threadingState.getIntpStack().contains(intpFunc)) {
                                 canIntpPoints = firstTrigger(intpRWSharedVarSet, threadingState, canIntpPoints, sucNode, sucedgeInfo);
                             }

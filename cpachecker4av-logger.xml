@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE benchmark PUBLIC "+//IDN sosy-lab.org//DTD BenchExec benchmark 1.9//EN" "https://www.sosy-lab.org/benchexec/benchmark-2.3.dtd">
+<benchmark tool="cpachecker" timelimit="180 min" memlimit="16 GB" cpuCores="1" threads="1">
+
+  <option name="-heap">4096000M</option>
+  <option name="-benchmark"/>
+  <option name="-timelimit">3000000000s</option>
+
+<rundefinition name="logger">
+	<!-- the ist task 'select-points' represents the use of interrupt points select strategy --> 
+  <tasks name="select-points">
+	  <includesfile>./test/logger/Tasks.set</includesfile>
+	  <propertyfile>./test/unreach-call.prp</propertyfile>
+	  <option name="-config">./config/myAnalysis-concurrent-interrupt-benchmark-logger.properties</option>
+  </tasks>
+</rundefinition>
+
+</benchmark>

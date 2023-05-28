@@ -1,0 +1,31 @@
+2022-11-17 18:21:38:990	INFO	CPAMain.detectFrontendLanguageIfNecessary	Language C detected and set for analysis
+
+2022-11-17 18:21:39:005	INFO	ResourceLimitChecker.fromConfiguration	Using the following resource limits: CPU-time limit of 300s
+
+2022-11-17 18:21:39:036	INFO	CPAchecker.run	CPAchecker (unknown version) / myAnalysis-concurrent-interrupt-benchmark-racebench (Java HotSpot(TM) 64-Bit Server VM 11.0.15) started
+
+2022-11-17 18:21:39:051	INFO	CPAchecker.parse	Parsing CFA from file(s) "../test/racebench/svp_simple_020_001.c"
+
+2022-11-17 18:21:39:390	WARNING	CheckBindingVisitor.visit	Undefined function init found, first called in line 26
+
+2022-11-17 18:21:39:391	WARNING	CheckBindingVisitor.visit	Undefined function disable_isr found, first called in line 27
+
+2022-11-17 18:21:39:406	WARNING	CheckBindingVisitor.visit	Undefined function enable_isr found, first called in line 47
+
+2022-11-17 18:21:39:502	INFO	EdgeInfo.<init>	Building Constrained Dependency Graph ...
+
+2022-11-17 18:21:39:630	WARNING	FormulaManagerView.<init>	Using unsound approximation of ints with unbounded integers and floats with rationals for encoding program semantics.
+
+2022-11-17 18:21:39:696	WARNING	ThreadingIntpCPA:ThreadingIntpTransferRelation.parseInterruptPriorityFile	The priority file 'test/racebench/svp_simple_020_001_priority.txt' for interruption does not exist!
+
+2022-11-17 18:21:39:786	WARNING	CPAchecker.printConfigurationWarnings	The following configuration options were specified but are not used:
+ cpa.threadingintp.maxInterruptLevel
+ cpa.por.pcdpor.depComputationStateType
+ cpa.locations.useIncClonedFunc
+ heap 
+
+
+2022-11-17 18:21:39:786	INFO	CPAchecker.runAlgorithm	Starting analysis ...
+
+2022-11-17 18:21:39:847	INFO	CPAchecker.runAlgorithm	Stopping analysis ...
+

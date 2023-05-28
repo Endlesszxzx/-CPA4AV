@@ -1,0 +1,160 @@
+scripts/cpa.sh -heap 4096M -benchmark -timelimit 300s -config ./config/myAnalysis-concurrent-interrupt-benchmark-pthread.properties -stats -spec test/unreach-call.prp -32 test/svcomp-benchmarks/pthread_interrupt/pthread_interrupt/svp_simple_321_001.i
+
+
+--------------------------------------------------------------------------------
+
+
+Running CPAchecker with Java heap of size 4096M.
+Running CPAchecker with default stack size (1024k). Specify a larger value with -stack if needed.
+Language C detected and set for analysis (CPAMain.detectFrontendLanguageIfNecessary, INFO)
+
+Using the following resource limits: CPU-time limit of 300s (ResourceLimitChecker.fromConfiguration, INFO)
+
+CPAchecker 2.0 / myAnalysis-concurrent-interrupt-benchmark-pthread (Java HotSpot(TM) 64-Bit Server VM 11.0.8) started (CPAchecker.run, INFO)
+
+Parsing CFA from file(s) "test/svcomp-benchmarks/pthread_interrupt/pthread_interrupt/svp_simple_321_001.i" (CPAchecker.parse, INFO)
+
+line 844: Dead code detected: return 0; (CFACreationUtils.addEdgeToCFA, INFO)
+
+Building Constrained Dependency Graph ... (EdgeInfo.<init>, INFO)
+
+Using unsound approximation of ints with unbounded integers and floats with rationals for encoding program semantics. (FormulaManagerView.<init>, WARNING)
+
+The following configuration options were specified but are not used:
+ cpa.threadingintp.maxInterruptLevel
+ cpa.por.pcdpor.depComputationStateType
+ cpa.locations.useIncClonedFunc 
+ (CPAchecker.printConfigurationWarnings, WARNING)
+
+Starting analysis ... (CPAchecker.runAlgorithm, INFO)
+
+========================== Verify Result ===========================
+explored states: 14210
+reached set size: 14211
+total time: 5369 ms
+Race times:
+ 
+[31m=========================== Conflicts checked =============================
+The total number of conflicts is0
+RWR conflicts have 0
+WRW conflicts have 0
+RWW conflicts have 0
+WWR conflicts have 0
+[0m=========================== 详细状态如下 =============================
+ raceRWRSet:
+[]
+ raceWRWSet:
+[]
+ raceRWWSet:
+[]
+ raceWWRSet:
+[]
+=========================== Predicates =============================
+====================================================================
+Stopping analysis ... (CPAchecker.runAlgorithm, INFO)
+
+
+BDDCPA statistics
+-----------------
+Number of boolean vars:           4 (of 6)
+Number of intEqual vars:          2 (of 4)
+Number of intAdd vars:            4 (of 5)
+Number of all vars:               10
+Number of intBool partitions:     4
+Number of intEq partitions:       2
+Number of intAdd partitions:      3
+Number of all partitions:         16
+Number of named predicates:          2816
+Number of BDD nodes:                               223142
+Size of BDD node table:                            257591
+Size of BDD cache:                                 25759
+Size of BDD node cleanup queue:                    0.63 (sum: 931035, count: 1487762, min: 0, max: 64180)
+Time for BDD node cleanup:                             0.191s
+Time for BDD garbage collection:                       0.053s (in 2 runs)
+
+DataAccessCPA statistics
+------------------------
+[32mtime for TransferRelation:[0m      [33m    0.138s[0m
+
+AutomatonAnalysis (SVCOMP) statistics
+-------------------------------------
+Number of states:                                  1
+Total time for successor computation:                  0.074s
+Automaton transfers with branching:                0
+Automaton transfer successors:                     0.97 (sum: 14208, count: 14608, min: 0, max: 1) [0 x 400, 1 x 14208]
+Number of states with assumption transitions:      0
+
+Constrained Dependency Graph statistics
+---------------------------------------
+Time for building the nodes of conditional dependence graph:     0.093s
+Time for building conditional dependence graph:        0.190s
+  Number of dependent node:                              17 (count: 1, min: 17, max: 17, avg: 17.00)
+  Number of dependent node pairs:                        40
+  Number of un-conditional dependent node pairs:         40
+  Number of block:                                       17
+  Size of block:                                         17 (sum: 17, min: 1, max: 1, avg: 1.00)
+
+CPA algorithm statistics
+------------------------
+Number of iterations:            14211
+Max size of waitlist:            403
+Average size of waitlist:        177
+ThreadingSortedWaitlist:                           14015.00 (sum: 14015, count: 1, min: 14015, max: 14015)
+CallstackSortedWaitlist:                           71.51 (sum: 14015, count: 196, min: 0, max: 14015)
+Number of computed successors:   14210
+Max successors for one state:    3
+Number of times merged:          0
+Number of times stopped:         0
+Number of times breaked:         0
+
+Total time for CPA algorithm:         5.369s (Max:     5.369s)
+  Time for choose from waitlist:      0.016s
+  Time for precision adjustment:      0.098s
+  Time for transfer relation:         3.043s
+  Time for stop operator:             1.989s
+  Time for adding to reached set:     0.101s
+
+CPAchecker general statistics
+-----------------------------
+Number of program locations:                       291
+Number of CFA edges (per node):                         298 (count: 291, min: 0, max: 2, avg: 1.02)
+Number of relevant variables:                      13
+Number of functions:                               12
+Number of loops (and loop nodes):                         2 (sum: 20, min: 10, max: 10, avg: 10.00)
+Size of reached set:             14211
+  Number of partitions:          244
+    Avg size of partitions:      58
+    Max size of partitions:      401 (with key [{svp_simple_321_001_isr_1=N76 (before line 852) Function svp_simple_321_001_isr_1 called from node N71, stack depth 1 [7ac020bf], stack [svp_simple_321_001_isr_1] @@ 1 @@ 1, svp_simple_321_001_main=N105 (before line 885) Function svp_simple_321_001_main called from node N104, stack depth 1 [dcc1555], stack [svp_simple_321_001_main] @@ -2147483648 @@ 0}])
+  Number of target states:       0
+
+Time for analysis setup:          1.943s
+  Time for loading CPAs:          0.348s
+  Time for loading parser:        0.249s
+  Time for CFA construction:      0.998s
+    Time for parsing file(s):     0.527s
+    Time for AST to CFA:          0.312s
+    Time for CFA sanity check:    0.000s
+    Time for post-processing:     0.108s
+      Time for function pointers resolving:            0.006s
+        Function calls via function pointers:             0 (count: 1, min: 0, max: 0, avg: 0.00)
+        Instrumented function pointer calls:              0 (count: 1, min: 0, max: 0, avg: 0.00)
+        Function calls with function pointer arguments:        0 (count: 1, min: 0, max: 0, avg: 0.00)
+        Instrumented function pointer arguments:          0 (count: 1, min: 0, max: 0, avg: 0.00)
+      Time for classifying variables:                  0.051s
+        Time for collecting variables:                 0.030s
+        Time for solving dependencies:                 0.001s
+        Time for building hierarchy:                   0.000s
+        Time for building classification:              0.020s
+        Time for exporting data:                       0.000s
+Time for Analysis:                5.404s
+CPU time for analysis:            5.390s
+Time for analyzing result:        0.011s
+Total time for CPAchecker:        7.347s
+Total CPU time for CPAchecker:    7.340s
+Time for statistics:              0.134s
+
+Time for Garbage Collector:       0.407s (in 57 runs)
+Garbage Collector(s) used:    Copy, MarkSweepCompact
+
+Verification result: TRUE. No property violation found by chosen configuration.
+More details about the verification run can be found in the directory "./output".

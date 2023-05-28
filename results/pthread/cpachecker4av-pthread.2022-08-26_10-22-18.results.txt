@@ -1,0 +1,92 @@
+   BENCHMARK INFORMATION
+benchmark definition:    cpachecker4av-pthread.xml
+name:                    cpachecker4av-pthread
+run sets:                select-points.pthread, all-points.pthread
+date:                    Fri, 2022-08-26 10:22:18 CST
+tool:                    CPAchecker 2.0
+tool executable:         scripts/cpa.sh
+options:                 -heap 4096M -benchmark -timelimit 300s
+parallel runs:           2
+resource limits:
+- memory:                4000.0 MB
+- time:                  300 s
+- cpu cores:             1
+hardware requirements:
+- cpu cores:             1
+- memory:                4000.0 MB
+------------------------------------------------------------
+
+   SYSTEM INFORMATION
+host:                    YangTian
+os:                      Linux-5.15.0-46-generic-x86_64-with-glibc2.29
+cpu:                     Intel Core i7-8700 CPU @ 3.20GHz
+- cores:                 12
+- max frequency:         4600.0 MHz
+- turbo boost enabled:   True
+ram:                     33539.833856 MB
+------------------------------------------------------------
+
+
+
+select-points.pthread
+Run set 1 of 2 with options '-heap 4096M -benchmark -timelimit 300s -config ./config/myAnalysis-concurrent-interrupt-benchmark-pthread.properties' and propertyfile 'None'
+
+inputfile                 status                       cpu time   wall time        host
+---------------------------------------------------------------------------------------
+svp_simple_304_001.yml    false(unreach-call)              2.82        2.82        None
+svp_simple_305_001.yml    false(unreach-call)              3.27        3.28        None
+svp_simple_306_001.yml    false(unreach-call)              4.14        4.15        None
+svp_simple_307_001.yml    false(unreach-call)              5.12        5.13        None
+svp_simple_318_001.yml    true                             3.56        3.58        None
+svp_simple_319_001.yml    true                             3.40        3.40        None
+svp_simple_320_001.yml    true                             8.92        8.93        None
+svp_simple_321_001.yml    true                             8.46        8.46        None
+svp_simple_322_001.yml    true                            15.52       15.52        None
+svp_simple_323_001.yml    true                            16.40       16.41        None
+svp_simple_324_001.yml    false(unreach-call)              2.90        2.90        None
+svp_simple_325_001.yml    false(unreach-call)              2.90        2.91        None
+svp_simple_327_001.yml    true                             2.83        2.83        None
+svp_simple_328_001.yml    true                             2.86        2.87        None
+svp_simple_329_001.yml    true                             2.83        2.84        None
+svp_simple_330_001.yml    true                             2.73        2.74        None
+svp_simple_331_001.yml    true                             2.86        2.86        None
+svp_simple_332_001.yml    true                             2.74        2.75        None
+---------------------------------------------------------------------------------------
+Run set 1                 done                            94.48       49.62           -
+
+
+all-points.pthread
+Run set 2 of 2 with options '-heap 4096M -benchmark -timelimit 300s -config ./config/myAnalysis-concurrent-interrupt-benchmark-pthread-all-points.properties' and propertyfile 'None'
+
+inputfile                 status                       cpu time   wall time        host
+---------------------------------------------------------------------------------------
+svp_simple_304_001.yml    true                             2.75        2.76        None
+svp_simple_305_001.yml    false(unreach-call)              3.43        3.43        None
+svp_simple_306_001.yml    false(unreach-call)              4.87        4.88        None
+svp_simple_307_001.yml    false(unreach-call)              6.79        6.79        None
+svp_simple_318_001.yml    true                             3.13        3.14        None
+svp_simple_319_001.yml    true                             2.95        2.95        None
+svp_simple_320_001.yml    true                             3.11        3.11        None
+svp_simple_321_001.yml    true                             2.95        2.95        None
+svp_simple_322_001.yml    true                             3.11        3.12        None
+svp_simple_323_001.yml    true                             3.15        3.16        None
+svp_simple_324_001.yml    false(unreach-call)              2.94        2.95        None
+svp_simple_325_001.yml    false(unreach-call)              2.83        2.83        None
+svp_simple_327_001.yml    true                             4.96        4.96        None
+svp_simple_328_001.yml    true                             4.96        4.98        None
+svp_simple_329_001.yml    true                            10.35       10.35        None
+svp_simple_330_001.yml    true                            10.10       10.10        None
+svp_simple_331_001.yml    true                            19.31       19.32        None
+svp_simple_332_001.yml    true                            22.09       22.11        None
+---------------------------------------------------------------------------------------
+Run set 2                 done                           113.96       60.88           -
+
+Statistics:             36 Files
+  correct:               0
+    correct true:        0
+    correct false:       0
+  incorrect:             0
+    incorrect true:      0
+    incorrect false:     0
+  unknown:               0
+  Score:                 0 (max: 0)

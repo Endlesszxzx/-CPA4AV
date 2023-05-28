@@ -1,0 +1,3 @@
+./scripts/benchmark.py cpachecker4av-ldv-races.xml --no-container
+./scripts/benchmark.py cpachecker4av-goblint-regression.xml --no-container
+./scripts/benchmark.py cpachecker4av-pthread.xml --no-container

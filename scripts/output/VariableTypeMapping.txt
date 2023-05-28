@@ -1,0 +1,7 @@
+svp_simple_020_001_global_var	6
+svp_simple_020_001_global_para	4
+svp_simple_020_001_main::reader2	6
+svp_simple_020_001_global_flag	6
+svp_simple_020_001_main::svp_simple_020_001_local_var2	4
+svp_simple_020_001_main::svp_simple_020_001_local_var1	4
+svp_simple_020_001_main::reader1	6

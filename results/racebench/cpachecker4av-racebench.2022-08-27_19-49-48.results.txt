@@ -1,0 +1,84 @@
+   BENCHMARK INFORMATION
+benchmark definition:    cpachecker4av-racebench.xml
+name:                    cpachecker4av-racebench
+run sets:                select-points.racebench, all-points.racebench
+date:                    Sat, 2022-08-27 19:49:48 CST
+tool:                    CPAchecker 2.0
+tool executable:         scripts/cpa.sh
+options:                 -heap 4096M -benchmark -timelimit 300s
+parallel runs:           2
+resource limits:
+- memory:                4000.0 MB
+- time:                  300 s
+- cpu cores:             1
+hardware requirements:
+- cpu cores:             1
+- memory:                4000.0 MB
+------------------------------------------------------------
+
+   SYSTEM INFORMATION
+host:                    YangTian
+os:                      Linux-5.15.0-46-generic-x86_64-with-glibc2.29
+cpu:                     Intel Core i7-8700 CPU @ 3.20GHz
+- cores:                 12
+- max frequency:         4600.0 MHz
+- turbo boost enabled:   True
+ram:                     33539.833856 MB
+------------------------------------------------------------
+
+
+
+select-points.racebench
+Run set 1 of 2 with options '-heap 4096M -benchmark -timelimit 300s -config ./config/myAnalysis-concurrent-interrupt-benchmark-racebench.properties' and propertyfile 'None'
+
+inputfile                 status                       cpu time   wall time        host
+---------------------------------------------------------------------------------------
+svp_simple_003_001.yml    true                             5.82        5.84        None
+svp_simple_004_001.yml    true                             2.91        2.92        None
+svp_simple_005_001.yml    true                             3.22        3.24        None
+svp_simple_006_001.yml    true                             3.57        3.58        None
+svp_simple_015_001.yml    true                             2.89        2.90        None
+svp_simple_016_001.yml    true                             2.83        2.84        None
+svp_simple_017_001.yml    true                             3.61        3.62        None
+svp_simple_021_001.yml    true                             3.10        3.12        None
+svp_simple_022_001.yml    true                             3.11        3.12        None
+svp_simple_023_001.yml    true                             2.75        2.76        None
+svp_simple_026_001.yml    true                             2.74        2.75        None
+svp_simple_027_001.yml    true                             2.73        2.73        None
+svp_simple_028_001.yml    true                             2.75        2.77        None
+svp_simple_030_001.yml    true                             2.67        2.67        None
+---------------------------------------------------------------------------------------
+Run set 1                 done                            44.85       24.57           -
+
+
+all-points.racebench
+Run set 2 of 2 with options '-heap 4096M -benchmark -timelimit 300s -config ./config/myAnalysis-concurrent-interrupt-benchmark-racebench-all-points.properties' and propertyfile 'None'
+
+inputfile                 status                       cpu time   wall time        host
+---------------------------------------------------------------------------------------
+svp_simple_003_001.yml    TIMEOUT                        301.01      301.02        None
+svp_simple_004_001.yml    true                             4.90        4.90        None
+svp_simple_005_001.yml    TIMEOUT                        301.01      301.02        None
+svp_simple_006_001.yml    true                            51.13       51.14        None
+svp_simple_015_001.yml    true                             2.99        3.00        None
+svp_simple_016_001.yml    true                             2.97        2.97        None
+svp_simple_017_001.yml    true                             4.26        4.27        None
+svp_simple_021_001.yml    true                             4.92        4.94        None
+svp_simple_022_001.yml    true                             6.45        6.46        None
+svp_simple_023_001.yml    true                             2.98        2.99        None
+svp_simple_026_001.yml    true                             4.13        4.14        None
+svp_simple_027_001.yml    true                             3.95        3.95        None
+svp_simple_028_001.yml    true                             3.73        3.75        None
+svp_simple_030_001.yml    true                             4.84        4.86        None
+---------------------------------------------------------------------------------------
+Run set 2                 done                           699.43      352.60           -
+
+Statistics:             28 Files
+  correct:               0
+    correct true:        0
+    correct false:       0
+  incorrect:             0
+    incorrect true:      0
+    incorrect false:     0
+  unknown:               2
+  Score:                 0 (max: 0)

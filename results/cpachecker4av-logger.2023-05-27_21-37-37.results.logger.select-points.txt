@@ -1,0 +1,26 @@
+   BENCHMARK INFORMATION
+benchmark definition:    cpachecker4av-logger.xml
+name:                    cpachecker4av-logger
+run sets:                logger.select-points
+date:                    Sat, 2023-05-27 21:37:37 PDT
+tool:                    CPAchecker 2.0
+tool executable:         scripts/cpa.sh
+options:                 -heap 40960000M -benchmark -timelimit 3000000000s
+resource limits:
+- memory:                20000.0 MB
+- time:                  114000 s
+- cpu cores:             1
+hardware requirements:
+- cpu cores:             1
+- memory:                20000.0 MB
+------------------------------------------------------------
+
+   SYSTEM INFORMATION
+host:                    ubuntu
+os:                      Linux-5.4.0-84-generic-x86_64-with-Ubuntu-18.04-bionic
+cpu:                     Intel Core i7-6700K CPU @ 4.00GHz
+- cores:                 2
+- max frequency:         4008.0 MHz
+ram:                     18974.94528 MB
+------------------------------------------------------------
+

@@ -1,0 +1,68 @@
+   BENCHMARK INFORMATION
+benchmark definition:    cpachecker4av-logger.xml
+name:                    cpachecker4av-logger
+run sets:                logger.select-points
+date:                    Sat, 2023-05-27 20:42:03 PDT
+tool:                    CPAchecker 2.0
+tool executable:         scripts/cpa.sh
+options:                 -heap 4096000M -benchmark -timelimit 3000000000s
+resource limits:
+- memory:                16000.0 MB
+- time:                  10800 s
+- cpu cores:             1
+hardware requirements:
+- cpu cores:             1
+- memory:                16000.0 MB
+------------------------------------------------------------
+
+   SYSTEM INFORMATION
+host:                    ubuntu
+os:                      Linux-5.4.0-84-generic-x86_64-with-Ubuntu-18.04-bionic
+cpu:                     Intel Core i7-6700K CPU @ 4.00GHz
+- cores:                 2
+- max frequency:         4008.0 MHz
+ram:                     18974.94528 MB
+------------------------------------------------------------
+
+
+
+logger.select-points
+Run set 1 of 1 with options '-heap 4096000M -benchmark -timelimit 3000000000s' and propertyfile 'None'
+
+inputfile                 status                       cpu time   wall time        host
+---------------------------------------------------------------------------------------
+svp_simple_001_001.yml    true                             4.20        4.26        None
+svp_simple_002_001.yml    true                             4.04        4.10        None
+svp_simple_003_001.yml    true                             9.38        9.43        None
+svp_simple_004_001.yml    true                             5.47        5.52        None
+svp_simple_005_001.yml    OUT OF MEMORY                  356.99      357.64        None
+svp_simple_006_001.yml    OUT OF MEMORY                  538.33      538.94        None
+svp_simple_007_001.yml    true                            13.24       13.40        None
+svp_simple_008_001.yml    true                            37.33       37.40        None
+svp_simple_009_001.yml    true                          1366.50     1367.87        None
+svp_simple_010_001.yml    true                             4.56        4.60        None
+svp_simple_011_001.yml    true                             5.13        5.16        None
+svp_simple_012_001.yml    true                             5.97        6.01        None
+svp_simple_013_001.yml    true                             6.77        6.82        None
+svp_simple_014_001.yml    true                            17.54       17.59        None
+svp_simple_015_001.yml    true                            25.15       25.21        None
+svp_simple_016_001.yml    true                             3.83        3.85        None
+svp_simple_017_001.yml    true                             4.61        4.65        None
+svp_simple_018_001.yml    true                             4.74        4.78        None
+svp_simple_019_001.yml    true                             3.56        3.59        None
+svp_simple_020_001.yml    true                             3.63        3.67        None
+svp_simple_021_001.yml    true                             5.32        5.35        None
+svp_simple_022_001.yml    true                             4.65        4.67        None
+svp_simple_023_001.yml    true                            19.02       19.04        None
+---------------------------------------------------------------------------------------
+Run set 1                 done                          2450.03     2457.10           -
+
+Statistics:             23 Files
+  correct:               0
+    correct true:        0
+    correct false:       0
+  incorrect:             0
+    incorrect true:      0
+    incorrect false:     0
+  unknown:               2
+  Score:                 0 (max: 0)

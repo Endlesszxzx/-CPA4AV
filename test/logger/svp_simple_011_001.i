@@ -1,62 +1,82 @@
 # 1 "svp_simple_011_001.c"
 # 1 "<built-in>"
 # 1 "<command-line>"
+# 31 "<command-line>"
+# 1 "/usr/include/stdc-predef.h" 1 3 4
+# 32 "<command-line>" 2
 # 1 "svp_simple_011_001.c"
 # 77 "svp_simple_011_001.c"
-# 1 "f:\\softmax\\mingw\\include\\assert.h" 1 3
-# 18 "f:\\softmax\\mingw\\include\\assert.h" 3
-# 1 "f:\\softmax\\mingw\\include\\_mingw.h" 1 3
-# 55 "f:\\softmax\\mingw\\include\\_mingw.h" 3
-       
-# 56 "f:\\softmax\\mingw\\include\\_mingw.h" 3
-# 66 "f:\\softmax\\mingw\\include\\_mingw.h" 3
-# 1 "f:\\softmax\\mingw\\include\\msvcrtver.h" 1 3
-# 35 "f:\\softmax\\mingw\\include\\msvcrtver.h" 3
-       
-# 36 "f:\\softmax\\mingw\\include\\msvcrtver.h" 3
-# 67 "f:\\softmax\\mingw\\include\\_mingw.h" 2 3
+# 1 "/usr/include/assert.h" 1 3 4
+# 35 "/usr/include/assert.h" 3 4
+# 1 "/usr/include/features.h" 1 3 4
+# 461 "/usr/include/features.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/sys/cdefs.h" 1 3 4
+# 452 "/usr/include/x86_64-linux-gnu/sys/cdefs.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/wordsize.h" 1 3 4
+# 453 "/usr/include/x86_64-linux-gnu/sys/cdefs.h" 2 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/long-double.h" 1 3 4
+# 454 "/usr/include/x86_64-linux-gnu/sys/cdefs.h" 2 3 4
+# 462 "/usr/include/features.h" 2 3 4
+# 485 "/usr/include/features.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/gnu/stubs.h" 1 3 4
+# 10 "/usr/include/x86_64-linux-gnu/gnu/stubs.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/gnu/stubs-64.h" 1 3 4
+# 11 "/usr/include/x86_64-linux-gnu/gnu/stubs.h" 2 3 4
+# 486 "/usr/include/features.h" 2 3 4
+# 36 "/usr/include/assert.h" 2 3 4
+# 66 "/usr/include/assert.h" 3 4
 
 
 
 
+# 69 "/usr/include/assert.h" 3 4
+extern void __assert_fail (const char *__assertion, const char *__file,
+      unsigned int __line, const char *__function)
+     __attribute__ ((__nothrow__ , __leaf__)) __attribute__ ((__noreturn__));
 
 
-# 1 "f:\\softmax\\mingw\\include\\w32api.h" 1 3
-# 35 "f:\\softmax\\mingw\\include\\w32api.h" 3
-       
-# 36 "f:\\softmax\\mingw\\include\\w32api.h" 3
-# 59 "f:\\softmax\\mingw\\include\\w32api.h" 3
-# 1 "f:\\softmax\\mingw\\include\\sdkddkver.h" 1 3
-# 35 "f:\\softmax\\mingw\\include\\sdkddkver.h" 3
-       
-# 36 "f:\\softmax\\mingw\\include\\sdkddkver.h" 3
-# 60 "f:\\softmax\\mingw\\include\\w32api.h" 2 3
-# 74 "f:\\softmax\\mingw\\include\\_mingw.h" 2 3
-# 174 "f:\\softmax\\mingw\\include\\_mingw.h" 3
-# 1 "f:\\softmax\\mingw\\include\\features.h" 1 3
-# 39 "f:\\softmax\\mingw\\include\\features.h" 3
-       
-# 40 "f:\\softmax\\mingw\\include\\features.h" 3
-# 175 "f:\\softmax\\mingw\\include\\_mingw.h" 2 3
-# 19 "f:\\softmax\\mingw\\include\\assert.h" 2 3
-# 38 "f:\\softmax\\mingw\\include\\assert.h" 3
- 
-# 38 "f:\\softmax\\mingw\\include\\assert.h" 3
-       void __attribute__((__cdecl__)) __attribute__((__nothrow__)) _assert (const char*, const char*, int) __attribute__((__noreturn__));
+extern void __assert_perror_fail (int __errnum, const char *__file,
+      unsigned int __line, const char *__function)
+     __attribute__ ((__nothrow__ , __leaf__)) __attribute__ ((__noreturn__));
+
+
+
+
+extern void __assert (const char *__assertion, const char *__file, int __line)
+     __attribute__ ((__nothrow__ , __leaf__)) __attribute__ ((__noreturn__));
+
+
+
 # 78 "svp_simple_011_001.c" 2
-# 1 "f:\\softmax\\mingw\\lib\\gcc\\mingw32\\9.2.0\\include\\stdbool.h" 1 3 4
+# 1 "/usr/lib/gcc/x86_64-linux-gnu/9/include/stdbool.h" 1 3 4
 # 79 "svp_simple_011_001.c" 2
-# 1 "f:\\softmax\\mingw\\include\\errno.h" 1 3
-# 34 "f:\\softmax\\mingw\\include\\errno.h" 3
-       
-# 35 "f:\\softmax\\mingw\\include\\errno.h" 3
-# 138 "f:\\softmax\\mingw\\include\\errno.h" 3
-
-# 147 "f:\\softmax\\mingw\\include\\errno.h" 3
- int* __attribute__((__cdecl__)) __attribute__((__nothrow__)) _errno(void);
-
+# 1 "/usr/include/errno.h" 1 3 4
+# 28 "/usr/include/errno.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/errno.h" 1 3 4
+# 26 "/usr/include/x86_64-linux-gnu/bits/errno.h" 3 4
+# 1 "/usr/include/linux/errno.h" 1 3 4
+# 1 "/usr/include/x86_64-linux-gnu/asm/errno.h" 1 3 4
+# 1 "/usr/include/asm-generic/errno.h" 1 3 4
 
 
+
+
+# 1 "/usr/include/asm-generic/errno-base.h" 1 3 4
+# 6 "/usr/include/asm-generic/errno.h" 2 3 4
+# 1 "/usr/include/x86_64-linux-gnu/asm/errno.h" 2 3 4
+# 1 "/usr/include/linux/errno.h" 2 3 4
+# 27 "/usr/include/x86_64-linux-gnu/bits/errno.h" 2 3 4
+# 29 "/usr/include/errno.h" 2 3 4
+
+
+
+
+
+
+
+
+extern int *__errno_location (void) __attribute__ ((__nothrow__ , __leaf__)) __attribute__ ((__const__));
+# 52 "/usr/include/errno.h" 3 4
 
 # 80 "svp_simple_011_001.c" 2
 # 105 "svp_simple_011_001.c"
@@ -156,7 +176,7 @@ int tco_timer_set_heartbeat (int t)
 
  if (tmrval > 0x3f || tmrval < 0x04)
   return -
-# 274 "svp_simple_011_001.c" 3
+# 274 "svp_simple_011_001.c" 3 4
          22
 # 274 "svp_simple_011_001.c"
                ;
@@ -185,7 +205,7 @@ int tco_timer_set_heartbeat (int t)
 
  if ((val & 0x3f) != tmrval)
   return -
-# 287 "svp_simple_011_001.c" 3
+# 287 "svp_simple_011_001.c" 3 4
          22
 # 287 "svp_simple_011_001.c"
                ;

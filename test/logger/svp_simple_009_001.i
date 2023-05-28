@@ -2036,27 +2036,39 @@ int cnt1, cnt2, cnt3, cnt4, cnt5, cnt6, cnt7, cnt8;
 # 280 "svp_simple_009_001.c"
 void req1(void) {
 
-    req3();
 
-    req4();
+
+
 
     req6();
 
-        irq = 0;
-        { global_id = 1; global_dev = 1; };
+    irq = 0;
+    { global_id = 1; global_dev = 1; };
+    global_id = 1;
+    global_dev = 1;
 
-        { global_id = -1; global_dev = -1; };
-        cnt1++;
+    if (global_dev != 1) {
+    }
+    if (irq > -1) {
+        if (global_id != 1) {
+        }
+    }
+
+    global_id = -1;
+    global_dev = -1;
+    cnt1++;
 
 }
 
 void req2(void) {
 
-        irq = 0;
-        { global_id = 2; global_dev = 2; };
+    irq = 0;
 
-        { global_id = -1; global_dev = -1; };
-        cnt2++;
+    global_id = 2;
+    global_dev = 2;
+
+
+    cnt2++;
 
 }
 
@@ -2064,21 +2076,23 @@ void req3(void) {
 
 
 
-        irq = 0;
-        { global_id = 3; global_dev = 3; };
+    irq = 0;
 
-        { global_id = -1; global_dev = -1; };
-        cnt3++;
+    global_id = 3;
+    global_dev = 3;
+
+
+    cnt3++;
 
 }
 
 void req4(void) {
 
-        irq = 0;
-        { global_id = 4; global_dev = 4; };
+    irq = 0;
+    { global_id = 4; global_dev = 4; };
 
-        { global_id = -1; global_dev = -1; };
-        cnt4++;
+    { global_id = -1; global_dev = -1; };
+    cnt4++;
 
 }
 
@@ -2086,18 +2100,28 @@ void req5_isr(void) {
 
 
 
-        irq = 0;
-        { global_id = 5; global_dev = 5; };
+    irq = 0;
+    { global_id = 5; global_dev = 5; };
+    global_id = 5;
+    global_dev = 5;
 
-        { global_id = -1; global_dev = -1; };
-        cnt5++;
+    if (global_dev != 2) {
+    }
+    if (irq > -1) {
+        if (global_id != 2) {
+        }
+    }
+    { global_id = -1; global_dev = -1; };
+    global_id = -1;
+    global_dev = -1;
+    cnt5++;
 
 }
 
 void req6(void) {
 
-        irq = -1;
-        cnt6++;
+    irq = -1;
+    cnt6++;
 
 }
 
@@ -2105,32 +2129,37 @@ void req7_isr(void) {
 
 
 
-        irq = 0;
-        { global_id = 7; global_dev = 7; };
+    irq = 0;
 
-        { global_id = -1; global_dev = -1; };
-        cnt7++;
+    global_id = 7;
+    global_dev = 7;
+
+    if (global_dev != 7) {
+    }
+
+    cnt7++;
 
 }
 
 void req8_isr(void) {
 
-        irq = 0;
-        { global_id = 8; global_dev = 8; };
-        if (global_dev != 8) { } if (irq > -1) { if (global_id != 8) { } };
-        { global_id = -1; global_dev = -1; };
-        cnt8++;
+    irq = 0;
+    { global_id = 8; global_dev = 8; };
+    global_id = 8;
+    global_dev = 8;
+
+
+    cnt8++;
 
 }
 
-int svp_simple_009_001_main(void)
-{
+int svp_simple_009_001_main(void) {
 
 
     req1();
 
     req2();
-# 387 "svp_simple_009_001.c"
+# 416 "svp_simple_009_001.c"
     return 0;
 
 }

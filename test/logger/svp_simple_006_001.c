@@ -358,7 +358,7 @@ void task_RR_Wheel_isr(void ) {
     // //rtb_to_int = rt_roundd_snf(brake_acc_nodiv_ctrl_U_In_RRRotation);
 	// rtb_to_int = brake_acc_nodiv_ctrl_U_In_RRRotation;
 
-    // bool rtb_RelationalOperator;
+    bool rtb_RelationalOperator;
     // int rtb_vms;
     // int u;
     // rtb_vms = brake_acc_nodiv_ctrl_P_ABS_RR_Wheel_vms_Gain + brake_acc_nodiv_ctrl_B_local_RT4;

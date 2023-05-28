@@ -242,12 +242,12 @@ void task_compute_isr(void ) {
 
         test = 0;
 
-        // Distribution_idx = brake_acc_nodiv_ctrl_P_Distribution_Gain1 +
-        //     brake_acc_nodiv_ctrl_B_local_RT14;
-        // Distribution_idx_0 = brake_acc_nodiv_ctrl_P_Distribution_Gain2 +
-        //     brake_acc_nodiv_ctrl_B_local_RT14;
-        // Distribution_idx_1 = brake_acc_nodiv_ctrl_P_Distribution_Gain3 +
-        //     brake_acc_nodiv_ctrl_B_local_RT14;
+        Distribution_idx = brake_acc_nodiv_ctrl_P_Distribution_Gain1 +
+            brake_acc_nodiv_ctrl_B_local_RT14;
+        Distribution_idx_0 = brake_acc_nodiv_ctrl_P_Distribution_Gain2 +
+            brake_acc_nodiv_ctrl_B_local_RT14;
+        Distribution_idx_1 = brake_acc_nodiv_ctrl_P_Distribution_Gain3 +
+            brake_acc_nodiv_ctrl_B_local_RT14;
 
         // vkmh = RT9+RT10;
         // vkmh = vkmh + RT11;
@@ -260,11 +260,11 @@ void task_compute_isr(void ) {
         test++;
 
 
-        if (test != 0) {
+        // if (test != 0) {
 
-        }
-        if (test != 1) {
-        }
+        // }
+        // if (test != 1) {
+        // }
 
       
         RT_Buffer0 = brake_acc_nodiv_ctrl_P_Distribution_Gain0 + brake_acc_nodiv_ctrl_B_local_RT14;
@@ -305,26 +305,26 @@ void task_RR_Wheel_isr(void ) {
 
         brake_acc_nodiv_ctrl_B_local_RT4 = RT4_Buffer0;
 
-        // rtb_to_int = brake_acc_nodiv_ctrl_U_In_RRRotation;
+        rtb_to_int = brake_acc_nodiv_ctrl_U_In_RRRotation;
 
         bool rtb_RelationalOperator;
         int rtb_vms;
         int u;
         rtb_vms = brake_acc_nodiv_ctrl_P_ABS_RR_Wheel_vms_Gain + brake_acc_nodiv_ctrl_B_local_RT4;
 
-        // u = rtb_vms + brake_acc_nodiv_ctrl_P_ABS_RR_Wheel_wheSpdms_Gain;
-        // u = u + rtb_to_int;
+        u = rtb_vms + brake_acc_nodiv_ctrl_P_ABS_RR_Wheel_wheSpdms_Gain;
+        u = u + rtb_to_int;
 
-        // int positive_UpperSat_local = brake_acc_nodiv_ctrl_P_ABS_RR_Wheel_positive_UpperSat;
+        int positive_UpperSat_local = brake_acc_nodiv_ctrl_P_ABS_RR_Wheel_positive_UpperSat;
 
-        // if (u >= positive_UpperSat_local) {
-        //     u = brake_acc_nodiv_ctrl_P_ABS_RR_Wheel_positive_UpperSat;
-        // } else {
-        //     int positive_LowerSat_local = brake_acc_nodiv_ctrl_P_ABS_RR_Wheel_positive_LowerSat;
-        //     if (u <= positive_LowerSat_local) {
-        //         u = brake_acc_nodiv_ctrl_P_ABS_RR_Wheel_positive_LowerSat;
-        //     }
-        // }
+        if (u >= positive_UpperSat_local) {
+            u = brake_acc_nodiv_ctrl_P_ABS_RR_Wheel_positive_UpperSat;
+        } else {
+            int positive_LowerSat_local = brake_acc_nodiv_ctrl_P_ABS_RR_Wheel_positive_LowerSat;
+            if (u <= positive_LowerSat_local) {
+                u = brake_acc_nodiv_ctrl_P_ABS_RR_Wheel_positive_LowerSat;
+            }
+        }
 
         // int tmp0 = brake_acc_nodiv_ctrl_P_ABS_RR_Wheel_times_10_Gain;
 
@@ -426,23 +426,23 @@ void task_FL_Wheel_isr(void) {
 
     // }
 
-    // int In_BrakePedal;
+    int In_BrakePedal;
     // if (rtb_RelationalOperator) {
-    //     In_BrakePedal = brake_acc_nodiv_ctrl_U_In_BrakePedal;
+        In_BrakePedal = brake_acc_nodiv_ctrl_U_In_BrakePedal;
     // } else {
     //     In_BrakePedal = brake_acc_nodiv_ctrl_U_In_BrakePedal + 50;
     // }
-    // int Pedal_map_UpperSat = brake_acc_nodiv_ctrl_P_Pedal_map_UpperSat;
-    // int Pedal_map_LowerSat = brake_acc_nodiv_ctrl_P_Pedal_map_LowerSat;
+    int Pedal_map_UpperSat = brake_acc_nodiv_ctrl_P_Pedal_map_UpperSat;
+    int Pedal_map_LowerSat = brake_acc_nodiv_ctrl_P_Pedal_map_LowerSat;
     int tmp;
-    // if (In_BrakePedal >= Pedal_map_UpperSat) {
+    if (In_BrakePedal >= Pedal_map_UpperSat) {
         tmp = brake_acc_nodiv_ctrl_P_Pedal_map_UpperSat;
-    // } 
-    // if (In_BrakePedal <= Pedal_map_LowerSat) {
-    //     tmp = brake_acc_nodiv_ctrl_P_Pedal_map_LowerSat;
-    // } else {
-    //     tmp = brake_acc_nodiv_ctrl_U_In_BrakePedal;
-    // }
+    } 
+    if (In_BrakePedal <= Pedal_map_LowerSat) {
+        tmp = brake_acc_nodiv_ctrl_P_Pedal_map_LowerSat;
+    } else {
+        tmp = brake_acc_nodiv_ctrl_U_In_BrakePedal;
+    }
 
     RT14 = brake_acc_nodiv_ctrl_P_Gain1_Gain + tmp;
 

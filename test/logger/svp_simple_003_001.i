@@ -1,470 +1,751 @@
 # 1 "svp_simple_003_001.c"
 # 1 "<built-in>"
 # 1 "<command-line>"
+# 31 "<command-line>"
+# 1 "/usr/include/stdc-predef.h" 1 3 4
+# 32 "<command-line>" 2
 # 1 "svp_simple_003_001.c"
 
-# 1 "f:\\softmax\\mingw\\include\\stdio.h" 1 3
-# 38 "f:\\softmax\\mingw\\include\\stdio.h" 3
-       
-# 39 "f:\\softmax\\mingw\\include\\stdio.h" 3
-# 55 "f:\\softmax\\mingw\\include\\stdio.h" 3
-# 1 "f:\\softmax\\mingw\\include\\_mingw.h" 1 3
-# 55 "f:\\softmax\\mingw\\include\\_mingw.h" 3
-       
-# 56 "f:\\softmax\\mingw\\include\\_mingw.h" 3
-# 66 "f:\\softmax\\mingw\\include\\_mingw.h" 3
-# 1 "f:\\softmax\\mingw\\include\\msvcrtver.h" 1 3
-# 35 "f:\\softmax\\mingw\\include\\msvcrtver.h" 3
-       
-# 36 "f:\\softmax\\mingw\\include\\msvcrtver.h" 3
-# 67 "f:\\softmax\\mingw\\include\\_mingw.h" 2 3
+# 1 "/usr/include/stdio.h" 1 3 4
+# 27 "/usr/include/stdio.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/libc-header-start.h" 1 3 4
+# 33 "/usr/include/x86_64-linux-gnu/bits/libc-header-start.h" 3 4
+# 1 "/usr/include/features.h" 1 3 4
+# 461 "/usr/include/features.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/sys/cdefs.h" 1 3 4
+# 452 "/usr/include/x86_64-linux-gnu/sys/cdefs.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/wordsize.h" 1 3 4
+# 453 "/usr/include/x86_64-linux-gnu/sys/cdefs.h" 2 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/long-double.h" 1 3 4
+# 454 "/usr/include/x86_64-linux-gnu/sys/cdefs.h" 2 3 4
+# 462 "/usr/include/features.h" 2 3 4
+# 485 "/usr/include/features.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/gnu/stubs.h" 1 3 4
+# 10 "/usr/include/x86_64-linux-gnu/gnu/stubs.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/gnu/stubs-64.h" 1 3 4
+# 11 "/usr/include/x86_64-linux-gnu/gnu/stubs.h" 2 3 4
+# 486 "/usr/include/features.h" 2 3 4
+# 34 "/usr/include/x86_64-linux-gnu/bits/libc-header-start.h" 2 3 4
+# 28 "/usr/include/stdio.h" 2 3 4
 
 
 
 
 
+# 1 "/usr/lib/gcc/x86_64-linux-gnu/9/include/stddef.h" 1 3 4
+# 209 "/usr/lib/gcc/x86_64-linux-gnu/9/include/stddef.h" 3 4
 
-# 1 "f:\\softmax\\mingw\\include\\w32api.h" 1 3
-# 35 "f:\\softmax\\mingw\\include\\w32api.h" 3
-       
-# 36 "f:\\softmax\\mingw\\include\\w32api.h" 3
-# 59 "f:\\softmax\\mingw\\include\\w32api.h" 3
-# 1 "f:\\softmax\\mingw\\include\\sdkddkver.h" 1 3
-# 35 "f:\\softmax\\mingw\\include\\sdkddkver.h" 3
-       
-# 36 "f:\\softmax\\mingw\\include\\sdkddkver.h" 3
-# 60 "f:\\softmax\\mingw\\include\\w32api.h" 2 3
-# 74 "f:\\softmax\\mingw\\include\\_mingw.h" 2 3
-# 174 "f:\\softmax\\mingw\\include\\_mingw.h" 3
-# 1 "f:\\softmax\\mingw\\include\\features.h" 1 3
-# 39 "f:\\softmax\\mingw\\include\\features.h" 3
-       
-# 40 "f:\\softmax\\mingw\\include\\features.h" 3
-# 175 "f:\\softmax\\mingw\\include\\_mingw.h" 2 3
-# 56 "f:\\softmax\\mingw\\include\\stdio.h" 2 3
-# 68 "f:\\softmax\\mingw\\include\\stdio.h" 3
-# 1 "f:\\softmax\\mingw\\lib\\gcc\\mingw32\\9.2.0\\include\\stddef.h" 1 3 4
-# 209 "f:\\softmax\\mingw\\lib\\gcc\\mingw32\\9.2.0\\include\\stddef.h" 3 4
-
-# 209 "f:\\softmax\\mingw\\lib\\gcc\\mingw32\\9.2.0\\include\\stddef.h" 3 4
-typedef unsigned int size_t;
-# 321 "f:\\softmax\\mingw\\lib\\gcc\\mingw32\\9.2.0\\include\\stddef.h" 3 4
-typedef short unsigned int wchar_t;
-# 350 "f:\\softmax\\mingw\\lib\\gcc\\mingw32\\9.2.0\\include\\stddef.h" 3 4
-typedef short unsigned int wint_t;
-# 69 "f:\\softmax\\mingw\\include\\stdio.h" 2 3
-# 95 "f:\\softmax\\mingw\\include\\stdio.h" 3
-# 1 "f:\\softmax\\mingw\\include\\sys/types.h" 1 3
-# 34 "f:\\softmax\\mingw\\include\\sys/types.h" 3
-       
-# 35 "f:\\softmax\\mingw\\include\\sys/types.h" 3
-# 62 "f:\\softmax\\mingw\\include\\sys/types.h" 3
-  typedef long __off32_t;
+# 209 "/usr/lib/gcc/x86_64-linux-gnu/9/include/stddef.h" 3 4
+typedef long unsigned int size_t;
+# 34 "/usr/include/stdio.h" 2 3 4
 
 
-
-
-  typedef __off32_t _off_t;
-
-
-
-
-
-
-
-  typedef _off_t off_t;
-# 91 "f:\\softmax\\mingw\\include\\sys/types.h" 3
-  typedef long long __off64_t;
-
-
-
-
-
-
-  typedef __off64_t off64_t;
-# 115 "f:\\softmax\\mingw\\include\\sys/types.h" 3
-  typedef int _ssize_t;
-
-
-
-
-
-
-
-  typedef _ssize_t ssize_t;
-# 96 "f:\\softmax\\mingw\\include\\stdio.h" 2 3
-
-
-
-
-
-
-# 1 "f:\\softmax\\mingw\\lib\\gcc\\mingw32\\9.2.0\\include\\stdarg.h" 1 3 4
-# 40 "f:\\softmax\\mingw\\lib\\gcc\\mingw32\\9.2.0\\include\\stdarg.h" 3 4
+# 1 "/usr/lib/gcc/x86_64-linux-gnu/9/include/stdarg.h" 1 3 4
+# 40 "/usr/lib/gcc/x86_64-linux-gnu/9/include/stdarg.h" 3 4
 typedef __builtin_va_list __gnuc_va_list;
-# 103 "f:\\softmax\\mingw\\include\\stdio.h" 2 3
-# 210 "f:\\softmax\\mingw\\include\\stdio.h" 3
-typedef struct _iobuf
+# 37 "/usr/include/stdio.h" 2 3 4
+
+# 1 "/usr/include/x86_64-linux-gnu/bits/types.h" 1 3 4
+# 27 "/usr/include/x86_64-linux-gnu/bits/types.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/wordsize.h" 1 3 4
+# 28 "/usr/include/x86_64-linux-gnu/bits/types.h" 2 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/timesize.h" 1 3 4
+# 29 "/usr/include/x86_64-linux-gnu/bits/types.h" 2 3 4
+
+
+typedef unsigned char __u_char;
+typedef unsigned short int __u_short;
+typedef unsigned int __u_int;
+typedef unsigned long int __u_long;
+
+
+typedef signed char __int8_t;
+typedef unsigned char __uint8_t;
+typedef signed short int __int16_t;
+typedef unsigned short int __uint16_t;
+typedef signed int __int32_t;
+typedef unsigned int __uint32_t;
+
+typedef signed long int __int64_t;
+typedef unsigned long int __uint64_t;
+
+
+
+
+
+
+typedef __int8_t __int_least8_t;
+typedef __uint8_t __uint_least8_t;
+typedef __int16_t __int_least16_t;
+typedef __uint16_t __uint_least16_t;
+typedef __int32_t __int_least32_t;
+typedef __uint32_t __uint_least32_t;
+typedef __int64_t __int_least64_t;
+typedef __uint64_t __uint_least64_t;
+
+
+
+typedef long int __quad_t;
+typedef unsigned long int __u_quad_t;
+
+
+
+
+
+
+
+typedef long int __intmax_t;
+typedef unsigned long int __uintmax_t;
+# 141 "/usr/include/x86_64-linux-gnu/bits/types.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/typesizes.h" 1 3 4
+# 142 "/usr/include/x86_64-linux-gnu/bits/types.h" 2 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/time64.h" 1 3 4
+# 143 "/usr/include/x86_64-linux-gnu/bits/types.h" 2 3 4
+
+
+typedef unsigned long int __dev_t;
+typedef unsigned int __uid_t;
+typedef unsigned int __gid_t;
+typedef unsigned long int __ino_t;
+typedef unsigned long int __ino64_t;
+typedef unsigned int __mode_t;
+typedef unsigned long int __nlink_t;
+typedef long int __off_t;
+typedef long int __off64_t;
+typedef int __pid_t;
+typedef struct { int __val[2]; } __fsid_t;
+typedef long int __clock_t;
+typedef unsigned long int __rlim_t;
+typedef unsigned long int __rlim64_t;
+typedef unsigned int __id_t;
+typedef long int __time_t;
+typedef unsigned int __useconds_t;
+typedef long int __suseconds_t;
+
+typedef int __daddr_t;
+typedef int __key_t;
+
+
+typedef int __clockid_t;
+
+
+typedef void * __timer_t;
+
+
+typedef long int __blksize_t;
+
+
+
+
+typedef long int __blkcnt_t;
+typedef long int __blkcnt64_t;
+
+
+typedef unsigned long int __fsblkcnt_t;
+typedef unsigned long int __fsblkcnt64_t;
+
+
+typedef unsigned long int __fsfilcnt_t;
+typedef unsigned long int __fsfilcnt64_t;
+
+
+typedef long int __fsword_t;
+
+typedef long int __ssize_t;
+
+
+typedef long int __syscall_slong_t;
+
+typedef unsigned long int __syscall_ulong_t;
+
+
+
+typedef __off64_t __loff_t;
+typedef char *__caddr_t;
+
+
+typedef long int __intptr_t;
+
+
+typedef unsigned int __socklen_t;
+
+
+
+
+typedef int __sig_atomic_t;
+# 39 "/usr/include/stdio.h" 2 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h" 1 3 4
+
+
+
+
+# 1 "/usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h" 1 3 4
+# 13 "/usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h" 3 4
+typedef struct
 {
-  char *_ptr;
-  int _cnt;
-  char *_base;
-  int _flag;
-  int _file;
-  int _charbuf;
-  int _bufsiz;
-  char *_tmpfname;
-} FILE;
-# 239 "f:\\softmax\\mingw\\include\\stdio.h" 3
-extern __attribute__((__dllimport__)) FILE _iob[];
-# 252 "f:\\softmax\\mingw\\include\\stdio.h" 3
+  int __count;
+  union
+  {
+    unsigned int __wch;
+    char __wchb[4];
+  } __value;
+} __mbstate_t;
+# 6 "/usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h" 2 3 4
 
 
 
 
-
-
-
-
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) FILE * fopen (const char *, const char *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) FILE * freopen (const char *, const char *, FILE *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int fflush (FILE *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int fclose (FILE *);
-
-
-
-
-
-
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int remove (const char *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int rename (const char *, const char *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) FILE * tmpfile (void);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) char * tmpnam (char *);
-
-
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) char *_tempnam (const char *, const char *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int _rmtmp (void);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int _unlink (const char *);
-# 289 "f:\\softmax\\mingw\\include\\stdio.h" 3
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) char * tempnam (const char *, const char *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int rmtmp (void);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int unlink (const char *);
-
-
-
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int setvbuf (FILE *, char *, int, size_t);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) void setbuf (FILE *, char *);
-# 342 "f:\\softmax\\mingw\\include\\stdio.h" 3
-extern int __attribute__((__cdecl__)) __attribute__((__nothrow__)) __attribute__((__format__(__mingw_printf__,2,3))) __mingw_fprintf(FILE*, const char*, ...);
-extern int __attribute__((__cdecl__)) __attribute__((__nothrow__)) __attribute__((__format__(__mingw_printf__,1,2))) __mingw_printf(const char*, ...);
-extern int __attribute__((__cdecl__)) __attribute__((__nothrow__)) __attribute__((__format__(__mingw_printf__,2,3))) __mingw_sprintf(char*, const char*, ...);
-extern int __attribute__((__cdecl__)) __attribute__((__nothrow__)) __attribute__((__format__(__mingw_printf__,3,4))) __mingw_snprintf(char*, size_t, const char*, ...);
-extern int __attribute__((__cdecl__)) __attribute__((__nothrow__)) __attribute__((__format__(__mingw_printf__,2,0))) __mingw_vfprintf(FILE*, const char*, __builtin_va_list);
-extern int __attribute__((__cdecl__)) __attribute__((__nothrow__)) __attribute__((__format__(__mingw_printf__,1,0))) __mingw_vprintf(const char*, __builtin_va_list);
-extern int __attribute__((__cdecl__)) __attribute__((__nothrow__)) __attribute__((__format__(__mingw_printf__,2,0))) __mingw_vsprintf(char*, const char*, __builtin_va_list);
-extern int __attribute__((__cdecl__)) __attribute__((__nothrow__)) __attribute__((__format__(__mingw_printf__,3,0))) __mingw_vsnprintf(char*, size_t, const char*, __builtin_va_list);
-# 376 "f:\\softmax\\mingw\\include\\stdio.h" 3
-extern unsigned int _mingw_output_format_control( unsigned int, unsigned int );
-# 461 "f:\\softmax\\mingw\\include\\stdio.h" 3
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int fprintf (FILE *, const char *, ...);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int printf (const char *, ...);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int sprintf (char *, const char *, ...);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int vfprintf (FILE *, const char *, __builtin_va_list);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int vprintf (const char *, __builtin_va_list);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int vsprintf (char *, const char *, __builtin_va_list);
-# 479 "f:\\softmax\\mingw\\include\\stdio.h" 3
-static __inline__ __attribute__((__cdecl__)) __attribute__((__nothrow__))
-int snprintf (char *__buf, size_t __len, const char *__format, ...)
+typedef struct _G_fpos_t
 {
-  register int __retval;
-  __builtin_va_list __local_argv; __builtin_va_start( __local_argv, __format );
-  __retval = __mingw_vsnprintf( __buf, __len, __format, __local_argv );
-  __builtin_va_end( __local_argv );
-  return __retval;
-}
-
-static __inline__ __attribute__((__cdecl__)) __attribute__((__nothrow__))
-int vsnprintf (char *__buf, size_t __len, const char *__format, __builtin_va_list __local_argv)
+  __off_t __pos;
+  __mbstate_t __state;
+} __fpos_t;
+# 40 "/usr/include/stdio.h" 2 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h" 1 3 4
+# 10 "/usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h" 3 4
+typedef struct _G_fpos64_t
 {
-  return __mingw_vsnprintf( __buf, __len, __format, __local_argv );
-}
-# 513 "f:\\softmax\\mingw\\include\\stdio.h" 3
- int __attribute__((__cdecl__)) __attribute__((__nothrow__)) __attribute__((__format__(__ms_printf__,2,3))) __msvcrt_fprintf(FILE *, const char *, ...);
- int __attribute__((__cdecl__)) __attribute__((__nothrow__)) __attribute__((__format__(__ms_printf__,1,2))) __msvcrt_printf(const char *, ...);
- int __attribute__((__cdecl__)) __attribute__((__nothrow__)) __attribute__((__format__(__ms_printf__,2,3))) __msvcrt_sprintf(char *, const char *, ...);
- int __attribute__((__cdecl__)) __attribute__((__nothrow__)) __attribute__((__format__(__ms_printf__,2,0))) __msvcrt_vfprintf(FILE *, const char *, __builtin_va_list);
- int __attribute__((__cdecl__)) __attribute__((__nothrow__)) __attribute__((__format__(__ms_printf__,1,0))) __msvcrt_vprintf(const char *, __builtin_va_list);
- int __attribute__((__cdecl__)) __attribute__((__nothrow__)) __attribute__((__format__(__ms_printf__,2,0))) __msvcrt_vsprintf(char *, const char *, __builtin_va_list);
+  __off64_t __pos;
+  __mbstate_t __state;
+} __fpos64_t;
+# 41 "/usr/include/stdio.h" 2 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/types/__FILE.h" 1 3 4
+
+
+
+struct _IO_FILE;
+typedef struct _IO_FILE __FILE;
+# 42 "/usr/include/stdio.h" 2 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/types/FILE.h" 1 3 4
+
+
+
+struct _IO_FILE;
+
+
+typedef struct _IO_FILE FILE;
+# 43 "/usr/include/stdio.h" 2 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h" 1 3 4
+# 35 "/usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h" 3 4
+struct _IO_FILE;
+struct _IO_marker;
+struct _IO_codecvt;
+struct _IO_wide_data;
+
+
+
+
+typedef void _IO_lock_t;
 
 
 
 
 
-
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int _snprintf (char *, size_t, const char *, ...);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int _vsnprintf (char *, size_t, const char *, __builtin_va_list);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int _vscprintf (const char *, __builtin_va_list);
-# 536 "f:\\softmax\\mingw\\include\\stdio.h" 3
-__attribute__((__cdecl__)) __attribute__((__nothrow__)) __attribute__((__format__(__mingw_printf__,3,4)))
-int snprintf (char *, size_t, const char *, ...);
-
-__attribute__((__cdecl__)) __attribute__((__nothrow__)) __attribute__((__format__(__mingw_printf__,3,0)))
-int vsnprintf (char *, size_t, const char *, __builtin_va_list);
-
-__attribute__((__cdecl__)) __attribute__((__nothrow__))
-int vscanf (const char * __restrict__, __builtin_va_list);
-
-__attribute__((__cdecl__)) __attribute__((__nothrow__))
-int vfscanf (FILE * __restrict__, const char * __restrict__, __builtin_va_list);
-
-__attribute__((__cdecl__)) __attribute__((__nothrow__))
-int vsscanf (const char * __restrict__, const char * __restrict__, __builtin_va_list);
-# 679 "f:\\softmax\\mingw\\include\\stdio.h" 3
-__attribute__((__cdecl__)) __attribute__((__nothrow__)) ssize_t
-getdelim (char ** __restrict__, size_t * __restrict__, int, FILE * __restrict__);
-
-__attribute__((__cdecl__)) __attribute__((__nothrow__)) ssize_t
-getline (char ** __restrict__, size_t * __restrict__, FILE * __restrict__);
-# 699 "f:\\softmax\\mingw\\include\\stdio.h" 3
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int fscanf (FILE *, const char *, ...);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int scanf (const char *, ...);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int sscanf (const char *, const char *, ...);
-
-
-
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int fgetc (FILE *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) char * fgets (char *, int, FILE *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int fputc (int, FILE *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int fputs (const char *, FILE *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) char * gets (char *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int puts (const char *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int ungetc (int, FILE *);
-# 720 "f:\\softmax\\mingw\\include\\stdio.h" 3
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int _filbuf (FILE *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int _flsbuf (int, FILE *);
-
-
-
-extern inline __attribute__((__gnu_inline__)) __attribute__((__cdecl__)) __attribute__((__nothrow__)) int getc (FILE *);
-extern inline __attribute__((__gnu_inline__)) __attribute__((__cdecl__)) __attribute__((__nothrow__)) int getc (FILE * __F)
+struct _IO_FILE
 {
-  return (--__F->_cnt >= 0)
-    ? (int) (unsigned char) *__F->_ptr++
-    : _filbuf (__F);
-}
+  int _flags;
 
-extern inline __attribute__((__gnu_inline__)) __attribute__((__cdecl__)) __attribute__((__nothrow__)) int putc (int, FILE *);
-extern inline __attribute__((__gnu_inline__)) __attribute__((__cdecl__)) __attribute__((__nothrow__)) int putc (int __c, FILE * __F)
-{
-  return (--__F->_cnt >= 0)
-    ? (int) (unsigned char) (*__F->_ptr++ = (char)__c)
-    : _flsbuf (__c, __F);
-}
 
-extern inline __attribute__((__gnu_inline__)) __attribute__((__cdecl__)) __attribute__((__nothrow__)) int getchar (void);
-extern inline __attribute__((__gnu_inline__)) __attribute__((__cdecl__)) __attribute__((__nothrow__)) int getchar (void)
-{
-  return (--(&_iob[0])->_cnt >= 0)
-    ? (int) (unsigned char) *(&_iob[0])->_ptr++
-    : _filbuf ((&_iob[0]));
-}
+  char *_IO_read_ptr;
+  char *_IO_read_end;
+  char *_IO_read_base;
+  char *_IO_write_base;
+  char *_IO_write_ptr;
+  char *_IO_write_end;
+  char *_IO_buf_base;
+  char *_IO_buf_end;
 
-extern inline __attribute__((__gnu_inline__)) __attribute__((__cdecl__)) __attribute__((__nothrow__)) int putchar(int);
-extern inline __attribute__((__gnu_inline__)) __attribute__((__cdecl__)) __attribute__((__nothrow__)) int putchar(int __c)
-{
-  return (--(&_iob[1])->_cnt >= 0)
-    ? (int) (unsigned char) (*(&_iob[1])->_ptr++ = (char)__c)
-    : _flsbuf (__c, (&_iob[1]));}
-# 767 "f:\\softmax\\mingw\\include\\stdio.h" 3
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) size_t fread (void *, size_t, size_t, FILE *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) size_t fwrite (const void *, size_t, size_t, FILE *);
 
+  char *_IO_save_base;
+  char *_IO_backup_base;
+  char *_IO_save_end;
 
+  struct _IO_marker *_markers;
 
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int fseek (FILE *, long, int);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) long ftell (FILE *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) void rewind (FILE *);
-# 821 "f:\\softmax\\mingw\\include\\stdio.h" 3
-typedef union { long long __value; __off64_t __offset; } fpos_t;
+  struct _IO_FILE *_chain;
 
+  int _fileno;
+  int _flags2;
+  __off_t _old_offset;
 
 
+  unsigned short _cur_column;
+  signed char _vtable_offset;
+  char _shortbuf[1];
 
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int fgetpos (FILE *, fpos_t *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int fsetpos (FILE *, const fpos_t *);
-# 862 "f:\\softmax\\mingw\\include\\stdio.h" 3
-int __attribute__((__cdecl__)) __attribute__((__nothrow__)) __mingw_fseeki64 (FILE *, long long, int);
-extern inline __attribute__((__gnu_inline__)) __attribute__((__always_inline__)) __attribute__((__cdecl__)) __attribute__((__nothrow__)) int _fseeki64 (FILE *__f, long long __o, int __w)
-{ return __mingw_fseeki64 (__f, __o, __w); }
+  _IO_lock_t *_lock;
 
 
-long long __attribute__((__cdecl__)) __attribute__((__nothrow__)) __mingw_ftelli64 (FILE *);
-extern inline __attribute__((__gnu_inline__)) __attribute__((__always_inline__)) __attribute__((__cdecl__)) long long __attribute__((__nothrow__)) _ftelli64 (FILE *__file )
-{ return __mingw_ftelli64 (__file); }
 
 
 
 
 
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int feof (FILE *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int ferror (FILE *);
-# 886 "f:\\softmax\\mingw\\include\\stdio.h" 3
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) void clearerr (FILE *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) void perror (const char *);
+  __off64_t _offset;
 
+  struct _IO_codecvt *_codecvt;
+  struct _IO_wide_data *_wide_data;
+  struct _IO_FILE *_freeres_list;
+  void *_freeres_buf;
+  size_t __pad5;
+  int _mode;
 
+  char _unused2[15 * sizeof (int) - 4 * sizeof (void *) - sizeof (size_t)];
+};
+# 44 "/usr/include/stdio.h" 2 3 4
+# 52 "/usr/include/stdio.h" 3 4
+typedef __gnuc_va_list va_list;
+# 63 "/usr/include/stdio.h" 3 4
+typedef __off_t off_t;
+# 77 "/usr/include/stdio.h" 3 4
+typedef __ssize_t ssize_t;
 
 
 
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) FILE * _popen (const char *, const char *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int _pclose (FILE *);
 
 
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) FILE * popen (const char *, const char *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int pclose (FILE *);
 
+typedef __fpos_t fpos_t;
+# 133 "/usr/include/stdio.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/stdio_lim.h" 1 3 4
+# 134 "/usr/include/stdio.h" 2 3 4
 
 
 
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int _flushall (void);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int _fgetchar (void);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int _fputchar (int);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) FILE * _fdopen (int, const char *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int _fileno (FILE *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int _fcloseall (void);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) FILE * _fsopen (const char *, const char *, int);
+extern FILE *stdin;
+extern FILE *stdout;
+extern FILE *stderr;
 
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int _getmaxstdio (void);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int _setmaxstdio (int);
-# 936 "f:\\softmax\\mingw\\include\\stdio.h" 3
-unsigned int __attribute__((__cdecl__)) __mingw_get_output_format (void);
-unsigned int __attribute__((__cdecl__)) __mingw_set_output_format (unsigned int);
 
 
 
 
 
+extern int remove (const char *__filename) __attribute__ ((__nothrow__ , __leaf__));
 
+extern int rename (const char *__old, const char *__new) __attribute__ ((__nothrow__ , __leaf__));
 
-int __attribute__((__cdecl__)) __mingw_get_printf_count_output (void);
-int __attribute__((__cdecl__)) __mingw_set_printf_count_output (int);
-# 962 "f:\\softmax\\mingw\\include\\stdio.h" 3
-extern inline __attribute__((__gnu_inline__)) __attribute__((__always_inline__)) unsigned int __attribute__((__cdecl__)) _get_output_format (void)
-{ return __mingw_get_output_format (); }
 
-extern inline __attribute__((__gnu_inline__)) __attribute__((__always_inline__)) unsigned int __attribute__((__cdecl__)) _set_output_format (unsigned int __style)
-{ return __mingw_set_output_format (__style); }
-# 987 "f:\\softmax\\mingw\\include\\stdio.h" 3
-extern inline __attribute__((__gnu_inline__)) __attribute__((__always_inline__)) int __attribute__((__cdecl__)) _get_printf_count_output (void)
-{ return 0 ? 1 : __mingw_get_printf_count_output (); }
 
-extern inline __attribute__((__gnu_inline__)) __attribute__((__always_inline__)) int __attribute__((__cdecl__)) _set_printf_count_output (int __mode)
-{ return 0 ? 1 : __mingw_set_printf_count_output (__mode); }
+extern int renameat (int __oldfd, const char *__old, int __newfd,
+       const char *__new) __attribute__ ((__nothrow__ , __leaf__));
+# 173 "/usr/include/stdio.h" 3 4
+extern FILE *tmpfile (void) ;
+# 187 "/usr/include/stdio.h" 3 4
+extern char *tmpnam (char *__s) __attribute__ ((__nothrow__ , __leaf__)) ;
 
 
 
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int fgetchar (void);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int fputchar (int);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) FILE * fdopen (int, const char *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int fileno (FILE *);
-# 1007 "f:\\softmax\\mingw\\include\\stdio.h" 3
-extern inline __attribute__((__gnu_inline__)) __attribute__((__always_inline__)) FILE * __attribute__((__cdecl__)) __attribute__((__nothrow__)) fopen64 (const char *, const char *);
-extern inline __attribute__((__gnu_inline__)) __attribute__((__always_inline__))
-FILE * __attribute__((__cdecl__)) __attribute__((__nothrow__)) fopen64 (const char * filename, const char * mode)
-{ return fopen (filename, mode); }
 
-int __attribute__((__cdecl__)) __attribute__((__nothrow__)) fseeko64 (FILE *, __off64_t, int);
-# 1028 "f:\\softmax\\mingw\\include\\stdio.h" 3
-__off64_t __attribute__((__cdecl__)) __attribute__((__nothrow__)) ftello64 (FILE *);
-# 1041 "f:\\softmax\\mingw\\include\\stdio.h" 3
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int fwprintf (FILE *, const wchar_t *, ...);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int wprintf (const wchar_t *, ...);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int vfwprintf (FILE *, const wchar_t *, __builtin_va_list);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int vwprintf (const wchar_t *, __builtin_va_list);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int _snwprintf (wchar_t *, size_t, const wchar_t *, ...);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int _vscwprintf (const wchar_t *, __builtin_va_list);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int _vsnwprintf (wchar_t *, size_t, const wchar_t *, __builtin_va_list);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int fwscanf (FILE *, const wchar_t *, ...);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int wscanf (const wchar_t *, ...);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int swscanf (const wchar_t *, const wchar_t *, ...);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) wint_t fgetwc (FILE *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) wint_t fputwc (wchar_t, FILE *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) wint_t ungetwc (wchar_t, FILE *);
+extern char *tmpnam_r (char *__s) __attribute__ ((__nothrow__ , __leaf__)) ;
+# 204 "/usr/include/stdio.h" 3 4
+extern char *tempnam (const char *__dir, const char *__pfx)
+     __attribute__ ((__nothrow__ , __leaf__)) __attribute__ ((__malloc__)) ;
 
 
 
 
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int swprintf (wchar_t *, const wchar_t *, ...);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int vswprintf (wchar_t *, const wchar_t *, __builtin_va_list);
 
 
 
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) wchar_t * fgetws (wchar_t *, int, FILE *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int fputws (const wchar_t *, FILE *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) wint_t getwc (FILE *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) wint_t getwchar (void);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) wint_t putwc (wint_t, FILE *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) wint_t putwchar (wint_t);
+extern int fclose (FILE *__stream);
 
 
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) wchar_t * _getws (wchar_t *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int _putws (const wchar_t *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) FILE * _wfdopen(int, const wchar_t *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) FILE * _wfopen (const wchar_t *, const wchar_t *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) FILE * _wfreopen (const wchar_t *, const wchar_t *, FILE *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) FILE * _wfsopen (const wchar_t *, const wchar_t *, int);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) wchar_t * _wtmpnam (wchar_t *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) wchar_t * _wtempnam (const wchar_t *, const wchar_t *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int _wrename (const wchar_t *, const wchar_t *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int _wremove (const wchar_t *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) void _wperror (const wchar_t *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) FILE * _wpopen (const wchar_t *, const wchar_t *);
 
 
+extern int fflush (FILE *__stream);
+# 227 "/usr/include/stdio.h" 3 4
+extern int fflush_unlocked (FILE *__stream);
+# 246 "/usr/include/stdio.h" 3 4
+extern FILE *fopen (const char *__restrict __filename,
+      const char *__restrict __modes) ;
 
 
 
 
-__attribute__((__cdecl__)) __attribute__((__nothrow__)) int snwprintf (wchar_t *, size_t, const wchar_t *, ...);
-__attribute__((__cdecl__)) __attribute__((__nothrow__)) int vsnwprintf (wchar_t *, size_t, const wchar_t *, __builtin_va_list);
-# 1099 "f:\\softmax\\mingw\\include\\stdio.h" 3
-__attribute__((__cdecl__)) __attribute__((__nothrow__)) int vwscanf (const wchar_t *__restrict__, __builtin_va_list);
-__attribute__((__cdecl__)) __attribute__((__nothrow__))
-int vfwscanf (FILE *__restrict__, const wchar_t *__restrict__, __builtin_va_list);
-__attribute__((__cdecl__)) __attribute__((__nothrow__))
-int vswscanf (const wchar_t *__restrict__, const wchar_t * __restrict__, __builtin_va_list);
+extern FILE *freopen (const char *__restrict __filename,
+        const char *__restrict __modes,
+        FILE *__restrict __stream) ;
+# 279 "/usr/include/stdio.h" 3 4
+extern FILE *fdopen (int __fd, const char *__modes) __attribute__ ((__nothrow__ , __leaf__)) ;
+# 292 "/usr/include/stdio.h" 3 4
+extern FILE *fmemopen (void *__s, size_t __len, const char *__modes)
+  __attribute__ ((__nothrow__ , __leaf__)) ;
 
 
 
 
+extern FILE *open_memstream (char **__bufloc, size_t *__sizeloc) __attribute__ ((__nothrow__ , __leaf__)) ;
 
 
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) FILE * wpopen (const wchar_t *, const wchar_t *);
 
 
 
+extern void setbuf (FILE *__restrict __stream, char *__restrict __buf) __attribute__ ((__nothrow__ , __leaf__));
 
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) wint_t _fgetwchar (void);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) wint_t _fputwchar (wint_t);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int _getw (FILE *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int _putw (int, FILE *);
 
 
+extern int setvbuf (FILE *__restrict __stream, char *__restrict __buf,
+      int __modes, size_t __n) __attribute__ ((__nothrow__ , __leaf__));
 
 
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) wint_t fgetwchar (void);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) wint_t fputwchar (wint_t);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int getw (FILE *);
- __attribute__((__cdecl__)) __attribute__((__nothrow__)) int putw (int, FILE *);
 
 
+extern void setbuffer (FILE *__restrict __stream, char *__restrict __buf,
+         size_t __size) __attribute__ ((__nothrow__ , __leaf__));
 
 
+extern void setlinebuf (FILE *__stream) __attribute__ ((__nothrow__ , __leaf__));
+
+
+
+
+
+
+
+extern int fprintf (FILE *__restrict __stream,
+      const char *__restrict __format, ...);
+
+
+
+
+extern int printf (const char *__restrict __format, ...);
+
+extern int sprintf (char *__restrict __s,
+      const char *__restrict __format, ...) __attribute__ ((__nothrow__));
+
+
+
+
+
+extern int vfprintf (FILE *__restrict __s, const char *__restrict __format,
+       __gnuc_va_list __arg);
+
+
+
+
+extern int vprintf (const char *__restrict __format, __gnuc_va_list __arg);
+
+extern int vsprintf (char *__restrict __s, const char *__restrict __format,
+       __gnuc_va_list __arg) __attribute__ ((__nothrow__));
+
+
+
+extern int snprintf (char *__restrict __s, size_t __maxlen,
+       const char *__restrict __format, ...)
+     __attribute__ ((__nothrow__)) __attribute__ ((__format__ (__printf__, 3, 4)));
+
+extern int vsnprintf (char *__restrict __s, size_t __maxlen,
+        const char *__restrict __format, __gnuc_va_list __arg)
+     __attribute__ ((__nothrow__)) __attribute__ ((__format__ (__printf__, 3, 0)));
+# 379 "/usr/include/stdio.h" 3 4
+extern int vdprintf (int __fd, const char *__restrict __fmt,
+       __gnuc_va_list __arg)
+     __attribute__ ((__format__ (__printf__, 2, 0)));
+extern int dprintf (int __fd, const char *__restrict __fmt, ...)
+     __attribute__ ((__format__ (__printf__, 2, 3)));
+
+
+
+
+
+
+
+extern int fscanf (FILE *__restrict __stream,
+     const char *__restrict __format, ...) ;
+
+
+
+
+extern int scanf (const char *__restrict __format, ...) ;
+
+extern int sscanf (const char *__restrict __s,
+     const char *__restrict __format, ...) __attribute__ ((__nothrow__ , __leaf__));
+
+
+
+
+
+
+extern int fscanf (FILE *__restrict __stream, const char *__restrict __format, ...) __asm__ ("" "__isoc99_fscanf")
+
+                               ;
+extern int scanf (const char *__restrict __format, ...) __asm__ ("" "__isoc99_scanf")
+                              ;
+extern int sscanf (const char *__restrict __s, const char *__restrict __format, ...) __asm__ ("" "__isoc99_sscanf") __attribute__ ((__nothrow__ , __leaf__))
+
+                      ;
+# 432 "/usr/include/stdio.h" 3 4
+extern int vfscanf (FILE *__restrict __s, const char *__restrict __format,
+      __gnuc_va_list __arg)
+     __attribute__ ((__format__ (__scanf__, 2, 0))) ;
+
+
+
+
+
+extern int vscanf (const char *__restrict __format, __gnuc_va_list __arg)
+     __attribute__ ((__format__ (__scanf__, 1, 0))) ;
+
+
+extern int vsscanf (const char *__restrict __s,
+      const char *__restrict __format, __gnuc_va_list __arg)
+     __attribute__ ((__nothrow__ , __leaf__)) __attribute__ ((__format__ (__scanf__, 2, 0)));
+
+
+
+
+extern int vfscanf (FILE *__restrict __s, const char *__restrict __format, __gnuc_va_list __arg) __asm__ ("" "__isoc99_vfscanf")
+
+
+
+     __attribute__ ((__format__ (__scanf__, 2, 0))) ;
+extern int vscanf (const char *__restrict __format, __gnuc_va_list __arg) __asm__ ("" "__isoc99_vscanf")
+
+     __attribute__ ((__format__ (__scanf__, 1, 0))) ;
+extern int vsscanf (const char *__restrict __s, const char *__restrict __format, __gnuc_va_list __arg) __asm__ ("" "__isoc99_vsscanf") __attribute__ ((__nothrow__ , __leaf__))
+
+
+
+     __attribute__ ((__format__ (__scanf__, 2, 0)));
+# 485 "/usr/include/stdio.h" 3 4
+extern int fgetc (FILE *__stream);
+extern int getc (FILE *__stream);
+
+
+
+
+
+extern int getchar (void);
+
+
+
+
+
+
+extern int getc_unlocked (FILE *__stream);
+extern int getchar_unlocked (void);
+# 510 "/usr/include/stdio.h" 3 4
+extern int fgetc_unlocked (FILE *__stream);
+# 521 "/usr/include/stdio.h" 3 4
+extern int fputc (int __c, FILE *__stream);
+extern int putc (int __c, FILE *__stream);
+
+
+
+
+
+extern int putchar (int __c);
+# 537 "/usr/include/stdio.h" 3 4
+extern int fputc_unlocked (int __c, FILE *__stream);
+
+
+
+
+
+
+
+extern int putc_unlocked (int __c, FILE *__stream);
+extern int putchar_unlocked (int __c);
+
+
+
+
+
+
+extern int getw (FILE *__stream);
+
+
+extern int putw (int __w, FILE *__stream);
+
+
+
+
+
+
+
+extern char *fgets (char *__restrict __s, int __n, FILE *__restrict __stream)
+     ;
+# 603 "/usr/include/stdio.h" 3 4
+extern __ssize_t __getdelim (char **__restrict __lineptr,
+                             size_t *__restrict __n, int __delimiter,
+                             FILE *__restrict __stream) ;
+extern __ssize_t getdelim (char **__restrict __lineptr,
+                           size_t *__restrict __n, int __delimiter,
+                           FILE *__restrict __stream) ;
+
+
+
+
+
+
+
+extern __ssize_t getline (char **__restrict __lineptr,
+                          size_t *__restrict __n,
+                          FILE *__restrict __stream) ;
+
+
+
+
+
+
+
+extern int fputs (const char *__restrict __s, FILE *__restrict __stream);
+
+
+
+
+
+extern int puts (const char *__s);
+
+
+
+
+
+
+extern int ungetc (int __c, FILE *__stream);
+
+
+
+
+
+
+extern size_t fread (void *__restrict __ptr, size_t __size,
+       size_t __n, FILE *__restrict __stream) ;
+
+
+
+
+extern size_t fwrite (const void *__restrict __ptr, size_t __size,
+        size_t __n, FILE *__restrict __s);
+# 673 "/usr/include/stdio.h" 3 4
+extern size_t fread_unlocked (void *__restrict __ptr, size_t __size,
+         size_t __n, FILE *__restrict __stream) ;
+extern size_t fwrite_unlocked (const void *__restrict __ptr, size_t __size,
+          size_t __n, FILE *__restrict __stream);
+
+
+
+
+
+
+
+extern int fseek (FILE *__stream, long int __off, int __whence);
+
+
+
+
+extern long int ftell (FILE *__stream) ;
+
+
+
+
+extern void rewind (FILE *__stream);
+# 707 "/usr/include/stdio.h" 3 4
+extern int fseeko (FILE *__stream, __off_t __off, int __whence);
+
+
+
+
+extern __off_t ftello (FILE *__stream) ;
+# 731 "/usr/include/stdio.h" 3 4
+extern int fgetpos (FILE *__restrict __stream, fpos_t *__restrict __pos);
+
+
+
+
+extern int fsetpos (FILE *__stream, const fpos_t *__pos);
+# 757 "/usr/include/stdio.h" 3 4
+extern void clearerr (FILE *__stream) __attribute__ ((__nothrow__ , __leaf__));
+
+extern int feof (FILE *__stream) __attribute__ ((__nothrow__ , __leaf__)) ;
+
+extern int ferror (FILE *__stream) __attribute__ ((__nothrow__ , __leaf__)) ;
+
+
+
+extern void clearerr_unlocked (FILE *__stream) __attribute__ ((__nothrow__ , __leaf__));
+extern int feof_unlocked (FILE *__stream) __attribute__ ((__nothrow__ , __leaf__)) ;
+extern int ferror_unlocked (FILE *__stream) __attribute__ ((__nothrow__ , __leaf__)) ;
+
+
+
+
+
+
+
+extern void perror (const char *__s);
+
+
+
+
+
+# 1 "/usr/include/x86_64-linux-gnu/bits/sys_errlist.h" 1 3 4
+# 26 "/usr/include/x86_64-linux-gnu/bits/sys_errlist.h" 3 4
+extern int sys_nerr;
+extern const char *const sys_errlist[];
+# 782 "/usr/include/stdio.h" 2 3 4
+
+
+
+
+extern int fileno (FILE *__stream) __attribute__ ((__nothrow__ , __leaf__)) ;
+
+
+
+
+extern int fileno_unlocked (FILE *__stream) __attribute__ ((__nothrow__ , __leaf__)) ;
+# 800 "/usr/include/stdio.h" 3 4
+extern FILE *popen (const char *__command, const char *__modes) ;
+
+
+
+
+
+extern int pclose (FILE *__stream);
+
+
+
+
+
+extern char *ctermid (char *__s) __attribute__ ((__nothrow__ , __leaf__));
+# 840 "/usr/include/stdio.h" 3 4
+extern void flockfile (FILE *__stream) __attribute__ ((__nothrow__ , __leaf__));
+
+
+
+extern int ftrylockfile (FILE *__stream) __attribute__ ((__nothrow__ , __leaf__)) ;
+
+
+extern void funlockfile (FILE *__stream) __attribute__ ((__nothrow__ , __leaf__));
+# 858 "/usr/include/stdio.h" 3 4
+extern int __uflow (FILE *);
+extern int __overflow (FILE *, int);
+# 873 "/usr/include/stdio.h" 3 4
 
 # 3 "svp_simple_003_001.c" 2
-# 1 "f:\\softmax\\mingw\\include\\assert.h" 1 3
-# 38 "f:\\softmax\\mingw\\include\\assert.h" 3
- void __attribute__((__cdecl__)) __attribute__((__nothrow__)) _assert (const char*, const char*, int) __attribute__((__noreturn__));
+# 1 "/usr/include/assert.h" 1 3 4
+# 66 "/usr/include/assert.h" 3 4
+
+
+
+extern void __assert_fail (const char *__assertion, const char *__file,
+      unsigned int __line, const char *__function)
+     __attribute__ ((__nothrow__ , __leaf__)) __attribute__ ((__noreturn__));
+
+
+extern void __assert_perror_fail (int __errnum, const char *__file,
+      unsigned int __line, const char *__function)
+     __attribute__ ((__nothrow__ , __leaf__)) __attribute__ ((__noreturn__));
+
+
+
+
+extern void __assert (const char *__assertion, const char *__file, int __line)
+     __attribute__ ((__nothrow__ , __leaf__)) __attribute__ ((__noreturn__));
+
+
+
 # 4 "svp_simple_003_001.c" 2
 
 

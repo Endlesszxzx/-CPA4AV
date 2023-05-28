@@ -1,0 +1,68 @@
+   BENCHMARK INFORMATION
+benchmark definition:    cpachecker4av-logger.xml
+name:                    cpachecker4av-logger
+run sets:                logger.select-points
+date:                    Sun, 2023-05-28 10:41:20 CST
+tool:                    CPAchecker 2.0
+tool executable:         scripts/cpa.sh
+options:                 -heap 4096000M -benchmark -timelimit 3000000000s
+resource limits:
+- memory:                16000.0 MB
+- time:                  10800 s
+- cpu cores:             1
+hardware requirements:
+- cpu cores:             1
+- memory:                16000.0 MB
+------------------------------------------------------------
+
+   SYSTEM INFORMATION
+host:                    DESKTOP-HNM95CR
+os:                      Linux-5.15.90.1-microsoft-standard-WSL2-x86_64-with-Ubuntu-18.04-bionic
+cpu:                     AMD Ryzen 7 5800H with Radeon Graphics
+- cores:                 16
+- max frequency:         3193.915 MHz
+ram:                     8252.583935999999 MB
+------------------------------------------------------------
+
+
+
+logger.select-points
+Run set 1 of 1 with options '-heap 4096000M -benchmark -timelimit 3000000000s' and propertyfile 'None'
+
+inputfile                 status                       cpu time   wall time        host
+---------------------------------------------------------------------------------------
+svp_simple_001_001.yml    true                             4.13        4.43        None
+svp_simple_002_001.yml    true                             3.23        3.23        None
+svp_simple_003_001.yml    true                             7.54        7.55        None
+svp_simple_004_001.yml    true                             4.39        4.42        None
+svp_simple_005_001.yml    true                            23.71       23.73        None
+svp_simple_006_001.yml    KILLED BY SIGNAL 9             240.69      905.56        None
+svp_simple_007_001.yml    true                             9.31       10.16        None
+svp_simple_008_001.yml    true                            29.58       29.92        None
+svp_simple_009_001.yml    KILLED BY SIGNAL 9             633.94     1514.89        None
+svp_simple_010_001.yml    true                             3.40        3.99        None
+svp_simple_011_001.yml    true                             3.64        3.82        None
+svp_simple_012_001.yml    true                             4.13        4.30        None
+svp_simple_013_001.yml    true                             4.77        4.95        None
+svp_simple_014_001.yml    true                            12.16       12.30        None
+svp_simple_015_001.yml    true                            16.62       16.68        None
+svp_simple_016_001.yml    true                             2.59        2.64        None
+svp_simple_017_001.yml    true                             3.25        3.28        None
+svp_simple_018_001.yml    true                             3.29        3.30        None
+svp_simple_019_001.yml    true                             2.45        2.45        None
+svp_simple_020_001.yml    true                             2.45        2.46        None
+svp_simple_021_001.yml    true                             3.76        3.77        None
+svp_simple_022_001.yml    true                             3.16        3.17        None
+svp_simple_023_001.yml    true                            13.02       13.03        None
+---------------------------------------------------------------------------------------
+Run set 1                 done                          1035.15     2590.50           -
+
+Statistics:             23 Files
+  correct:               0
+    correct true:        0
+    correct false:       0
+  incorrect:             0
+    incorrect true:      0
+    incorrect false:     0
+  unknown:               2
+  Score:                 0 (max: 0)

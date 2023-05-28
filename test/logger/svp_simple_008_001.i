@@ -757,15 +757,25 @@ int global_dev;
 # 268 "svp_simple_008_001.c"
 int cnt1, cnt2, cnt3, cnt4, cnt5, cnt6;
 # 277 "svp_simple_008_001.c"
-void req1(void ) {
+void req1(void) {
 
-    req2();
 
-        irq = 1;
-        { global_id = 1; global_dev = 1; };
 
-        { global_id = -1; global_dev = -1; };
-        cnt1++;
+    irq = 1;
+
+    global_id = 1;
+    global_dev = 1;
+
+    if (global_dev != 1) {
+    }
+    if (irq > -1) {
+        if (global_id != 1) {
+        }
+    }
+
+    global_id = -1;
+    global_dev = -1;
+    cnt1++;
 
 }
 
@@ -773,11 +783,21 @@ void req2(void) {
 
 
 
-        irq = 2;
-        { global_id = 2; global_dev = 2; };
+    irq = 2;
 
-        { global_id = -1; global_dev = -1; };
-        cnt2++;
+    global_id = 2;
+    global_dev = 2;
+
+    if (global_dev != 2) {
+    }
+    if (irq > -1) {
+        if (global_id != 2) {
+        }
+    }
+
+
+
+    cnt2++;
 
 }
 
@@ -785,11 +805,19 @@ void req3_isr(void) {
 
 
 
-        irq = 3;
-        { global_id = 3; global_dev = 3; };
+    irq = 3;
 
-        { global_id = -1; global_dev = -1; };
-        cnt3++;
+    global_id = 3;
+    global_dev = 3;
+
+    if (global_dev != 3) {
+    }
+    if (irq > -1) {
+        if (global_id != 3) {
+        }
+    }
+
+    cnt3++;
 
 }
 
@@ -797,38 +825,47 @@ void req4_isr(void) {
 
 
 
-        irq = 0;
-        { global_id = 4; global_dev = 4; };
+    irq = 0;
 
-        { global_id = -1; global_dev = -1; };
-        cnt4++;
+    global_id = 4;
+    global_dev = 4;
+
+    if (global_dev != 4) {
+    }
+    if (irq > -1) {
+        if (global_id != 4) {
+        }
+    }
+
+    cnt4++;
 
 }
 
 void req5_isr(void) {
 
-        irq = 0;
-        { global_id = 5; global_dev = 5; };
-        if (global_dev != 5) { } if (irq > -1) { if (global_id != 5) { } };
-        { global_id = -1; global_dev = -1; };
-        cnt5++;
+    irq = 0;
+    { global_id = 5; global_dev = 5; };
+    global_id = 5;
+    global_dev = 5;
+
+
+    cnt5++;
 
 }
 
 void req6(void) {
 
-        irq = -1;
-        cnt6++;
+    irq = -1;
+    cnt6++;
 
 }
 
-int svp_simple_008_001_main(void)
-{
+int svp_simple_008_001_main(void) {
 
     req1();
 
     req6();
-# 357 "svp_simple_008_001.c"
+# 394 "svp_simple_008_001.c"
     return 0;
 
 }

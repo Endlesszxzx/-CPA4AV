@@ -1919,17 +1919,7 @@ void task_compute() {
 
 
     brake_acc_nodiv_ctrl_B_local_RT4 = brake_acc_nodiv_ctrl_P_RT4_X0;
-
-
-    brake_acc_nodiv_ctrl_B_local_RT1 = brake_acc_nodiv_ctrl_P_RT1_X0;
-
-
-    brake_acc_nodiv_ctrl_B_local_RT2 = brake_acc_nodiv_ctrl_P_RT2_X0;
-
-
-    brake_acc_nodiv_ctrl_B_local_RT3 = brake_acc_nodiv_ctrl_P_RT3_X0;
-
-
+# 250 "svp_simple_006_001.c"
     test = 0;
 
 
@@ -1946,11 +1936,11 @@ void task_compute() {
         brake_acc_nodiv_ctrl_B_local_RT14;
 # 277 "svp_simple_006_001.c"
     vkmh = RT9+RT10;
-    vkmh = vkmh + RT11;
-    vkmh = vkmh + RT12;
-    vkmh = vkmh + brake_acc_nodiv_ctrl_P_average_rpm_Gain;
-    vkmh = vkmh + brake_acc_nodiv_ctrl_P_wgrads_Gain;
-    vkmh = vkmh + brake_acc_nodiv_ctrl_P_vkmh_Gain;
+
+
+
+
+
 
 
     test++;
@@ -1964,10 +1954,7 @@ void task_compute() {
     if (test != 1) {
 
     }
-# 308 "svp_simple_006_001.c"
-    RT_Buffer0 = brake_acc_nodiv_ctrl_P_Distribution_Gain0 + brake_acc_nodiv_ctrl_B_local_RT14;
-
-
+# 311 "svp_simple_006_001.c"
     RT4_Buffer0 = vkmh;
 
 
@@ -2001,70 +1988,13 @@ void task_RR_Wheel_isr(void ) {
     brake_acc_nodiv_ctrl_B_local_RT4 = brake_acc_nodiv_ctrl_P_RT4_X0;
 
     brake_acc_nodiv_ctrl_B_local_RT1 = brake_acc_nodiv_ctrl_P_RT1_X0;
-
-    brake_acc_nodiv_ctrl_B_local_RT2 = brake_acc_nodiv_ctrl_P_RT2_X0;
-
-    brake_acc_nodiv_ctrl_B_local_RT3 = brake_acc_nodiv_ctrl_P_RT3_X0;
-
-
-
-
-
-    int rtb_to_int;
-
-    brake_acc_nodiv_ctrl_B_local_RT_h = RT_Buffer0;
-
-    brake_acc_nodiv_ctrl_B_local_RT4 = RT4_Buffer0;
-
- rtb_to_int = 10;
-
+# 361 "svp_simple_006_001.c"
     
 # 361 "svp_simple_006_001.c" 3 4
    _Bool 
 # 361 "svp_simple_006_001.c"
         rtb_RelationalOperator;
-    int rtb_vms;
-    int u;
-    rtb_vms = 10 + brake_acc_nodiv_ctrl_B_local_RT4;
-
-    u = rtb_vms + 10;
-    u = u + rtb_to_int;
-
-    int positive_UpperSat_local = 100;
-
-    if (u >= positive_UpperSat_local) {
-        u = 100;
-    } else {
-        int positive_LowerSat_local = 5;
-        if (u <= positive_LowerSat_local) {
-            u = 5;
-        }
-    }
-
-
-
-
-
-
-
-    int tmp0 = 10;
-
-    int tmp1 = 10 + rtb_vms;
-    if (tmp0 > tmp1) {
-        rtb_RelationalOperator = 
-# 390 "svp_simple_006_001.c" 3 4
-                                1
-# 390 "svp_simple_006_001.c"
-                                    ;
-    } else {
-        rtb_RelationalOperator = 
-# 392 "svp_simple_006_001.c" 3 4
-                                0
-# 392 "svp_simple_006_001.c"
-                                     ;
-    }
-
-
+# 396 "svp_simple_006_001.c"
     int Threshold_10kmh_Threshold_local = 100;
     if (brake_acc_nodiv_ctrl_B_local_RT4 >= Threshold_10kmh_Threshold_local) {
 
@@ -2091,14 +2021,7 @@ void task_RR_Wheel_isr(void ) {
 
 
     brake_acc_nodiv_ctrl_B_local_RT1 = RT1_Buffer0;
-
-
-
-
-
-
-    RT9 = rtb_to_int;
-
+# 430 "svp_simple_006_001.c"
 }
 
 void task_FL_Wheel_isr(void ) {
@@ -2123,9 +2046,9 @@ void task_FL_Wheel_isr(void ) {
 
     brake_acc_nodiv_ctrl_B_local_RT1 = brake_acc_nodiv_ctrl_P_RT1_X0;
 
-    brake_acc_nodiv_ctrl_B_local_RT2 = brake_acc_nodiv_ctrl_P_RT2_X0;
 
-    brake_acc_nodiv_ctrl_B_local_RT3 = brake_acc_nodiv_ctrl_P_RT3_X0;
+
+
     int rtb_to_int1;
 
 
@@ -2142,53 +2065,7 @@ void task_FL_Wheel_isr(void ) {
    _Bool 
 # 477 "svp_simple_006_001.c"
         rtb_RelationalOperator;
-    int rtb_vms;
-    int u;
-
-
-    rtb_vms = 10 + brake_acc_nodiv_ctrl_B_local_RT4;
-
-
-
-    u = rtb_vms + 10;
-    u = u + rtb_to_int1;
-
-
-    int positive_UpperSat_local = 100;
-
-    if (u >= positive_UpperSat_local) {
-        u = 100;
-    } else {
-
-        int positive_LowerSat_local = 5;
-        if (u <= positive_LowerSat_local) {
-            u = 5;
-        }
-    }
-
-
-
-
-
-
-
-    int tmp0 = 10;
-    int tmp1 = 10 + rtb_vms;
-    if (tmp0 > tmp1) {
-        rtb_RelationalOperator = 
-# 511 "svp_simple_006_001.c" 3 4
-                                1
-# 511 "svp_simple_006_001.c"
-                                    ;
-    } else {
-        rtb_RelationalOperator = 
-# 513 "svp_simple_006_001.c" 3 4
-                                0
-# 513 "svp_simple_006_001.c"
-                                     ;
-    }
-
-
+# 517 "svp_simple_006_001.c"
     int Threshold_10kmh_Threshold_local = 100;
     if (brake_acc_nodiv_ctrl_B_local_RT4 >= Threshold_10kmh_Threshold_local) {
 
@@ -2207,28 +2084,11 @@ void task_FL_Wheel_isr(void ) {
         brake_acc_nodiv_ctrl_B_local_ABS_FL_Wheel_Threshold_10kmh = brake_acc_nodiv_ctrl_B_local_RT3;
 
     }
-# 544 "svp_simple_006_001.c"
-    int In_BrakePedal;
-    if (rtb_RelationalOperator) {
-        In_BrakePedal = 15;
-    } else {
-        In_BrakePedal = 15 + 50;
-    }
-    int Pedal_map_UpperSat = 50;
-    int Pedal_map_LowerSat = 20;
+# 552 "svp_simple_006_001.c"
     int tmp;
-    if (In_BrakePedal >= Pedal_map_UpperSat) {
+
         tmp = 50;
-    }
-    if (In_BrakePedal <= Pedal_map_LowerSat) {
-        tmp = 20;
-    } else {
-        tmp = 15;
-    }
-
-
-
-
+# 565 "svp_simple_006_001.c"
     RT14 = brake_acc_nodiv_ctrl_P_Gain1_Gain + tmp;
 
     RT12 = rtb_to_int1;
@@ -2254,64 +2114,20 @@ void task_FR_Wheel_isr(void )
 
     brake_acc_nodiv_ctrl_B_local_RT1 = brake_acc_nodiv_ctrl_P_RT1_X0;
 
-    brake_acc_nodiv_ctrl_B_local_RT2 = brake_acc_nodiv_ctrl_P_RT2_X0;
 
-    brake_acc_nodiv_ctrl_B_local_RT3 = brake_acc_nodiv_ctrl_P_RT3_X0;
+
+
 
 
 
     int rtb_to_int_k;
-
-    brake_acc_nodiv_ctrl_B_local_RT4 = RT4_Buffer0;
-
-
-
-
- rtb_to_int_k = 10;
 # 614 "svp_simple_006_001.c"
     
 # 614 "svp_simple_006_001.c" 3 4
    _Bool 
 # 614 "svp_simple_006_001.c"
         rtb_RelationalOperator;
-
-
-    int rtb_vms = 10 + brake_acc_nodiv_ctrl_B_local_RT4;
-
-
-
-    int u = rtb_vms + 10;
-    u = u + rtb_to_int_k;
-
-
-    int positive_UpperSat_local = 100;
-    if (u >= positive_UpperSat_local) {
-        u = 100;
-    } else {
-
-        int positive_LowerSat_local = 5;
-        if (u <= positive_LowerSat_local) {
-            u = 5;
-        }
-    }
-# 643 "svp_simple_006_001.c"
-    int tmp0 = 10;
-    int tmp1 = 10 + rtb_vms;
-    if (tmp0 > tmp1) {
-        rtb_RelationalOperator = 
-# 646 "svp_simple_006_001.c" 3 4
-                                1
-# 646 "svp_simple_006_001.c"
-                                    ;
-    } else {
-        rtb_RelationalOperator = 
-# 648 "svp_simple_006_001.c" 3 4
-                                0
-# 648 "svp_simple_006_001.c"
-                                     ;
-    }
-
-
+# 652 "svp_simple_006_001.c"
     int Threshold_10kmh_Threshold_local = 100;
     if (brake_acc_nodiv_ctrl_B_local_RT4 >= Threshold_10kmh_Threshold_local) {
 

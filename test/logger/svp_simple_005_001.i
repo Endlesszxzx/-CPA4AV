@@ -1922,17 +1922,16 @@ void task_compute_isr(void ) {
 
 
         test = 0;
+
+        Distribution_idx = brake_acc_nodiv_ctrl_P_Distribution_Gain1 +
+            brake_acc_nodiv_ctrl_B_local_RT14;
+        Distribution_idx_0 = brake_acc_nodiv_ctrl_P_Distribution_Gain2 +
+            brake_acc_nodiv_ctrl_B_local_RT14;
+        Distribution_idx_1 = brake_acc_nodiv_ctrl_P_Distribution_Gain3 +
+            brake_acc_nodiv_ctrl_B_local_RT14;
 # 260 "svp_simple_005_001.c"
         test++;
-
-
-        if (test != 0) {
-
-        }
-        if (test != 1) {
-        }
-
-
+# 270 "svp_simple_005_001.c"
         RT_Buffer0 = brake_acc_nodiv_ctrl_P_Distribution_Gain0 + brake_acc_nodiv_ctrl_B_local_RT14;
 
         RT4_Buffer0 = vkmh;
@@ -1971,7 +1970,7 @@ void task_RR_Wheel_isr(void ) {
 
         brake_acc_nodiv_ctrl_B_local_RT4 = RT4_Buffer0;
 
-
+        rtb_to_int = 10;
 
         
 # 310 "svp_simple_005_001.c" 3 4
@@ -1981,6 +1980,20 @@ void task_RR_Wheel_isr(void ) {
         int rtb_vms;
         int u;
         rtb_vms = 10 + brake_acc_nodiv_ctrl_B_local_RT4;
+
+        u = rtb_vms + 10;
+        u = u + rtb_to_int;
+
+        int positive_UpperSat_local = 100;
+
+        if (u >= positive_UpperSat_local) {
+            u = 100;
+        } else {
+            int positive_LowerSat_local = 5;
+            if (u <= positive_LowerSat_local) {
+                u = 5;
+            }
+        }
 # 353 "svp_simple_005_001.c"
         brake_acc_nodiv_ctrl_B_local_RT1 = RT1_Buffer0;
 
@@ -2023,16 +2036,24 @@ void task_FL_Wheel_isr(void) {
 
 
     rtb_vms = 10 + brake_acc_nodiv_ctrl_B_local_RT4;
-# 437 "svp_simple_005_001.c"
+# 429 "svp_simple_005_001.c"
+    int In_BrakePedal;
+
+        In_BrakePedal = 15;
+
+
+
+    int Pedal_map_UpperSat = 50;
+    int Pedal_map_LowerSat = 20;
     int tmp;
-
+    if (In_BrakePedal >= Pedal_map_UpperSat) {
         tmp = 50;
-
-
-
-
-
-
+    }
+    if (In_BrakePedal <= Pedal_map_LowerSat) {
+        tmp = 20;
+    } else {
+        tmp = 15;
+    }
 
     RT14 = brake_acc_nodiv_ctrl_P_Gain1_Gain + tmp;
 

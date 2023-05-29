@@ -1,7 +1,0 @@
-tool	CPAchecker 2.0	CPAchecker 2.0	CPAchecker 2.0	CPAchecker 2.0	CPAchecker 2.0	CPAchecker 2.0	CPAchecker 2.0	CPAchecker 2.0
-run set	all-points.goblint-regression	all-points.goblint-regression	all-points.goblint-regression	all-points.goblint-regression	select-points.goblint-regression	select-points.goblint-regression	select-points.goblint-regression	select-points.goblint-regression
-../test/svcomp-benchmarks/goblint-regression_interrupt/goblint-regression_interrupt/	status	cputime (s)	walltime (s)	memory (MB)	status	cputime (s)	walltime (s)	memory (MB)
-svp_simple_604_001.yml	true	2.602426894	2.615395711036399	109.752320	false(unreach-call)	2.807918843	2.8145227120257914	109.723648
-svp_simple_605_001.yml	true	2.71725631	2.7215123180067167	111.906816	false(unreach-call)	2.758412235	2.762314041960053	110.673920
-svp_simple_606_001.yml	true	2.69861399	2.7063725139014423	109.383680	false(unreach-call)	2.788420291	2.7925564739853144	112.750592
-svp_simple_607_001.yml	true	2.721053943	2.7339174409862608	108.752896	false(unreach-call)	2.635815324	2.649606349063106	109.723648

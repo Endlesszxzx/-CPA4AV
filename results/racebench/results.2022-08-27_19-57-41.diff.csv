@@ -1,5 +1,0 @@
-tool	CPAchecker 2.0	CPAchecker 2.0	CPAchecker 2.0	CPAchecker 2.0	CPAchecker 2.0	CPAchecker 2.0	CPAchecker 2.0	CPAchecker 2.0
-run set	all-points.racebench	all-points.racebench	all-points.racebench	all-points.racebench	select-points.racebench	select-points.racebench	select-points.racebench	select-points.racebench
-../test/racebench/	status	cputime (s)	walltime (s)	memory (MB)	status	cputime (s)	walltime (s)	memory (MB)
-svp_simple_003_001.yml	TIMEOUT	301.007608771	301.0213775850134	336.125952	true	5.824528514	5.84359855693765	157.724672
-svp_simple_005_001.yml	TIMEOUT	301.007378886	301.0150960650062	231.170048	true	3.222325945	3.2354640789562836	127.070208

@@ -1,4 +1,0 @@
-tool	CPAchecker 2.0	CPAchecker 2.0	CPAchecker 2.0	CPAchecker 2.0	CPAchecker 2.0	CPAchecker 2.0	CPAchecker 2.0	CPAchecker 2.0
-run set	all-points.pthread	all-points.pthread	all-points.pthread	all-points.pthread	select-points.pthread	select-points.pthread	select-points.pthread	select-points.pthread
-../test/svcomp-benchmarks/pthread_interrupt/pthread_interrupt/	status	cputime (s)	walltime (s)	memory (MB)	status	cputime (s)	walltime (s)	memory (MB)
-svp_simple_304_001.yml	true	2.745433366	2.76035552599933	105.279488	false(unreach-call)	2.818380322	2.8221808010712266	109.965312

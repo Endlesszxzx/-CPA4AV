@@ -204,7 +204,7 @@ public final class ThreadingIntpTransferRelation extends SingleEdgeTransferRelat
 
 
     public ThreadingIntpTransferRelation(Configuration pConfig, CFA pCfa, LogManager pLogger) throws InvalidConfigurationException {
-        System.out.println("当前选择的策略是"+strategy);
+       // System.out.println("当前选择的策略是"+strategy);
         pConfig.inject(this);
         cfa = pCfa;
         locationCPA = LocationCPA.create(pCfa, pConfig);

@@ -111,15 +111,15 @@ public class RaceNum {
 //                "\n     WWR的冲突有：" + raceWWR +
 //                "\n\033[0m";
         return
-                "\n\033[31m" +
+                "\n" +
                         "=========================== Conflicts checked =============================" +
                         "\nThe total number of conflicts is " + raceNum +
                         "\nRWR conflicts have " + raceRWR +
                         "\nWRW conflicts have " + raceWRW +
                         "\nRWW conflicts have " + raceRWW +
                         "\nWWR conflicts have " + raceWWR +
-                        "\n\033[0m" +
-                        "=========================== 详细状态如下 =============================" +
+                   
+                        "\n=========================== Detail =============================" +
                         "\n raceRWRSet:\n" + raceRWRSet +
                         "\n raceWRWSet:\n" + raceWRWSet +
                         "\n raceRWWSet:\n" + raceRWWSet +

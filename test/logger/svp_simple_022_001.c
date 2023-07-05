@@ -1123,7 +1123,7 @@ int svp_simple_022_001_main(int argc, char *argv[]) {
   pthread_t t1;
   pthread_t t2;
     // __CPROVER_ASYNC_1:
-    closesr3();
+//   closer3();
   // markus: functions in fops are write, open, release, ioctl
   /*
   pthread_create(&t1, NULL, writer1, NULL);

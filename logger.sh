@@ -25,6 +25,7 @@ fi
 config_file=$1
 test_file_dir=$2
 output="racebench-$(date +%y-%m-%d_%H-%M).md"
+logdir=logs
 touch $output
 touch tmp.out
 echo "### $(date)" > $output
@@ -34,6 +35,11 @@ echo "| task-name | RWR | WRW | RWW | WWR | total-bugs| state | total time(ms) |
 echo "| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | " >> $output
 
 # run the ./scripts/cpa.sh for task in 'racebench'
+if [ ! -d ${logdir} ];then
+	echo "making dir ${logdir} ..."
+	mkdir ${logdir}
+fi
+
 for task in $(ls $test_file_dir | grep -E ".*\.i")
 do
 	# m1:RWR, m2:WRW, m3:RWW, m4:WWR
@@ -41,7 +47,10 @@ do
 	task="$test_file_dir/$task"
 	# for line in $lines (attention: 'for' will read content separated by space)
 	# but 'while read' will read content separeted by newline)
-	./scripts/cpa.sh -config $config_file -nolog $task -benchmark -heap 8080M| grep -E "(^[RW][RW][RW])|(explored\ states)|(total\ time)" > tmp.out
+	logf=${task%.*}
+	logf=${logf##*/}
+	./scripts/cpa.sh -config $config_file -nolog $task -benchmark -heap 32768M -timelimit 900s > ${logdir}/${logf}.log 2>&1
+	grep -E "(^[RW][RW][RW])|(explored\ states)|(total\ time)" > tmp.out < ${logdir}/${logf}.log
    	while read line
 	do 
 		flag=$[flag+1] 
